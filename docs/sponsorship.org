@@ -1,0 +1,5 @@
+It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
+
+[[file:images/default-yellow.png]]
+
+[[https://www.buymeacoffee.com/kickingvegas]]

@@ -1,73 +1,123 @@
-* Anju
+*!!! NOTE: THE PROJECT IS WIP !!!*
 
-Anju is a project to re-imagine Emacs mouse interactions with opinionated emphasis on:
+When ready, this package is planned to be distributed on MELPA.
+
+* Anju (안주)
+:PROPERTIES:
+:CUSTOM_ID: anju-안주
+:END:
+
+Anju is a project to align mouse interactions in Emacs with contemporary (circa 2026) expectations. Effort towards this alignment is made in the following areas:
 
 - Context-sensitive menus
-- Avoidance of using the middle mouse button (~<mouse-2>~ )
-- Direct manipulation
+- De-emphasis of middle mouse button usage (binding =<mouse-2>=)
+- Support direct manipulation when possible
+- Re-organization of the main menu bar
 
-In addressing the above concerns, Anju seeks to provide a calmer mouse experience for Emacs.
+The features offered by Anju are opinionated, but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
 
-** Motivations
-
-*** Context Sensitive Menus
-
-Anju takes the opinion that Emacs' default menu configuration over-emphasizes providing choice which often results in long menu selection with many un-actionable items. In contrast, Anju seeks to constrain choice to fine-grained, context sensitive actions.
-
-*** De-emphasis of the Middle Mouse Button
-
-The default mouse bindings for Emacs (as of this writing 30.2) were designed for 3-button mouse hardware used by 90's workstations. Such mice had three buttons that were indistinct as shown in the photo below for a Sun optical mouse.
-
-[[https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sun_optical_mouse.jpg/960px-Sun_optical_mouse.jpg]]
-
-Emacs mouse defaults made the assumption that clicking on the middle button (~<mouse-2>~) was common based on such hardware. This assumption broke with the now-common design of having a scroll-wheel in place of what was a plain hardware button as shown in the image below:
-
-https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg
-
-Today (2026), most GUI applications now only use the scroll-wheel for scroll actions and rarely use the middle button for click actions.
-
-*** Direct Manipulation
-
-Anju seeks to provide mouse-driven [[https://www.nngroup.com/articles/direct-manipulation/][direct manipulation]] workflows for common Emacs activities. This ideal is best illustrated with Emacs window management, where from the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Mode-Line.html][mode line]], a pop-up menu for splitting or swapping windows is made available. 
+Please note that all UI terminology in this document is Emacs-centric and differs from conventional GUI terminology. Refer to [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Frames.html][Frames (GNU Emacs Manual)]] for more detail on this.
 
 * Features
+:PROPERTIES:
+:CUSTOM_ID: features
+:END:
 
-- ~context-menu-mode~ Enhancements
-  - Region support
-  - Omit major mode keymap menu from context menu
-    
-- Mode line enhancements
-
-- Menu bar enhancements
-  - Add bookmarks menu
-  - Reconfigured Help menu
-    
-    
-  
+- Context Menu Enhancements
+  - Commands for selected text
+    - Style (bold, italic, code, etc.) for Org and Markdown
+    - Transformation (upper/lower case, capitalize)
+    - Toggle Comment
+    - Occur
+    - Write to file (region)
+    - Many others…
+  - Support for Modes
+    - Dired
+    - Org mode
+  - Window management based on mouse position
+    - Create
+    - Delete
+    - Swap
+  - Omits default major mode menu keymaps from context menu for concision
+    - Don't worry, you can still get at them with control right-click
+  - Customize your own context menus
+- Enhanced Mode Line
+  - Left double-click on a blank space in the mode line to maximize a window in its frame.
+    - Left double-click again to return to the frame's previous window configuration.
+  - Right-click on a blank space in the mode line to invoke a window management menu.
+  - Left-click on the buffer name will popup a buffer list selection.
+    - Customize your own buffer list
+      
+- Main Menu Enhancements
+  - Add Bookmarks menu
+  - Streamlined Help menu
+  - Customize your own menus
 
 * Requirements
-Anju requires Emacs 29.1+
+:PROPERTIES:
+:CUSTOM_ID: requirements
+:END:
+Anju requires Emacs 28.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
 
-# Certain menus require more installed software:
+Certain menus require more installed software:
 
-  
+- Anju Dired Support: GNU Coreutils (~ls~)
+- Markdown import to Org: pandoc
+
 * Install
-TBD
+:PROPERTIES:
+:CUSTOM_ID: install
+:END:
+
+Basic installation of Anju composes of two parts:
+
+1. Add the minor-mode ~context-menu-mode~ to the hook of major modes for which you want context menu support.
+   
+2. Call ~anju-init~ in your Emacs initialization file.
 
 
+Shown below is example Elisp to accomplish the above. Users can adjust which major modes to support context menus accordingly.
+
+#+begin_src elisp :lexical no
+  (add-hook 'prog-mode-hook #'context-menu-mode)
+  (add-hook 'text-mode-hook #'context-menu-mode)
+  (add-hook 'dired-mode-hook #'context-menu-mode)
+  (add-hook 'shell-mode-hook #'context-menu-mode)
+
+  (anju-init)
+#+end_src
+
+
+The ~anju-init~ command can be customized to preference. Read more on this in the Anju User Guide.
+# TODO: Add link to Info HTML
+
+* Future Work
+:PROPERTIES:
+:CUSTOM_ID: future-work
+:END:
+
+Work on Anju is on-going. Plans for future enhancements include:
+
+- Support for more built-in modes
+- Further changes to the main menu
+
+Although much consideration on both the user and developer experience has been made, they are both subject to change in future releases if a better approach presents itself.
+    
 * Sponsorship
+:PROPERTIES:
+:CUSTOM_ID: sponsorship
+:END:
 It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
 
+\\
 [[https://www.buymeacoffee.com/kickingvegas][file:docs/images/default-yellow.png]]
 
-
-* See Also
-
-TBD
-
 * Acknowledgments
+:PROPERTIES:
+:CUSTOM_ID: acknowledgments
+:END:
 
-TBD
+Thanks goes out to the contributors to ~mouse.el~, whose work this package builds upon.
 
 
 #+HTML: <p align='center'>© 2026 Charles Y. Choi</p>

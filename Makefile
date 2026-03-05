@@ -43,7 +43,8 @@
 #   $ make new-sprint
 
 LISP_DIR=./lisp
-MAIN_EL=$(realpath $(LISP_DIR)/anju.el)
+PACKAGE_NAME=anju
+MAIN_EL=$(realpath $(LISP_DIR)/$(PACKAGE_NAME).el)
 
 TIMESTAMP := $(shell /bin/date "+%Y%m%d_%H%M%S")
 VERSION := $(shell ./scripts/read-version.sh $(MAIN_EL))
@@ -55,7 +56,7 @@ VERSION_LAST_TAG := $(shell git tag --sort=-creatordate | head -n 1)
 .PHONY: tests					\
 create-pr					\
 bump-anju					\
-bump-anju-info				\
+bump-anju-info					\
 bump						\
 checkout-development				\
 checkout-main					\
@@ -81,10 +82,10 @@ bump-anju:
 
 # bump-anju-info: VERSION_BUMP:=$(shell python -m semver nextver $(VERSION) $(BUMP_LEVEL))
 bump-anju-info:
-	sed -i 's/+MACRO: version $(VERSION)/+MACRO: version $(VERSION_BUMP)/' docs/casual.org
+	sed -i 's/+MACRO: version $(VERSION)/+MACRO: version $(VERSION_BUMP)/' docs/$(PACKAGE_NAME).org
 
 bump: bump-anju bump-anju-info
-	git commit -m 'Bump version to $(VERSION_BUMP)' $(MAIN_EL) docs/casual.org
+	git commit -m 'Bump version to $(VERSION_BUMP)' $(MAIN_EL) docs/$(PACKAGE_NAME).org
 	git push
 
 checkout-development:
