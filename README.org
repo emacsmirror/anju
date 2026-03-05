@@ -1,0 +1,73 @@
+* Anju
+
+Anju is a project to re-imagine Emacs mouse interactions with opinionated emphasis on:
+
+- Context-sensitive menus
+- Avoidance of using the middle mouse button (~<mouse-2>~ )
+- Direct manipulation
+
+In addressing the above concerns, Anju seeks to provide a calmer mouse experience for Emacs.
+
+** Motivations
+
+*** Context Sensitive Menus
+
+Anju takes the opinion that Emacs' default menu configuration over-emphasizes providing choice which often results in long menu selection with many un-actionable items. In contrast, Anju seeks to constrain choice to fine-grained, context sensitive actions.
+
+*** De-emphasis of the Middle Mouse Button
+
+The default mouse bindings for Emacs (as of this writing 30.2) were designed for 3-button mouse hardware used by 90's workstations. Such mice had three buttons that were indistinct as shown in the photo below for a Sun optical mouse.
+
+[[https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sun_optical_mouse.jpg/960px-Sun_optical_mouse.jpg]]
+
+Emacs mouse defaults made the assumption that clicking on the middle button (~<mouse-2>~) was common based on such hardware. This assumption broke with the now-common design of having a scroll-wheel in place of what was a plain hardware button as shown in the image below:
+
+https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg
+
+Today (2026), most GUI applications now only use the scroll-wheel for scroll actions and rarely use the middle button for click actions.
+
+*** Direct Manipulation
+
+Anju seeks to provide mouse-driven [[https://www.nngroup.com/articles/direct-manipulation/][direct manipulation]] workflows for common Emacs activities. This ideal is best illustrated with Emacs window management, where from the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Mode-Line.html][mode line]], a pop-up menu for splitting or swapping windows is made available. 
+
+* Features
+
+- ~context-menu-mode~ Enhancements
+  - Region support
+  - Omit major mode keymap menu from context menu
+    
+- Mode line enhancements
+
+- Menu bar enhancements
+  - Add bookmarks menu
+  - Reconfigured Help menu
+    
+    
+  
+
+* Requirements
+Anju requires Emacs 29.1+
+
+# Certain menus require more installed software:
+
+  
+* Install
+TBD
+
+
+* Sponsorship
+It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
+
+[[https://www.buymeacoffee.com/kickingvegas][file:docs/images/default-yellow.png]]
+
+
+* See Also
+
+TBD
+
+* Acknowledgments
+
+TBD
+
+
+#+HTML: <p align='center'>© 2026 Charles Y. Choi</p>
