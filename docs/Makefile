@@ -23,7 +23,8 @@ endif
 TIMESTAMP := $(shell /bin/date "+%Y%m%d_%H%M%S")
 PKG_NAME=anju
 ORG_FILES :=					\
-sponsorship.org					\
+$(PKG_NAME).org					\
+sponsorship.org
 
 $(PKG_NAME).info: $(PKG_NAME).texi
 	texi2any $<

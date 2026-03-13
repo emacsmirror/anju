@@ -23,7 +23,41 @@
 
 ;;; Commentary:
 
-;;
+;; Anju is a project to align mouse interactions in Emacs with contemporary
+;; (circa 2026) expectations. Effort towards this alignment is made in the
+;; following areas:
+
+;; - Context-sensitive menus
+;; - De-emphasis of middle mouse button usage (binding <mouse-2>)
+;; - Support direct manipulation when possible
+;; - Re-organization of the main menu bar
+
+;; The features offered by Anju are opinionated, but avoids unconventional
+;; behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+
+;; INSTALLATION
+
+;; Basic installation of Anju composes of two parts:
+
+;; 1. Add the minor-mode `context-menu-mode' to the hook of major modes that
+;;    should support it.
+
+;; 2. Call `anju-init' in your Emacs initialization file.
+
+;; Shown below is example Elisp to accomplish the above. Users can adjust which
+;; major modes to support context menus accordingly.
+
+;;   (add-hook 'prog-mode-hook #'context-menu-mode)
+;;   (add-hook 'text-mode-hook #'context-menu-mode)
+;;   (add-hook 'dired-mode-hook #'context-menu-mode)
+;;   (add-hook 'shell-mode-hook #'context-menu-mode)
+
+;;   (anju-init)
+
+
+;; The `anju-init' command can be customized to preference. Read more on this in
+;; the Anju User Guide.
+
 
 ;;; Code:
 (require 'anju-mode-line)
@@ -34,6 +68,7 @@
 ;; -------------------------------------------------------------------
 ;; Initialization Routines
 
+;;;###autoload (autoload 'anju-init "anju" nil t)
 (defun anju-init ()
   "Reconfigure Emacs mouse menus and bindings to Anju specification.
 
@@ -56,7 +91,7 @@ Emacs."
       (anju-mode-line--set-bindings))
 
   (if anju-reconfigure-main-menu-enable
-     (run-hooks 'anju-reconfigure-main-menu-hook))
+      (run-hooks 'anju-reconfigure-main-menu-hook))
 
   (if anju-reconfigure-context-menu-functions-enable
       (anju-reconfigure-context-menu-functions)))

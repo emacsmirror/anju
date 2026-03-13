@@ -114,8 +114,10 @@
                        :help "Send Emacs bug report."]
                       'describe-copying)
 
-  (define-key global-map [menu-bar help-menu  emacs-tutorial] nil t)
-  (define-key global-map [menu-bar help-menu  emacs-tutorial-language-specific] nil t)
+  (when anju-help-menu-remove-emacs-tutorial
+    (define-key global-map [menu-bar help-menu  emacs-tutorial] nil t)
+    (define-key global-map [menu-bar help-menu  emacs-tutorial-language-specific] nil t))
+
   (define-key global-map [menu-bar help-menu  emacs-psychotherapist] nil t)
   (define-key global-map [menu-bar help-menu  more-manuals] nil t)
   (define-key global-map [menu-bar help-menu  emacs-manual] nil t)
