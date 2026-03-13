@@ -1,4 +1,4 @@
-*!!! NOTE: THE PROJECT IS WIP !!!*
+*!!! NOTE: THIS PROJECT IS WIP !!!*
 
 When ready, this package is planned to be distributed on MELPA.
 
