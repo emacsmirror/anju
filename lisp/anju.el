@@ -5,7 +5,7 @@
 ;; Author: Charles Choi <charles.choi@yummymelon.com>
 ;; URL: https://github.com/kickingvegas/casual
 ;; Keywords: tools
-;; Version: 0.1.1
+;; Version: 0.1.2-rc.1
 ;; Package-Requires: ((emacs "28.1") (magit "4.4.0") (casual "2.14.0") (markdown-mode "2.7"))
 
 ;; This program is free software; you can redistribute it and/or modify
