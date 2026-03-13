@@ -1,0 +1,321 @@
+#+startup: overview nologdone
+#+TITLE: Anju User Guide
+#+SUBTITLE: for version {{{version}}}
+#+AUTHOR: Charles Y. Choi
+#+EMAIL: kickingvegas@gmail.com
+#+OPTIONS: ':t toc:t author:t email:t H:4 f:t
+#+LANGUAGE: en
+#+MACRO: version 0.1.0
+#+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
+#+TEXINFO_FILENAME: anju.info
+#+TEXINFO_CLASS: casual
+#+TEXINFO_HEADER: @syncodeindex pg cp
+#+TEXINFO_HEADER: @paragraphindent none
+#+TEXINFO_TITLEPAGE: t
+#+TEXINFO_DIR_CATEGORY: Emacs misc features
+#+TEXINFO_DIR_NAME: Anju
+#+TEXINFO_DIR_DESC: A package for customizing Emacs mouse interactions.
+#+TEXINFO_PRINTED_TITLE: Anju User Guide
+
+Version: {{{version}}}
+
+#+TEXINFO: Copyright © 2026 @w{Charles Y. Choi}
+
+Anju is a project to align mouse interactions in Emacs with contemporary (circa 2026) expectations. Effort towards this alignment is made in the following areas:
+
+- Context-sensitive menus
+- De-emphasis of middle mouse button usage (binding =<mouse-2>=)
+- Support direct manipulation when possible
+- Re-organization of the main menu bar
+
+The features offered by Anju are opinionated, but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+
+Please note that all UI terminology in this document is Emacs-centric and differs from conventional GUI terminology. Refer to (emacs) Frames ([[info:emacs#Frames][emacs#Frames]]) for more detail on this.
+
+#+INCLUDE: "./sponsorship.org"
+
+* Copying
+:PROPERTIES:
+:COPYING: t
+:END:
+
+Copyright © 2026 Charles Y. Choi
+
+* Motivation
+#+CINDEX: Motivation
+
+The Anju package is intended to change the default mouse interactions in Emacs for the following reasons:
+
+- Uneven implementation of context-sensitive menus for different modes.
+- Over-commitment to legacy usage of the middle mouse button.
+- Lengthy menus that feel more like an inventory of commands rather than a designed user experience.
+- Over-reliance on mouse workflows that require switching between the mouse and keyboard.
+
+Anju makes opinionated design decisions, but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+
+Elaboration on what informs Anju's opinions is described below.
+
+** Design Principles and Concerns
+#+CINDEX: Design Principles and Concerns
+
+This section conveys the principles and concerns used by Anju to inform its design decisions.
+
+Editorially, all design decisions for Anju are ultimately the opinion of Charles Y. Choi.
+
+
+#+TEXINFO: @subheading General Principles
+
+- Menus should be organized.
+  - A coherent information architecture should be conveyed.
+  - Balance between concision and discoverability should be made in a menu's offerings.
+- Nesting of sub-menus should be carefully considered, ideally not exceeding a depth of two.
+- Mouse workflows that require keyboard input should be minimized.
+- If the opportunity to provide a direct manipulation experience is available, it should be taken.
+- Unconventional mouse interactions should be avoided.
+
+#+TEXINFO: @subheading Concerns
+
+Anju takes the position that different types of menus have different concerns or objectives. This is most apparent in contrasting the design of a main menu section (e.g. File, Edit, Options, …) to that of a context menu.
+
+For Anju:
+
+- The highest concern of a main menu section is discoverability.
+- The highest concern of a context menu is concision.
+
+A common implementation practice in Emacs is to reuse menu keymaps for both the main menu and context menus. This violates the above concerns, which Anju seeks to address.
+
+The next sub-sections further detail the design concerns with respect to an area where mouse interaction occurs.
+
+#+TEXINFO: @subsubheading Context Menu
+
+A context menu (as its name implies) should constrain itself to commands relevant to /context/. The parameters of this context are usually (although not exclusively) defined by a subset of:
+
+- Point (cursor) position
+- Text selection
+- Mouse cursor position
+- Major mode
+- Read-only state (on or off)
+
+Anju takes the opinion that context menus should /not/ support general command discovery. The context menu offering should be /concise/. Users seeking command discovery should instead look at the main menu.
+
+#+TEXINFO: @subsubheading Direct Manipulation
+
+Support for direct action based on mouse cursor position is a common user interaction technique. Anju applies this to Emacs window management, where window creation, deletion, and swapping are supported from both the context menu and the mode line.
+
+#+TEXINFO: @subsubheading No Middle Button Bindings
+
+Anju eschews Emacs' default middle mouse button bindings as they presume usage of a [[https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sun_optical_mouse.jpg/960px-Sun_optical_mouse.jpg][90's style 3-button mouse]]. This style of mouse design has long been superseded with a middle [[https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg][scroll-wheel+button control]]. This widespread hardware change has resulted in the majority of mouse-supporting applications to emphasize scrolling actions with the middle control and clicking actions to the left and right buttons. Anju follows suit, primarily binding the right mouse button click (down) event to raising a context menu. In addition, Anju reconfigures commands that were previously bound to the middle button to ones accessible via a context menu.
+
+The only exception Anju makes in this matter is to keep the Emacs default binding of ~mouse-2~ to ~mouse-yank-primary~.
+
+* Features
+#+CINDEX: Features
+
+- Context Menu Enhancements
+  - Commands for selected text
+    - Style (bold, italic, code, etc.) text for Org and Markdown
+    - Transformation (upper/lower case, capitalize)
+    - Toggle Comment
+    - Occur
+    - Write to file (region)
+    - Many others…
+  - Support for Modes
+    - Dired
+    - Org mode
+  - Window management based on mouse position
+    - Create
+    - Delete
+    - Swap
+  - Omits default major mode menu keymaps from context menu for concision
+    - Don't worry, you can still get at them with control right-click
+  - Customize your own context menus
+- Enhanced Mode Line
+  - Left double-click on a blank space in the mode line to maximize a window in its frame.
+    - Left double-click again to return to the frame's previous window configuration.
+  - Right-click on a blank space in the mode line to invoke a window management menu.
+  - Left-click on the buffer name will popup a buffer list selection.
+    - Customize your own buffer list
+      
+- Main Menu Enhancements
+  - Add Bookmarks menu
+  - Streamlined Help menu
+  - Customize your own menus
+
+* Requirements
+#+CINDEX: Requirements
+
+Anju requires Emacs 28.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
+
+Certain menus require more installed software:
+
+- Anju Dired Support: GNU Coreutils (~ls~)
+- Markdown import to Org: pandoc
+
+* Install
+#+CINDEX: Install
+#+VINDEX: anju-unset-legacy-mouse-bindings-enable
+#+VINDEX: anju-mode-line-bindings-enable
+#+VINDEX: anju-reconfigure-main-menu-enable
+#+VINDEX: anju-reconfigure-context-menu-functions-enable
+#+VINDEX: anju-reconfigure-main-menu-hook
+#+VINDEX: context-menu-functions
+
+Basic installation of Anju composes of two parts:
+
+1. Add the minor-mode ~context-menu-mode~ to the hook of major modes for which you want context menu support.
+   
+2. Call ~anju-init~ in your Emacs initialization file.
+
+Shown below is example Elisp to accomplish the above. Users can adjust which major modes to support context menus accordingly.
+
+#+begin_src elisp :lexical no
+  (add-hook 'prog-mode-hook #'context-menu-mode)
+  (add-hook 'text-mode-hook #'context-menu-mode)
+  (add-hook 'dired-mode-hook #'context-menu-mode)
+  (add-hook 'shell-mode-hook #'context-menu-mode)
+
+  (anju-init)
+#+end_src
+
+Anju has a number of customizable variables which will determine the behavior of ~anju-init~. They are:
+
+- ~anju-unset-legacy-mouse-bindings-enable~ :: Remove bindings using ~mouse-2~.
+  
+- ~anju-mode-line-bindings-enable~ :: Enable Anju-defined bindings for the mode line.
+  
+- ~anju-reconfigure-main-menu-enable~ :: Reconfigure the main menu.
+
+  The variable  ~anju-reconfigure-main-menu-hook~ is a list of functions which each modify a different section of the main menu.
+  
+- ~anju-reconfigure-context-menu-functions-enable~ :: Enable reconfiguration of the variable ~context-menu-functions~ with Anju-defined menu functions.
+  
+  If ~context-menu-functions~ is already set via ~customize-variable~ then no changes will be made to it even if ~anju-reconfigure-context-menu-functions-enable~ is ~t~.
+
+By default, all the above ~*-enable~ variables are turned on (~t~).  Users preferring to make granular changes to ~anju-init~ can invoke ~M-x~ ~customize-group~ ~anju~.
+
+While not required, the following additions to your Emacs initialization file is recommended:
+
+- Add Markdown export support to Org mode
+  - ~M-x~ ~customize-variable~ ~org-export-backends~, check ~md~ option.
+    
+- Globally bind ~C-x 1~ to ~anju-toggle-one-window~.
+  
+  #+BEGIN_SRC elisp :lexical no
+  (keymap-global-set "C-x 1" #'anju-toggle-one-window)
+  #+END_SRC
+  
+- Set ~use-file-dialog~ to ~t~ to support mouse-driven-only dialog interactions.
+
+
+* Customization and Developer Experience
+#+CINDEX: Customization and Developer Experience
+
+Anju is designed to work with the existing mechanisms for defining mouse interaction in Emacs. Namely, it builds from menu keymaps ([[info:elisp#Menu Keymaps][elisp#Menu Keymaps]]) and ~context-menu-mode~ (introduced in Emacs 28).
+
+Users wishing to customize Anju should acquaint themselves with the Easy Menu ([[info:elisp#Easy Menu][elisp#Easy Menu]]) library.
+
+There are two hook variables of concern:
+
+- ~context-menu-functions~ :: A list of functions where each function defines a context menu. This  variable is defined by ~context-menu-mode~.
+
+  A function added to ~context-menu-functions~ must have two arguments:
+  - ~menu~ : reference to the menu 
+  - ~click~ : a mouse event
+
+  The following example Elisp illustrates an implementation of a context menu function.
+  
+  #+BEGIN_SRC elisp :lexical no
+    (defun anju-context-menu-wordcount (menu click) ; TODO
+      "Context menu hook function for wordcount commands.
+
+    - MENU: menu
+    - CLICK: event
+
+    This function is intended to be hooked into `context-menu-functions'."
+
+      (save-excursion
+        (mouse-set-point click)
+
+        (when (derived-mode-p 'text-mode) ; context predicate 
+          (anju-context-menu-item-separator menu count-words-separator)
+          (easy-menu-add-item menu nil ["Count Words"
+                                        count-words
+                                        :help "Count words"])))
+      menu)
+  #+END_SRC
+
+  Note the context predicate ~(derived-mode-p 'text-mode)~ which is used to determine if the desired context is met. This context predicate will differ for different context menu functions.
+  
+
+- ~anju-reconfigure-main-menu-hook~ :: A list of functions where each function modifies the main menu. It is recommended that each hook function only modify a specific menu section.
+
+  Shown below is an example Elisp function which modifies the “Text” menu section of the main menu for modes which derive from ~text-mode~.
+
+  #+BEGIN_SRC elisp :lexical no
+  (defun anju-main-menu--reconfigure-text-mode ()
+    "Reconfigure Text mode menu."
+    (easy-menu-remove-item text-mode-menu nil "Center Line")
+    (easy-menu-remove-item text-mode-menu nil "Center Region")
+    (easy-menu-remove-item text-mode-menu nil "Center Paragraph")
+    (easy-menu-remove-item text-mode-menu nil "Paragraph Indent")
+    (easy-menu-remove-item text-mode-menu nil "---")
+  
+    (easy-menu-add-item text-mode-menu nil anju-transform-text-menu "Auto Fill")
+    (easy-menu-add-item text-mode-menu nil anju-style-menu "Auto Fill"))
+  #+END_SRC
+
+* Future Work
+#+CINDEX: Future Work
+
+Work on Anju is on-going. Plans for future enhancements include:
+
+- Support for more built-in modes
+- Further changes to the main menu
+
+Although much consideration on both the user and developer experience has been made, they are both subject to change in future releases if a better approach presents itself.
+
+
+* Feedback & Discussion
+#+CINDEX: Feedback
+Please report any feedback about Anju to the [[https://github.com/kickingvegas/anju/issues][issue tracker on GitHub]].
+
+#+CINDEX: Discussion
+To participate in general discussion about using Anju, please join the [[https://github.com/kickingvegas/anju/discussions][discussion group]].
+
+* Sponsorship
+#+CINDEX: Sponsorship
+
+It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
+
+[[file:images/default-yellow.png]]
+
+[[https://www.buymeacoffee.com/kickingvegas][buymeacoffee.com/kickingvegas]]
+
+* About Anju
+#+CINDEX: About Anju
+
+[[https://github.com/kickingvegas/anju][Anju]] was conceived and crafted by Charles Choi in San Francisco, California.
+
+Thank you for using Anju.
+
+Always choose love.
+
+* Acknowledgments
+#+CINDEX: Acknowledgments
+
+Thanks goes out to the contributors to ~mouse.el~, whose work this package builds upon.
+
+
+* Main Index
+:PROPERTIES:
+:INDEX:    cp
+:END:
+
+Index for this user guide.
+
+* Variable Index
+:PROPERTIES:
+:INDEX:    vr
+:END:
+
+Variables, functions, commands, and menus referenced by this user guide.
