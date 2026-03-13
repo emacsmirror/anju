@@ -20,7 +20,7 @@ Copyright © 2026 Charles Y@. Choi
 @finalout
 @titlepage
 @title Anju User Guide
-@subtitle for version 0.1.1
+@subtitle for version 0.1.2-rc.1
 @author Charles Y@. Choi (@email{kickingvegas@@gmail.com})
 @page
 @vskip 0pt plus 1filll
@@ -33,7 +33,7 @@ Copyright © 2026 Charles Y@. Choi
 @node Top
 @top Anju User Guide
 
-Version: 0.1.1
+Version: 0.1.2-rc.1
 
 Copyright © 2026 @w{Charles Y. Choi}
 
@@ -50,11 +50,11 @@ Support direct manipulation when possible
 Re-organization of the main menu bar
 @end itemize
 
-The features offered by Anju are opinionated@comma{} but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+The features offered by Anju are opinionated, but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
 
 Please note that all UI terminology in this document is Emacs-centric and differs from conventional GUI terminology. Refer to (emacs) Frames (@ref{Frames,emacs#Frames,,emacs,}) for more detail on this.
 
-It costs money to make@comma{} enhance@comma{} and maintain Anju as ideologically free software. If you enjoy using Anju@comma{} please buy me a coffee to help support its development and maintenance.
+It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
 
 @image{images/default-yellow,,,,png}
 
@@ -104,7 +104,7 @@ Lengthy menus that feel more like an inventory of commands rather than a designe
 Over-reliance on mouse workflows that require switching between the mouse and keyboard.
 @end itemize
 
-Anju makes opinionated design decisions@comma{} but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+Anju makes opinionated design decisions, but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
 
 Elaboration on what informs Anju's opinions is described below.
 
@@ -119,7 +119,7 @@ Elaboration on what informs Anju's opinions is described below.
 
 This section conveys the principles and concerns used by Anju to inform its design decisions.
 
-Editorially@comma{} all design decisions for Anju are ultimately the opinion of Charles Y@. Choi.
+Editorially, all design decisions for Anju are ultimately the opinion of Charles Y@. Choi.
 
 
 @subheading General Principles
@@ -134,18 +134,18 @@ A coherent information architecture should be conveyed.
 Balance between concision and discoverability should be made in a menu's offerings.
 @end itemize
 @item
-Nesting of sub-menus should be carefully considered@comma{} ideally not exceeding a depth of two.
+Nesting of sub-menus should be carefully considered, ideally not exceeding a depth of two.
 @item
 Mouse workflows that require keyboard input should be minimized.
 @item
-If the opportunity to provide a direct manipulation experience is available@comma{} it should be taken.
+If the opportunity to provide a direct manipulation experience is available, it should be taken.
 @item
 Unconventional mouse interactions should be avoided.
 @end itemize
 
 @subheading Concerns
 
-Anju takes the position that different types of menus have different concerns or objectives. This is most apparent in contrasting the design of a main menu section (e.g. File@comma{} Edit@comma{} Options@comma{} …) to that of a context menu.
+Anju takes the position that different types of menus have different concerns or objectives. This is most apparent in contrasting the design of a main menu section (e.g. File, Edit, Options, …) to that of a context menu.
 
 For Anju:
 
@@ -156,7 +156,7 @@ The highest concern of a main menu section is discoverability.
 The highest concern of a context menu is concision.
 @end itemize
 
-A common implementation practice in Emacs is to reuse menu keymaps for both the main menu and context menus. This violates the above concerns@comma{} which Anju seeks to address.
+A common implementation practice in Emacs is to reuse menu keymaps for both the main menu and context menus. This violates the above concerns, which Anju seeks to address.
 
 The next sub-sections further detail the design concerns with respect to an area where mouse interaction occurs.
 
@@ -181,11 +181,11 @@ Anju takes the opinion that context menus should @emph{not} support general comm
 
 @subsubheading Direct Manipulation
 
-Support for direct action based on mouse cursor position is a common user interaction technique. Anju applies this to Emacs window management@comma{} where window creation@comma{} deletion@comma{} and swapping are supported from both the context menu and the mode line.
+Support for direct action based on mouse cursor position is a common user interaction technique. Anju applies this to Emacs window management, where window creation, deletion, and swapping are supported from both the context menu and the mode line.
 
 @subsubheading No Middle Button Bindings
 
-Anju eschews Emacs' default middle mouse button bindings as they presume usage of a @uref{https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sun_optical_mouse.jpg/960px-Sun_optical_mouse.jpg, 90's style 3-button mouse}. This style of mouse design has long been superseded with a middle @uref{https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg, scroll-wheel+button control}. This widespread hardware change has resulted in the majority of mouse-supporting applications to emphasize scrolling actions with the middle control and clicking actions to the left and right buttons. Anju follows suit@comma{} primarily binding the right mouse button click (down) event to raising a context menu. In addition@comma{} Anju reconfigures commands that were previously bound to the middle button to ones accessible via a context menu.
+Anju eschews Emacs' default middle mouse button bindings as they presume usage of a @uref{https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sun_optical_mouse.jpg/960px-Sun_optical_mouse.jpg, 90's style 3-button mouse}. This style of mouse design has long been superseded with a middle @uref{https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg, scroll-wheel+button control}. This widespread hardware change has resulted in the majority of mouse-supporting applications to emphasize scrolling actions with the middle control and clicking actions to the left and right buttons. Anju follows suit, primarily binding the right mouse button click (down) event to raising a context menu. In addition, Anju reconfigures commands that were previously bound to the middle button to ones accessible via a context menu.
 
 The only exception Anju makes in this matter is to keep the Emacs default binding of @code{mouse-2} to @code{mouse-yank-primary}.
 
@@ -202,9 +202,9 @@ Context Menu Enhancements
 Commands for selected text
 @itemize
 @item
-Style (bold@comma{} italic@comma{} code@comma{} etc.) text for Org and Markdown
+Style (bold, italic, code, etc.) text for Org and Markdown
 @item
-Transformation (upper/lower case@comma{} capitalize)
+Transformation (upper/lower case, capitalize)
 @item
 Toggle Comment
 @item
@@ -236,7 +236,7 @@ Swap
 Omits default major mode menu keymaps from context menu for concision
 @itemize
 @item
-Don't worry@comma{} you can still get at them with control right-click
+Don't worry, you can still get at them with control right-click
 @end itemize
 @item
 Customize your own context menus
@@ -277,7 +277,7 @@ Customize your own menus
 
 @cindex Requirements
 
-Anju requires Emacs 28.1+@comma{} Magit 4.4+@comma{} Casual 2.13+@comma{} Markdown Mode 2.7+.
+Anju requires Emacs 28.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
 
 Certain menus require more installed software:
 
@@ -340,16 +340,16 @@ Enable reconfiguration of the variable @code{context-menu-functions} with Anju-d
 If @code{context-menu-functions} is already set via @code{customize-variable} then no changes will be made to it even if @code{anju-reconfigure-context-menu-functions-enable} is @code{t}.
 @end table
 
-By default@comma{} all the above @code{*-enable} variables are turned on (@code{t}).  Users preferring to make granular changes to @code{anju-init} can invoke @code{M-x} @code{customize-group} @code{anju}.
+By default, all the above @code{*-enable} variables are turned on (@code{t}).  Users preferring to make granular changes to @code{anju-init} can invoke @code{M-x} @code{customize-group} @code{anju}.
 
-While not required@comma{} the following additions to your Emacs initialization file is recommended:
+While not required, the following additions to your Emacs initialization file is recommended:
 
 @itemize
 @item
 Add Markdown export support to Org mode
 @itemize
 @item
-@code{M-x} @code{customize-variable} @code{org-export-backends}@comma{} check @code{md} option.
+@code{M-x} @code{customize-variable} @code{org-export-backends}, check @code{md} option.
 @end itemize
 
 @item
@@ -368,7 +368,7 @@ Set @code{use-file-dialog} to @code{t} to support mouse-driven-only dialog inter
 
 @cindex Customization and Developer Experience
 
-Anju is designed to work with the existing mechanisms for defining mouse interaction in Emacs. Namely@comma{} it builds from menu keymaps (@ref{Menu Keymaps,elisp#Menu Keymaps,,elisp,}) and @code{context-menu-mode} (introduced in Emacs 28).
+Anju is designed to work with the existing mechanisms for defining mouse interaction in Emacs. Namely, it builds from menu keymaps (@ref{Menu Keymaps,elisp#Menu Keymaps,,elisp,}) and @code{context-menu-mode} (introduced in Emacs 28).
 
 Users wishing to customize Anju should acquaint themselves with the Easy Menu (@ref{Easy Menu,elisp#Easy Menu,,elisp,}) library.
 
@@ -446,7 +446,7 @@ Support for more built-in modes
 Further changes to the main menu
 @end itemize
 
-Although much consideration on both the user and developer experience has been made@comma{} they are both subject to change in future releases if a better approach presents itself.
+Although much consideration on both the user and developer experience has been made, they are both subject to change in future releases if a better approach presents itself.
 
 @node Feedback & Discussion
 @chapter Feedback & Discussion
@@ -455,14 +455,14 @@ Although much consideration on both the user and developer experience has been m
 Please report any feedback about Anju to the @uref{https://github.com/kickingvegas/anju/issues, issue tracker on GitHub}.
 
 @cindex Discussion
-To participate in general discussion about using Anju@comma{} please join the @uref{https://github.com/kickingvegas/anju/discussions, discussion group}.
+To participate in general discussion about using Anju, please join the @uref{https://github.com/kickingvegas/anju/discussions, discussion group}.
 
 @node Sponsorship
 @chapter Sponsorship
 
 @cindex Sponsorship
 
-It costs money to make@comma{} enhance@comma{} and maintain Anju as ideologically free software. If you enjoy using Anju@comma{} please buy me a coffee to help support its development and maintenance.
+It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
 
 @image{images/default-yellow,,,,png}
 
@@ -473,7 +473,7 @@ It costs money to make@comma{} enhance@comma{} and maintain Anju as ideologicall
 
 @cindex About Anju
 
-@uref{https://github.com/kickingvegas/anju, Anju} was conceived and crafted by Charles Choi in San Francisco@comma{} California.
+@uref{https://github.com/kickingvegas/anju, Anju} was conceived and crafted by Charles Choi in San Francisco, California.
 
 Thank you for using Anju.
 
@@ -484,7 +484,7 @@ Always choose love.
 
 @cindex Acknowledgments
 
-Thanks goes out to the contributors to @code{mouse.el}@comma{} whose work this package builds upon.
+Thanks goes out to the contributors to @code{mouse.el}, whose work this package builds upon.
 
 @node Main Index
 @chapter Main Index
@@ -496,7 +496,7 @@ Index for this user guide.
 @node Variable Index
 @chapter Variable Index
 
-Variables@comma{} functions@comma{} commands@comma{} and menus referenced by this user guide.
+Variables, functions, commands, and menus referenced by this user guide.
 
 @printindex vr
 
