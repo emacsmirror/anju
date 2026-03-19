@@ -71,7 +71,7 @@ Certain menus require more installed software:
 
 Basic installation of Anju composes of two parts:
 
-1. Add the minor-mode ~context-menu-mode~ to the hook of major modes for which you want context menu support.
+1. Add the minor-mode ~context-menu-mode~ to the hook of major modes that should support it.
    
 2. Call ~anju-init~ in your Emacs initialization file.
 
@@ -88,8 +88,7 @@ Shown below is example Elisp to accomplish the above. Users can adjust which maj
 #+end_src
 
 
-The ~anju-init~ command can be customized to preference. Read more on this in the Anju User Guide.
-# TODO: Add link to Info HTML
+The ~anju-init~ command can be customized to preference. Read more on this in the [[https://kickingvegas.github.io/anju/Install.html][Anju User Guide]].
 
 * Future Work
 :PROPERTIES:

@@ -33,5 +33,4 @@ endif
 
 ANJU_BASE_DIR=$(abspath $(shell pwd)/..)
 ANJU_LISP_DIR=$(ANJU_BASE_DIR)/lisp
-ANJU_TEST_INCLUDES=
 EMACS_ELPA_DIR=$(HOME)/.config/emacs/elpa

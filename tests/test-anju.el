@@ -24,6 +24,11 @@
 
 ;;; Code:
 
+(require 'anju-test-utils)
+
+(ert-deftest test-anju-init ()
+  "Test `anju-init' is bound."
+  (should (fboundp #'anju-init)))
 
 
 (provide 'tests-anju)

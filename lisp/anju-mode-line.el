@@ -25,7 +25,7 @@
 ;;; Code:
 (require 'anju-utils)
 
-(defcustom anju-mode-line-buffer-list-function #'anju--buffer-list
+(defcustom anju-mode-line-buffer-list-function #'anju-buffer-list-menu-items
   "Function that populates the mode line buffer name popup menu.
 
 Assign this variable to a function that returns a value that conforms to
@@ -37,7 +37,7 @@ clicked (typically with mouse 1).
 
 Users who wish define their own menu should override this value with
 their own function. It is highly recommended that such users look at the
-source to `anju--buffer-list' as a start to defining their own menu
+source to `anju-buffer-list-menu-items' as a start to defining their own menu
 function."
   :type 'function
   :group 'anju)
@@ -91,8 +91,6 @@ Derived from code found at URL
          (window (window-at x y frame)))
     window))
 
-;; (easy-menu-add-item anju-window-management-menu nil anju-windmove-swap-menu)
-
 (defun anju-popup-window-management-menu (click)
   "Popup mouse window management with CLICK."
   (interactive "e")
@@ -103,13 +101,27 @@ Derived from code found at URL
   (interactive "e")
   (popup-menu (funcall anju-mode-line-buffer-list-function) click))
 
+
+;; -------------------------------------------------------------------
+;; Buffer Filter Logic
+
+(defun anju-buffer-list--filter (filter buffers &optional count)
+  "Apply FILTER on BUFFERS, taking the first COUNT if defined."
+  (let ((result (seq-filter filter buffers)))
+    (if count
+        (seq-take result count)
+      result)))
+
 (defun anju-temporary-buffer-filter (buf)
   "Return t if BUF name is has pattern *<name>*."
-  (let ((bufname (string-trim (buffer-name buf))))
+  (let* ((bufname (string-trim (buffer-name buf))))
     (not
      (or
       (string-match-p "^\\*.*\\*$" bufname)
-      (string-match-p "^\\*info\\*\\(<[[:digit:]]*>\\)*$" bufname)))))
+      (string-match-p "^\\*info\\*\\(<[[:digit:]]*>\\)*$" bufname)
+      (string-match-p "^\\*eshell\\*\\(<[[:digit:]]*>\\)*$" bufname)
+      (string-match-p "\~.*~$" bufname) ; filter out ediff buffers
+      ))))
 
 (defun anju-info-buffer-filter (buf)
   "Return t if BUF is an Info buffer."
@@ -117,28 +129,72 @@ Derived from code found at URL
     (eq (derived-mode-p major-mode) 'Info-mode)))
 
 (defun anju-help-buffer-filter (buf)
-  "Return t if BUF is an Info buffer."
+  "Return t if BUF is a Help buffer."
   (with-current-buffer buf
     (eq (derived-mode-p major-mode) 'help-mode)))
 
-(defun anju--buffer-list ()
-  "Vector of menu items to populate `anju-popup-buffer-menu'."
-  (interactive)
+(defun anju-eshell-buffer-filter (buf)
+  "Return t if BUF is an Eshell buffer."
+  (with-current-buffer buf
+    (eq (derived-mode-p major-mode) 'eshell-mode)))
+
+(defun anju-shell-buffer-filter (buf)
+  "Return t if BUF is a Shell buffer."
+  (with-current-buffer buf
+    (eq (derived-mode-p major-mode) 'shell-mode)))
+
+(defun anju-buffer-list-plain-filter (buffers &optional count)
+  "Filter BUFFERS for plain names only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-temporary-buffer-filter buffers count))
+
+(defun anju-buffer-list-info-filter (buffers &optional count)
+  "Filter BUFFERS for Info buffers only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-info-buffer-filter buffers count))
+
+(defun anju-buffer-list-help-filter (buffers &optional count)
+  "Filter BUFFERS for Help buffers only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-help-buffer-filter buffers count))
+
+(defun anju-buffer-list-eshell-filter (buffers &optional count)
+  "Filter BUFFERS for Eshell buffers only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-eshell-buffer-filter buffers count))
+
+(defun anju-buffer-list-shell-filter (buffers &optional count)
+  "Filter BUFFERS for Shell buffers only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-shell-buffer-filter buffers count))
+
+(defun anju-process-buffer-list-filter-functions (buffers)
+  "Process `anju-process-buffer-list-filter-functions' to filter BUFFERS.
+
+- BUFFERS : List of buffers, usually from `buffer-list'"
+
+  (let* ((apply-result (map-apply
+                        (lambda (k v)
+                          (if (fboundp k)
+                              (funcall k buffers v)
+                            (progn
+                              (message (format "WARNING: %s is undefined." (symbol-name k)))
+                              nil)))
+                        anju-buffer-list-filter-functions)))
+    (seq-reduce #'append apply-result '())))
+
+(defun anju-buffer-list-menu-items ()
+  "Vector of menu items to populate `anju-popup-buffer-menu'.
+
+Note that this function called by indirection via the variable
+`anju-mode-line-buffer-list-function'."
 
   (let* ((open-buffers (buffer-list))
-         (plain-buffers (seq-filter #'anju-temporary-buffer-filter open-buffers))
-         (info-buffers (seq-filter #'anju-info-buffer-filter open-buffers))
-         (help-buffers (seq-filter #'anju-help-buffer-filter open-buffers))
-         (plain-buffers (seq-take plain-buffers 7))
-
+         (all-buffers (anju-process-buffer-list-filter-functions open-buffers))
+         (all-buffers (remove (current-buffer) all-buffers))
          (buffer-items (mapcar (lambda (buf)
                                  (vector (format "%s" (buffer-name buf))
                                          `(lambda () (interactive) (switch-to-buffer ,buf))
                                          :visible (and (eq (selected-window) (anju-window-under-mouse)))))
-                               (append plain-buffers info-buffers help-buffers)))
+                               all-buffers))
 
          (menu-items (append buffer-items
-                             '("---")
+                             '("--")
                              '(["Set Selected" mouse-set-point
                                 :visible (not (and (eq (selected-window) (anju-window-under-mouse))))
                                 :help "Set window at point as selected"]
@@ -155,9 +211,6 @@ Derived from code found at URL
                                 :visible (and (eq (selected-window) (anju-window-under-mouse)))
                                 :help "List all buffers"]))))
       menu-items))
-
-
-
 
 (defun anju-mode-line--set-bindings ()
   "Set Anju bindings."

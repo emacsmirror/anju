@@ -27,7 +27,6 @@
 $(PACKAGE_PATHS)					\
 $(patsubst %, -l %, $(ELISP_INCLUDES))			\
 -l $<							\
--l $(ANJU_TEST_INCLUDES)				\
 -l $(patsubst %, ../tests/%, $(ELISP_TEST_INCLUDES))	\
 -l $(patsubst %, ../tests/test-%, $<)			\
 -f ert-run-tests-batch-and-exit
@@ -48,7 +47,6 @@ $(PACKAGE_PATHS)				\
 $(patsubst %, -l %, $(ELISP_INCLUDES))		\
 $(patsubst %, -l %, $(ELISP_PACKAGES))		\
 -l $<						\
--l $(ANJU_TEST_INCLUDES)			\
 -l ../tests/$(ELISP_TEST_INCLUDES)		\
 -l $(patsubst %, ../tests/test-%, $<)		\
 -f ert-run-tests-batch-and-exit
