@@ -23,35 +23,36 @@ Please note that all UI terminology in this document is Emacs-centric and differ
 :CUSTOM_ID: features
 :END:
 
-- Context Menu Enhancements
-  - Commands for selected text
-    - Style (bold, italic, code, etc.) for Org and Markdown
-    - Transformation (upper/lower case, capitalize)
-    - Toggle Comment
-    - Occur
-    - Write to file (region)
-    - Many others…
-  - Support for Modes
-    - Dired
-    - Org mode
-  - Window management based on mouse position
-    - Create
-    - Delete
-    - Swap
-  - Omits default major mode menu keymaps from context menu for concision
-    - Don't worry, you can still get at them with control right-click
-  - Customize your own context menus
-- Enhanced Mode Line
-  - Left double-click on a blank space in the mode line to maximize a window in its frame.
-    - Left double-click again to return to the frame's previous window configuration.
-  - Right-click on a blank space in the mode line to invoke a window management menu.
-  - Left-click on the buffer name will popup a buffer list selection.
-    - Customize your own buffer list
-      
-- Main Menu Enhancements
-  - Add Bookmarks menu
-  - Streamlined Help menu
-  - Customize your own menus
+Anju offers many enhancements to the mouse interactions provided by Emacs. These enhancements are organized to the following areas below:
+
+- Mode Line
+- Context Menu
+- Main Menu
+- Emacs Window Management
+
+Some screenshots to demo Anju's offerings are shown below.
+
+On the mode line, left-click (~mouse-1~) on the buffer name to raise a pop-up menu containing a list of open buffers. The contents of this list is controlled by the customizable variable ~anju-buffer-list-filter-functions~.
+  
+[[file:docs/images/anju-mode-line-buffer-list.png]]
+
+
+A right-click (~mouse-3~) on any blank space on the mode line will pop-up a window management menu.
+
+[[file:docs/images/anju-mode-line-window-management.png]]
+
+From here, one can:
+- Delete the window (×)
+- Split the window horizontally (→)
+- Split the window vertically (↓)
+- If multiple windows are shown, swap the current window.
+
+Shown below is an screenshot of a context menu when text is selected.
+
+[[file:docs/images/anju-context-menu-region.png]]
+
+More detail on Anju's features can be found in the [[https://kickingvegas.github.io/anju/Features.html][Anju User Guide]].
+
 
 * Requirements
 :PROPERTIES:

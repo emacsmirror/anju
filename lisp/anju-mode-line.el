@@ -179,9 +179,12 @@ Derived from code found at URL
     (seq-reduce #'append apply-result '())))
 
 (defun anju-buffer-list-menu-items ()
-  "Vector of menu items to populate `anju-popup-buffer-menu'.
+  "Vector of menu items populating `anju-popup-buffer-menu'.
 
-Note that this function called by indirection via the variable
+The list of menu items can be configured with the customizable variable
+`anju-buffer-list-filter-functions'.
+
+This function called by indirection via the variable
 `anju-mode-line-buffer-list-function'."
 
   (let* ((open-buffers (buffer-list))

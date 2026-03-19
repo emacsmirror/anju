@@ -39,25 +39,20 @@
 
 ;; Basic installation of Anju composes of two parts:
 
-;; 1. Add the minor-mode `context-menu-mode' to the hook of major modes that
-;;    should support it.
+;; 1. Turn on `context-menu-mode' to major modes of preference. This is done
+;;    using the `add-hook' function as shown below.
+
+;;     (add-hook 'prog-mode-hook #'context-menu-mode)
+;;     (add-hook 'text-mode-hook #'context-menu-mode)
+;;     (add-hook 'dired-mode-hook #'context-menu-mode)
+;;     (add-hook 'shell-mode-hook #'context-menu-mode)
 
 ;; 2. Call `anju-init' in your Emacs initialization file.
 
-;; Shown below is example Elisp to accomplish the above. Users can adjust which
-;; major modes to support context menus accordingly.
-
-;;   (add-hook 'prog-mode-hook #'context-menu-mode)
-;;   (add-hook 'text-mode-hook #'context-menu-mode)
-;;   (add-hook 'dired-mode-hook #'context-menu-mode)
-;;   (add-hook 'shell-mode-hook #'context-menu-mode)
-
-;;   (anju-init)
-
+;;     (anju-init)
 
 ;; The `anju-init' command can be customized to preference. Read more on this in
-;; the Anju User Guide.
-
+;; the Anju User Guide in Info.
 
 ;;; Code:
 (require 'anju-mode-line)
