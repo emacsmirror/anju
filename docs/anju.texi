@@ -20,7 +20,7 @@ Copyright © 2026 Charles Y@. Choi
 @finalout
 @titlepage
 @title Anju User Guide
-@subtitle for version 0.1.2-rc.1
+@subtitle for version 0.1.3-rc.1
 @author Charles Y@. Choi (@email{kickingvegas@@gmail.com})
 @page
 @vskip 0pt plus 1filll
@@ -33,7 +33,7 @@ Copyright © 2026 Charles Y@. Choi
 @node Top
 @top Anju User Guide
 
-Version: 0.1.2-rc.1
+Version: 0.1.3-rc.1
 
 Copyright © 2026 @w{Charles Y. Choi}
 
@@ -50,11 +50,11 @@ Support direct manipulation when possible
 Re-organization of the main menu bar
 @end itemize
 
-The features offered by Anju are opinionated, but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+The features offered by Anju are opinionated@comma{} but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
 
 Please note that all UI terminology in this document is Emacs-centric and differs from conventional GUI terminology. Refer to (emacs) Frames (@ref{Frames,emacs#Frames,,emacs,}) for more detail on this.
 
-It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
+It costs money to make@comma{} enhance@comma{} and maintain Anju as ideologically free software. If you enjoy using Anju@comma{} please buy me a coffee to help support its development and maintenance.
 
 @image{images/default-yellow,,,,png}
 
@@ -67,7 +67,7 @@ It costs money to make, enhance, and maintain Anju as ideologically free softwar
 * Features::
 * Requirements::
 * Install::
-* Customization and Developer Experience::
+* Customization::
 * Future Work::
 * Feedback & Discussion::
 * Sponsorship::
@@ -82,6 +82,20 @@ It costs money to make, enhance, and maintain Anju as ideologically free softwar
 Motivation
 
 * Design Principles and Concerns::
+
+Features
+
+* Mode Line::
+* Context Menu::
+* Main Menu::
+* Window Management::
+
+Customization
+
+* Anju Initialization (@code{anju-init})::
+* Context Menu Customization::
+* Mode Line Buffer List Menu Customization::
+* Main Menu Customization::
 
 @end detailmenu
 @end menu
@@ -104,7 +118,7 @@ Lengthy menus that feel more like an inventory of commands rather than a designe
 Over-reliance on mouse workflows that require switching between the mouse and keyboard.
 @end itemize
 
-Anju makes opinionated design decisions, but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+Anju makes opinionated design decisions@comma{} but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
 
 Elaboration on what informs Anju's opinions is described below.
 
@@ -119,7 +133,7 @@ Elaboration on what informs Anju's opinions is described below.
 
 This section conveys the principles and concerns used by Anju to inform its design decisions.
 
-Editorially, all design decisions for Anju are ultimately the opinion of Charles Y@. Choi.
+Editorially@comma{} all design decisions for Anju are ultimately the opinion of Charles Y@. Choi.
 
 
 @subheading General Principles
@@ -134,18 +148,18 @@ A coherent information architecture should be conveyed.
 Balance between concision and discoverability should be made in a menu's offerings.
 @end itemize
 @item
-Nesting of sub-menus should be carefully considered, ideally not exceeding a depth of two.
+Nesting of sub-menus should be carefully considered@comma{} ideally not exceeding a depth of two.
 @item
 Mouse workflows that require keyboard input should be minimized.
 @item
-If the opportunity to provide a direct manipulation experience is available, it should be taken.
+If the opportunity to provide a direct manipulation experience is available@comma{} it should be taken.
 @item
 Unconventional mouse interactions should be avoided.
 @end itemize
 
 @subheading Concerns
 
-Anju takes the position that different types of menus have different concerns or objectives. This is most apparent in contrasting the design of a main menu section (e.g. File, Edit, Options, …) to that of a context menu.
+Anju takes the position that different types of menus have different concerns or objectives. This is most apparent in contrasting the design of a main menu section (e.g. File@comma{} Edit@comma{} Options@comma{} …) to that of a context menu.
 
 For Anju:
 
@@ -156,7 +170,7 @@ The highest concern of a main menu section is discoverability.
 The highest concern of a context menu is concision.
 @end itemize
 
-A common implementation practice in Emacs is to reuse menu keymaps for both the main menu and context menus. This violates the above concerns, which Anju seeks to address.
+A common implementation practice in Emacs is to reuse menu keymaps for both the main menu and context menus. This violates the above concerns@comma{} which Anju seeks to address.
 
 The next sub-sections further detail the design concerns with respect to an area where mouse interaction occurs.
 
@@ -181,11 +195,11 @@ Anju takes the opinion that context menus should @emph{not} support general comm
 
 @subsubheading Direct Manipulation
 
-Support for direct action based on mouse cursor position is a common user interaction technique. Anju applies this to Emacs window management, where window creation, deletion, and swapping are supported from both the context menu and the mode line.
+Support for direct action based on mouse cursor position is a common user interaction technique. Anju applies this to Emacs window management@comma{} where window creation@comma{} deletion@comma{} and swapping are supported from both the context menu and the mode line.
 
 @subsubheading No Middle Button Bindings
 
-Anju eschews Emacs' default middle mouse button bindings as they presume usage of a @uref{https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sun_optical_mouse.jpg/960px-Sun_optical_mouse.jpg, 90's style 3-button mouse}. This style of mouse design has long been superseded with a middle @uref{https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg, scroll-wheel+button control}. This widespread hardware change has resulted in the majority of mouse-supporting applications to emphasize scrolling actions with the middle control and clicking actions to the left and right buttons. Anju follows suit, primarily binding the right mouse button click (down) event to raising a context menu. In addition, Anju reconfigures commands that were previously bound to the middle button to ones accessible via a context menu.
+Anju eschews Emacs' default middle mouse button bindings as they presume usage of a @uref{https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sun_optical_mouse.jpg/960px-Sun_optical_mouse.jpg, 90's style 3-button mouse}. This style of mouse design has long been superseded with a middle @uref{https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg, scroll-wheel+button control}. This widespread hardware change has resulted in the majority of mouse-supporting applications to emphasize scrolling actions with the middle control and clicking actions to the left and right buttons. Anju follows suit@comma{} primarily binding the right mouse button click (down) event to raising a context menu. In addition@comma{} Anju reconfigures commands that were previously bound to the middle button to ones accessible via a context menu.
 
 The only exception Anju makes in this matter is to keep the Emacs default binding of @code{mouse-2} to @code{mouse-yank-primary}.
 
@@ -194,90 +208,131 @@ The only exception Anju makes in this matter is to keep the Emacs default bindin
 
 @cindex Features
 
+Anju offers many enhancements to the mouse interactions provided by Emacs. These enhancements are detailed in the following sections below.
+
+@menu
+* Mode Line::
+* Context Menu::
+* Main Menu::
+* Window Management::
+@end menu
+
+@node Mode Line
+@section Mode Line
+
+@cindex Mode Line
+
+The following mode line enhancements are provided by Anju:
+
+@subheading Pop-up Buffer List
+@cindex Pop-up Buffer List
+
+On the mode line@comma{} left-click (@code{mouse-1}) on the buffer name to raise a pop-up menu containing a list of open buffers. The contents of this list is controlled by the customizable variable @code{anju-buffer-list-filter-functions}.
+
+@image{images/anju-mode-line-buffer-list,,,,png}
+
+@subheading Window Management
+@cindex Window Management
+
+A right-click (@code{mouse-3}) on any blank space on the mode line will pop-up a window management menu.
+
+@image{images/anju-mode-line-window-management,,,,png}
+
+From here@comma{} one can:
 @itemize
 @item
-Context Menu Enhancements
+Delete the window (×)
+@item
+Split the window horizontally (→)
+@item
+Split the window vertically (↓)
+@item
+If multiple windows are shown@comma{} swap the current window.
+@end itemize
+
+Note: usage of ``window'' refers to the Emacs definition of it. Refer to @ref{Frames,emacs#Frames,,emacs,} for more detail on this.
+
+@subheading Toggle Maximize Window
+@cindex Toggle Maximize Window
+
+A left-double-click on any blank space on the mode line will checkpoint the current window configuration@comma{} then maximize the current window (@code{delete-other-windows}). Re-doing the left-double-click will restore the prior window configuration.
+
+@node Context Menu
+@section Context Menu
+
+@cindex Context Menu
+
+Anju both works with and enhances @code{context-menu-mode} to support features like
+
 @itemize
 @item
-Commands for selected text
+Selected Text Commands
 @itemize
 @item
-Style (bold, italic, code, etc.) text for Org and Markdown
+Style (bold@comma{} italic@comma{} code@comma{} etc.)
 @item
-Transformation (upper/lower case, capitalize)
-@item
-Toggle Comment
+Transform Text (upper/lower case@comma{} capitalize)
 @item
 Occur
 @item
-Write to file (region)
+Toggle comment (when available)
 @item
-Many others…
+Write to file (@code{write-region})
 @end itemize
 @item
-Support for Modes
+Mode-specific support
 @itemize
 @item
-Dired
-@item
 Org mode
+@item
+Dired
 @end itemize
 @item
 Window management based on mouse position
-@itemize
 @item
-Create
-@item
-Delete
-@item
-Swap
-@end itemize
-@item
-Omits default major mode menu keymaps from context menu for concision
-@itemize
-@item
-Don't worry, you can still get at them with control right-click
-@end itemize
-@item
-Customize your own context menus
-@end itemize
-@item
-Enhanced Mode Line
-@itemize
-@item
-Left double-click on a blank space in the mode line to maximize a window in its frame.
-@itemize
-@item
-Left double-click again to return to the frame's previous window configuration.
-@end itemize
-@item
-Right-click on a blank space in the mode line to invoke a window management menu.
-@item
-Left-click on the buffer name will popup a buffer list selection.
-@itemize
-@item
-Customize your own buffer list
-@end itemize
+Full support for @code{context-menu-mode} customization using @code{context-menu-functions}.
 @end itemize
 
-@item
-Main Menu Enhancements
-@itemize
-@item
-Add Bookmarks menu
-@item
-Streamlined Help menu
-@item
-Customize your own menus
-@end itemize
-@end itemize
+Anju is planned to have on-going development@comma{} with more commands and modes supported in future releases.  
+
+Shown below is an screenshot of a context menu when text is selected.
+
+@image{images/anju-context-menu-region,,,,png}
+
+The screenshot below shows a context menu for Org mode. Note that the upper part of the menu changes with respect to what kind of Org element (in the example below@comma{} a list item) the point is on.
+
+@image{images/anju-context-menu-org-mode,,,,png}
+
+@node Main Menu
+@section Main Menu
+
+Anju offers the following enhancements to the main menu:
+
+@subheading Bookmarks menu
+
+To support usage of Emacs bookmarks@comma{} the following menu is added to the main menu.
+
+@image{images/anju-main-menu-bookmarks,,,,png}
+
+@subheading Re-organization of the Help menu
+
+An opinionated re-organization of the Help menu is provided.
+
+@image{images/anju-main-menu-help,,,,png}
+
+Anju provides support for customizing main menu enhancements.
+
+@node Window Management
+@section Window Management
+
+Window management via mouse interaction is provided for through the @ref{Mode Line, , mode line} and @ref{Context Menu, , context menu}. More detail is provided in those sections.
 
 @node Requirements
 @chapter Requirements
 
 @cindex Requirements
 
-Anju requires Emacs 28.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
+Anju requires Emacs 28.1+@comma{} Magit 4.4+@comma{} Casual 2.13+@comma{} Markdown Mode 2.7+.
 
 Certain menus require more installed software:
 
@@ -292,64 +347,45 @@ Markdown import to Org: pandoc
 @chapter Install
 
 @cindex Install
-@vindex anju-unset-legacy-mouse-bindings-enable
-@vindex anju-mode-line-bindings-enable
-@vindex anju-reconfigure-main-menu-enable
-@vindex anju-reconfigure-context-menu-functions-enable
-@vindex anju-reconfigure-main-menu-hook
-@vindex context-menu-functions
+@vindex context-menu-mode
+@vindex anju-init
 
 Basic installation of Anju composes of two parts:
 
 @enumerate
 @item
-Add the minor-mode @code{context-menu-mode} to the hook of major modes for which you want context menu support.
-
-@item
-Call @code{anju-init} in your Emacs initialization file.
-@end enumerate
-
-Shown below is example Elisp to accomplish the above. Users can adjust which major modes to support context menus accordingly.
-
+Turn on @code{context-menu-mode} to major modes of preference. This is done using the @code{add-hook} function as shown below.
 @lisp
 (add-hook 'prog-mode-hook #'context-menu-mode)
 (add-hook 'text-mode-hook #'context-menu-mode)
 (add-hook 'dired-mode-hook #'context-menu-mode)
 (add-hook 'shell-mode-hook #'context-menu-mode)
-
-(anju-init)
 @end lisp
 
-Anju has a number of customizable variables which will determine the behavior of @code{anju-init}. They are:
+@item
+Call @code{anju-init} in your Emacs initialization file.
 
-@table @asis
-@item @code{anju-unset-legacy-mouse-bindings-enable}
-Remove bindings using @code{mouse-2}.
+@lisp
+(anju-init)
+@end lisp
+@end enumerate
 
-@item @code{anju-mode-line-bindings-enable}
-Enable Anju-defined bindings for the mode line.
+Anju supports a high degree of customization. Users who wish this should make a deep read of the @ref{Customization, , Customization} section.
 
-@item @code{anju-reconfigure-main-menu-enable}
-Reconfigure the main menu.
-
-The variable  @code{anju-reconfigure-main-menu-hook} is a list of functions which each modify a different section of the main menu.
-
-@item @code{anju-reconfigure-context-menu-functions-enable}
-Enable reconfiguration of the variable @code{context-menu-functions} with Anju-defined menu functions.
-
-If @code{context-menu-functions} is already set via @code{customize-variable} then no changes will be made to it even if @code{anju-reconfigure-context-menu-functions-enable} is @code{t}.
-@end table
-
-By default, all the above @code{*-enable} variables are turned on (@code{t}).  Users preferring to make granular changes to @code{anju-init} can invoke @code{M-x} @code{customize-group} @code{anju}.
-
-While not required, the following additions to your Emacs initialization file is recommended:
+While not required@comma{} the following additions to your Emacs initialization file can further enhance your mouse experience:
 
 @itemize
+@item
+Enable @code{org-mouse}
+@lisp
+(require 'org-mouse)
+@end lisp
+
 @item
 Add Markdown export support to Org mode
 @itemize
 @item
-@code{M-x} @code{customize-variable} @code{org-export-backends}, check @code{md} option.
+@code{M-x} @code{customize-variable} @code{org-export-backends}@comma{} check @code{md} option.
 @end itemize
 
 @item
@@ -360,36 +396,86 @@ Globally bind @code{C-x 1} to @code{anju-toggle-one-window}.
 @end lisp
 
 @item
-Set @code{use-file-dialog} to @code{t} to support mouse-driven-only dialog interactions.
+Set @code{use-file-dialog} to @code{t} to support mouse-driven-only dialog interactions@comma{} or @code{nil} to always get a mini-buffer prompt.
 @end itemize
 
-@node Customization and Developer Experience
-@chapter Customization and Developer Experience
+@node Customization
+@chapter Customization
 
-@cindex Customization and Developer Experience
+@cindex Customization
 
-Anju is designed to work with the existing mechanisms for defining mouse interaction in Emacs. Namely, it builds from menu keymaps (@ref{Menu Keymaps,elisp#Menu Keymaps,,elisp,}) and @code{context-menu-mode} (introduced in Emacs 28).
+Anju provides a number of ways to customize mouse interactions in Emacs. In many cases@comma{} Anju leverages off existing Emacs customization options@comma{} particularly around defining and modifying menus. Users who wish to modify menus in Emacs should familiarize themselves with menu keymaps (@ref{Menu Keymaps,elisp#Menu Keymaps,,elisp,}) and the Easy Menu (@ref{Easy Menu,elisp#Easy Menu,,elisp,}) library.
 
-Users wishing to customize Anju should acquaint themselves with the Easy Menu (@ref{Easy Menu,elisp#Easy Menu,,elisp,}) library.
+Customization options for the different areas Anju covers are detailed below.
 
-There are two hook variables of concern:
+@menu
+* Anju Initialization (@code{anju-init})::
+* Context Menu Customization::
+* Mode Line Buffer List Menu Customization::
+* Main Menu Customization::
+@end menu
+
+@node Anju Initialization (@code{anju-init})
+@section Anju Initialization (@code{anju-init})
+
+@cindex Anju Initialization
+@vindex anju-init
+@vindex anju-reconfigure-context-menu-functions-enable
+@vindex anju-mode-line-bindings-enable
+@vindex anju-unset-legacy-mouse-bindings-enable
+@vindex anju-reconfigure-main-menu-enable
+@vindex anju-help-menu-remove-emacs-tutorial
+@vindex anju-reconfigure-main-menu-hook
+
+Anju has a number of customizable variables that determine the behavior of @code{anju-init}. They are:
 
 @table @asis
-@item @code{context-menu-functions}
-A list of functions where each function defines a context menu. This  variable is defined by @code{context-menu-mode}.
+@item @code{anju-reconfigure-context-menu-functions-enable}
+Enable reconfiguration of the variable @code{context-menu-functions} with Anju-defined menu functions.
 
-A function added to @code{context-menu-functions} must have two arguments:
+If @code{context-menu-functions} is previously set via @code{customize-variable} then @code{anju-init} will make no changes to @code{context-menu-functions} regardless of how  @code{anju-reconfigure-context-menu-functions-enable} is set.
+
+@item @code{anju-mode-line-bindings-enable}
+Enable Anju-defined bindings for the mode line.
+
+@item @code{anju-unset-legacy-mouse-bindings-enable}
+Remove bindings using @code{mouse-2}.
+
+@item @code{anju-reconfigure-main-menu-enable}
+Reconfigure the main menu.
+
+The variable  @code{anju-reconfigure-main-menu-hook} is a list of functions which each modify a different section of the main menu.
+
+If @code{anju-reconfigure-main-menu-enable} is @code{t}@comma{} the variable @code{anju-help-menu-remove-emacs-tutorial} can control if the menu entries for the Emacs tutorial are shown.
+@end table
+
+By default@comma{} all the above @code{*-enable} variables are turned on (@code{t}).  Users preferring to make granular changes to @code{anju-init} can invoke @code{M-x} @code{customize-group} @code{anju}.
+
+@node Context Menu Customization
+@section Context Menu Customization
+
+@cindex Context Menu Customization
+@vindex context-menu-mode
+@vindex context-menu-functions
+
+
+Anju uses @code{context-menu-mode} (introduced in Emacs 28) to define its context menu behavior. This is accomplished through the customizable hook variable @code{context-menu-functions}.
+
+@code{context-menu-functions} is a list of functions where each function has two arguments:
+
 @itemize
 @item
-@code{menu} : reference to the menu 
+@code{menu} : reference to the context menu
 @item
 @code{click} : a mouse event
 @end itemize
 
+When the context menu is raised@comma{} typically via right-click (@code{mouse-3})@comma{} each function in @code{context-menu-functions} is run@comma{} populating the context menu.
+
 The following example Elisp illustrates an implementation of a context menu function.
 
 @lisp
-(defun anju-context-menu-wordcount (menu click) ; TODO
+(defun anju-context-menu-wordcount (menu click)
   "Context menu hook function for wordcount commands.
 
 - MENU: menu
@@ -400,7 +486,7 @@ This function is intended to be hooked into `context-menu-functions'."
   (save-excursion
     (mouse-set-point click)
 
-    (when (derived-mode-p 'text-mode) ; context predicate 
+    (when (derived-mode-p 'text-mode) ; context predicate
       (anju-context-menu-item-separator menu count-words-separator)
       (easy-menu-add-item menu nil ["Count Words"
                                     count-words
@@ -408,13 +494,146 @@ This function is intended to be hooked into `context-menu-functions'."
   menu)
 @end lisp
 
-Note the context predicate @code{(derived-mode-p 'text-mode)} which is used to determine if the desired context is met. This context predicate will differ for different context menu functions.
-@end table
 
+Defining how a menu item is context-sensitive can be determined in multiple places:
+
+@enumerate
+@item
+At the time of menu item definition
+@item
+At a higher level.
+@end enumerate
+
+The @emph{context} is determined by a predicate which can take into account different things@comma{} among them:
+
+@itemize
+@item
+Selected Text (@code{use-region-p})
+@item
+Major mode
+@item
+Cursor (Point) position
+@item
+Mouse position
+@end itemize
+
+In the example above@comma{} the context predicate is @code{(derived-mode-p 'text-mode)}.  Note that it is defined at a higher level to avoid instantiating menu items if the context does not apply.
+
+The context predicate can be embedded in the menu item definition itself. See more about this with the @code{:visible} and @code{:active} keywords for the macro @code{easy-menu-define}.
+
+It is up to the implementer to determine where to best apply the context predicate.
+
+@subheading Customizing context-menu-functions
+
+It is highly recommended to use the @code{customize-variable} command to configure @code{context-menu-functions} instead of using @code{add-hook} for the following reasons:
+
+@enumerate
+@item
+A visual UI is provided showing what choices for built-in context menu functions are available.
+@item
+Users can insert their own custom function.
+@item
+Top-down ordering of functions determines the order menu items will be similarly be presented in the context menu.
+@end enumerate
+
+@node Mode Line Buffer List Menu Customization
+@section Mode Line Buffer List Menu Customization
+
+@cindex Mode Line Buffer List Menu Customization
+@vindex anju-buffer-list-filter-functions
+@vindex anju-mode-line-buffer-list-function
+@vindex anju-buffer-list-plain-filter
+@vindex anju-buffer-list-eshell-filter
+@vindex anju-buffer-list-shell-filter
+@vindex anju-buffer-list-info-filter
+@vindex anju-buffer-list-help-filter
+@vindex anju-buffer-list-menu-items
+@vindex anju-popup-buffer-menu
+
+The pop-up buffer list menu can be customized two ways:
+
+@enumerate
+@item
+Customizing the variable @code{anju-buffer-list-filter-functions}@comma{} a list of filter functions that are run each time the pop-up menu is raised when left-clicking the mode line buffer name.
+
+@item
+Customizing the variable @code{anju-mode-line-buffer-list-function}@comma{} which gives a user complete control on what is displayed in the pop-up menu.
+@end enumerate
+
+
+@subheading anju-buffer-list-filter-functions
+
+This variable is an alist used by the function @code{anju-buffer-list-menu-items} to populate the list of buffers used in the pop up menu @code{anju-popup-buffer-menu}.
+
+This alist is filled using the following key@comma{} value pair types:
 
 @table @asis
-@item @code{anju-reconfigure-main-menu-hook}
-A list of functions where each function modifies the main menu. It is recommended that each hook function only modify a specific menu section.
+@item key
+a buffer list filter function
+@item value
+integer used as the maximum count of buffers to use from the filter function
+@end table
+
+The buffer list filter function is of the form @code{(filter-fn (buffers &optional count))} where buffers is a list of buffers (usually @code{buffer-list}) and count is the maximum count of buffers to use.
+
+The order of the buffer list presumes the most recently used buffers are
+at the front of the list.
+
+Anju provides the following buffer filters:
+
+@itemize
+@item
+@code{anju-buffer-list-plain-filter}
+@item
+@code{anju-buffer-list-eshell-filter}
+@item
+@code{anju-buffer-list-shell-filter}
+@item
+@code{anju-buffer-list-info-filter}
+@item
+@code{anju-buffer-list-help-filter}
+@end itemize
+
+Users can customize @code{anju-buffer-list-filter-functions} to re-compose or add their own filters to define the resulting buffer list returned by @code{anju-buffer-list-menu-items}. It is highly recommended that the @code{customize-variable} command be used to accomplish this.
+
+@subheading anju-mode-line-buffer-list-function
+@vindex anju-mode-line-buffer-list-function
+
+Function that populates the mode line buffer name popup menu.
+
+Assign this variable to a function that returns a value that conforms to the @code{MENU} parameter of the command @code{popup-menu}.
+
+This setting allows for customization of the buffer list (or any other menu content) when the mode line buffer name (identifier) is clicked (typically with @code{mouse-1}).
+
+Users who wish define their own menu should override this value with their own function. It is highly recommended that such users look at the source to @code{anju-buffer-list-menu-items} as a start to defining their own menu function.
+
+@node Main Menu Customization
+@section Main Menu Customization
+
+@cindex Main Menu Customization
+@vindex anju-main-menu--reconfigure-text-mode
+@vindex anju-main-menu--reconfigure-bookmarks
+@vindex anju-main-menu--reconfigure-help
+@vindex anju-help-menu-remove-emacs-tutorial
+
+Anju modifies the main menu via the customizable hook variable @code{anju-reconfigure-main-menu-hook}. This hook is run in the command @code{anju-init}.
+
+By default@comma{} the following hook functions are run:
+
+@table @asis
+@item @code{anju-main-menu--reconfigure-text-mode}
+Reconfigures Text menu for text mode buffers.
+@item @code{anju-main-menu--reconfigure-bookmarks}
+Adds Bookmarks menu to main menu.
+@item @code{anju-main-menu--reconfigure-help}
+Reconfigures Help menu.
+@itemize
+@item
+Set the customizable variable @code{anju-help-menu-remove-emacs-tutorial} to @code{t} if removing the tutorial entries is desired.
+@end itemize
+@end table
+
+@code{anju-reconfigure-main-menu-hook} can be modified to add additional custom hook functions. Users who wish to do this should familiarize themselves with menu keymaps (@ref{Menu Keymaps,elisp#Menu Keymaps,,elisp,}) and the Easy Menu (@ref{Easy Menu,elisp#Easy Menu,,elisp,}) library.
 
 Shown below is an example Elisp function which modifies the “Text” menu section of the main menu for modes which derive from @code{text-mode}.
 
@@ -430,7 +649,6 @@ Shown below is an example Elisp function which modifies the “Text” menu sect
   (easy-menu-add-item text-mode-menu nil anju-transform-text-menu "Auto Fill")
   (easy-menu-add-item text-mode-menu nil anju-style-menu "Auto Fill"))
 @end lisp
-@end table
 
 @node Future Work
 @chapter Future Work
@@ -446,7 +664,7 @@ Support for more built-in modes
 Further changes to the main menu
 @end itemize
 
-Although much consideration on both the user and developer experience has been made, they are both subject to change in future releases if a better approach presents itself.
+Although much consideration on both the user and developer experience has been made@comma{} they are both subject to change in future releases if a better approach presents itself.
 
 @node Feedback & Discussion
 @chapter Feedback & Discussion
@@ -455,14 +673,14 @@ Although much consideration on both the user and developer experience has been m
 Please report any feedback about Anju to the @uref{https://github.com/kickingvegas/anju/issues, issue tracker on GitHub}.
 
 @cindex Discussion
-To participate in general discussion about using Anju, please join the @uref{https://github.com/kickingvegas/anju/discussions, discussion group}.
+To participate in general discussion about using Anju@comma{} please join the @uref{https://github.com/kickingvegas/anju/discussions, discussion group}.
 
 @node Sponsorship
 @chapter Sponsorship
 
 @cindex Sponsorship
 
-It costs money to make, enhance, and maintain Anju as ideologically free software. If you enjoy using Anju, please buy me a coffee to help support its development and maintenance.
+It costs money to make@comma{} enhance@comma{} and maintain Anju as ideologically free software. If you enjoy using Anju@comma{} please buy me a coffee to help support its development and maintenance.
 
 @image{images/default-yellow,,,,png}
 
@@ -473,7 +691,7 @@ It costs money to make, enhance, and maintain Anju as ideologically free softwar
 
 @cindex About Anju
 
-@uref{https://github.com/kickingvegas/anju, Anju} was conceived and crafted by Charles Choi in San Francisco, California.
+@uref{https://github.com/kickingvegas/anju, Anju} was conceived and crafted by Charles Choi in San Francisco@comma{} California.
 
 Thank you for using Anju.
 
@@ -484,7 +702,7 @@ Always choose love.
 
 @cindex Acknowledgments
 
-Thanks goes out to the contributors to @code{mouse.el}, whose work this package builds upon.
+Thanks goes out to the contributors to @code{mouse.el}@comma{} whose work this package builds upon.
 
 @node Main Index
 @chapter Main Index
@@ -496,7 +714,7 @@ Index for this user guide.
 @node Variable Index
 @chapter Variable Index
 
-Variables, functions, commands, and menus referenced by this user guide.
+Variables@comma{} functions@comma{} commands@comma{} and menus referenced by this user guide.
 
 @printindex vr
 

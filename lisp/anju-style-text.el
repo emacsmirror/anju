@@ -165,7 +165,7 @@ contiguous without spaces."
      :help "Strike-through selected region"]
     ["Remove" anju-style-remove
      :visible (and (derived-mode-p 'org-mode) visible-mode)
-     :help "Strike-through selected region"]))
+     :help "Remove markup from selected region"]))
 
 (provide 'anju-style-text)
 

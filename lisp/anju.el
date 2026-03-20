@@ -5,7 +5,7 @@
 ;; Author: Charles Choi <charles.choi@yummymelon.com>
 ;; URL: https://github.com/kickingvegas/casual
 ;; Keywords: tools
-;; Version: 0.1.2
+;; Version: 0.1.3-rc.1
 ;; Package-Requires: ((emacs "28.1") (magit "4.4.0") (casual "2.14.0") (markdown-mode "2.7"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,36 @@
 
 ;;; Commentary:
 
-;;
+;; Anju is a project to align mouse interactions in Emacs with contemporary
+;; (circa 2026) expectations. Effort towards this alignment is made in the
+;; following areas:
+
+;; - Context-sensitive menus
+;; - De-emphasis of middle mouse button usage (binding <mouse-2>)
+;; - Support direct manipulation when possible
+;; - Re-organization of the main menu bar
+
+;; The features offered by Anju are opinionated, but avoids unconventional
+;; behavior. Anju aspires to bring a calmer mouse experience to Emacs.
+
+;; INSTALLATION
+
+;; Basic installation of Anju composes of two parts:
+
+;; 1. Turn on `context-menu-mode' to major modes of preference. This is done
+;;    using the `add-hook' function as shown below.
+
+;;     (add-hook 'prog-mode-hook #'context-menu-mode)
+;;     (add-hook 'text-mode-hook #'context-menu-mode)
+;;     (add-hook 'dired-mode-hook #'context-menu-mode)
+;;     (add-hook 'shell-mode-hook #'context-menu-mode)
+
+;; 2. Call `anju-init' in your Emacs initialization file.
+
+;;     (anju-init)
+
+;; The `anju-init' command can be customized to preference. Read more on this in
+;; the Anju User Guide in Info.
 
 ;;; Code:
 (require 'anju-mode-line)
@@ -34,6 +63,7 @@
 ;; -------------------------------------------------------------------
 ;; Initialization Routines
 
+;;;###autoload (autoload 'anju-init "anju" nil t)
 (defun anju-init ()
   "Reconfigure Emacs mouse menus and bindings to Anju specification.
 
@@ -56,7 +86,7 @@ Emacs."
       (anju-mode-line--set-bindings))
 
   (if anju-reconfigure-main-menu-enable
-     (run-hooks 'anju-reconfigure-main-menu-hook))
+      (run-hooks 'anju-reconfigure-main-menu-hook))
 
   (if anju-reconfigure-context-menu-functions-enable
       (anju-reconfigure-context-menu-functions)))

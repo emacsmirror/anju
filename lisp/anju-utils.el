@@ -74,6 +74,61 @@ nil and restart Emacs."
   :type 'boolean
   :group 'anju)
 
+(defcustom anju-help-menu-remove-emacs-tutorial nil
+  "If non-nil, remove the Emacs tutorial entries.
+
+To return to behavior that is not modified by Anju, set this value to
+nil and restart Emacs."
+  :type 'boolean
+  :group 'anju)
+
+(defcustom anju-buffer-list-filter-functions
+  '((anju-buffer-list-plain-filter . 7)
+    (anju-buffer-list-eshell-filter . 3)
+    (anju-buffer-list-shell-filter . 3)
+    (anju-buffer-list-info-filter . 3)
+    (anju-buffer-list-help-filter . 3))
+
+  "Alist used for the pop-up buffers menu from the mode-line buffer name.
+
+This variable is used by the function `anju-buffer-list-menu-items' to
+populate the list of buffers used in the pop up menu `anju-popup-buffer-menu'.
+
+This alist is filled using the following key, value pair types:
+
+- key: a buffer list filter function
+- value: integer used as the maximum count of buffers to use from the
+  filter function
+
+The buffer list filter function is of the form (filter-fn (buffers
+&optional count)) where buffers is a list of buffers (usually
+`buffer-list') and count is the maximum count of buffers to use.
+
+The order of the buffer list presumes the most recently used buffers are
+at the front of the list.
+
+Anju provides the following buffer filters:
+
+- `anju-buffer-list-plain-filter'
+- `anju-buffer-list-eshell-filter'
+- `anju-buffer-list-shell-filter'
+- `anju-buffer-list-info-filter'
+- `anju-buffer-list-help-filter'
+
+Users can customize `anju-buffer-list-filter-functions' to re-compose or
+add their own filters to define the resulting buffer list returned by
+`anju-buffer-list-menu-items'."
+
+  :type '(alist
+          :key-type (choice (function-item anju-buffer-list-plain-filter)
+                            (function-item anju-buffer-list-eshell-filter)
+                            (function-item anju-buffer-list-shell-filter)
+                            (function-item anju-buffer-list-info-filter)
+                            (function-item anju-buffer-list-help-filter)
+                            (function :tag "Custom buffer list filter"))
+          :value-type integer)
+  :group 'anju)
+
 (defcustom anju-reconfigure-main-menu-hook
   '(anju-main-menu--reconfigure-bookmarks
     anju-main-menu--reconfigure-text-mode
@@ -91,7 +146,7 @@ nil and restart Emacs."
 (defmacro anju-context-menu-item-separator (menu key)
   "Add single line separator to MENU with KEY."
   `(define-key-after ,menu [,key]
-     '(menu-item "--single-line")))
+     '(menu-item "--")))
 
 (defun anju-utils--command-in-new-frame (cmd)
   "Invoke CMD in a new frame.
