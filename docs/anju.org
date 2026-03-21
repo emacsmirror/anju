@@ -21,7 +21,7 @@ Version: {{{version}}}
 
 #+TEXINFO: Copyright © 2026 @w{Charles Y. Choi}
 
-Anju is a project to align mouse interactions in Emacs with contemporary (circa 2026) expectations. Effort towards this alignment is made in the following areas:
+Anju (안주) is a project to align mouse interactions in Emacs with contemporary (circa 2026) expectations. Effort towards this alignment is made in the following areas:
 
 - Context-sensitive menus
 - De-emphasis of middle mouse button usage (binding =<mouse-2>=)
@@ -56,6 +56,10 @@ Anju makes opinionated design decisions, but avoids unconventional behavior. Anj
 Elaboration on what informs Anju's opinions is described below.
 
 ** Design Principles and Concerns
+:PROPERTIES:
+:CUSTOM_ID: design-principles
+:END:
+
 #+CINDEX: Design Principles and Concerns
 
 This section conveys the principles and concerns used by Anju to inform its design decisions.
@@ -124,7 +128,8 @@ The following mode line enhancements are provided by Anju:
 #+TEXINFO: @subheading Pop-up Buffer List
 #+CINDEX: Pop-up Buffer List
 
-On the mode line, left-click (~mouse-1~) on the buffer name to raise a pop-up menu containing a list of open buffers. The contents of this list is controlled by the customizable variable ~anju-buffer-list-filter-functions~.
+On the mode line, left-click (~mouse-1~) on the buffer name to raise a pop-up menu containing a list of open buffers. The contents of this list is controlled by the customizable variable ~anju-buffer-list-filter-functions~. More info on customizing the buffer list menu can be found in [[#mode-line-menu-customization][Mode Line Buffer List Menu Customization]].
+
   
 [[file:images/anju-mode-line-buffer-list.png]]
 
@@ -167,6 +172,7 @@ Anju both works with and enhances ~context-menu-mode~ to support features like
   - Dired
 - Window management based on mouse position
 - Full support for ~context-menu-mode~ customization using ~context-menu-functions~.
+  - See [[#context-menu-customization][Context Menu Customization]] for more info.
 
 Anju is planned to have on-going development, with more commands and modes supported in future releases.  
 
@@ -174,9 +180,28 @@ Shown below is an screenshot of a context menu when text is selected.
 
 [[file:images/anju-context-menu-region.png]]
 
+*** Org Mode Context Menu
+
 The screenshot below shows a context menu for Org mode. Note that the upper part of the menu changes with respect to what kind of Org element (in the example below, a list item) the point is on.
 
 [[file:images/anju-context-menu-org-mode.png]]
+
+Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]]. 
+
+
+*** Dired Mode Context Menu
+
+Anju has context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
+
+[[file:images/anju-dired-copy-to.png]]
+
+
+If the mouse point is over a directory, the option to insert a view (aka subdir) for it in the buffer is provided.
+
+[[file:images/anju-dired-insert-subdir.png]]
+
+Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]]. 
+
 
 ** Main Menu
 
@@ -194,7 +219,8 @@ An opinionated re-organization of the Help menu is provided.
 
 [[file:images/anju-main-menu-help.png]]
 
-Anju provides support for customizing main menu enhancements. 
+Anju provides support for customizing the enhancements ([[#main-menu-customization][Main Menu Customization]])
+ to the main menu. 
 
 ** Window Management
 
@@ -294,6 +320,10 @@ By default, all the above ~*-enable~ variables are turned on (~t~).  Users prefe
 
 
 ** Context Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: context-menu-customization
+:END:
+
 #+CINDEX: Context Menu Customization
 #+VINDEX: context-menu-mode
 #+VINDEX: context-menu-functions
@@ -351,14 +381,16 @@ It is up to the implementer to determine where to best apply the context predica
 
 #+TEXINFO: @subheading Customizing context-menu-functions
 
-It is highly recommended to use the ~customize-variable~ command to configure ~context-menu-functions~ instead of using ~add-hook~ for the following reasons:
+It is recommended to use the ~customize-variable~ command to configure ~context-menu-functions~ instead of using ~add-hook~ for the following reasons:
 
 1. A visual UI is provided showing what choices for built-in context menu functions are available.
 2. Users can insert their own custom function.
-3. Top-down ordering of functions determines the order menu items will be similarly be presented in the context menu.
-
+3. Top-down ordering of functions will similarly determine the order of menu items in the context menu.
 
 ** Mode Line Buffer List Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: mode-line-menu-customization
+:END:
 #+CINDEX: Mode Line Buffer List Menu Customization
 #+VINDEX: anju-buffer-list-filter-functions
 #+VINDEX: anju-mode-line-buffer-list-function
@@ -399,7 +431,7 @@ Anju provides the following buffer filters:
 - ~anju-buffer-list-info-filter~
 - ~anju-buffer-list-help-filter~
 
-Users can customize ~anju-buffer-list-filter-functions~ to re-compose or add their own filters to define the resulting buffer list returned by ~anju-buffer-list-menu-items~. It is highly recommended that the ~customize-variable~ command be used to accomplish this.
+Users can customize ~anju-buffer-list-filter-functions~ to re-compose or add their own filters to define the resulting buffer list returned by ~anju-buffer-list-menu-items~. It is recommended that the ~customize-variable~ command be used to accomplish this.
 
 #+TEXINFO: @subheading anju-mode-line-buffer-list-function
 #+VINDEX: anju-mode-line-buffer-list-function
@@ -410,9 +442,12 @@ Assign this variable to a function that returns a value that conforms to the ~ME
 
 This setting allows for customization of the buffer list (or any other menu content) when the mode line buffer name (identifier) is clicked (typically with ~mouse-1~).
 
-Users who wish define their own menu should override this value with their own function. It is highly recommended that such users look at the source to ~anju-buffer-list-menu-items~ as a start to defining their own menu function.
+Users who wish define their own menu should override this value with their own function. It is recommended that such users look at the source to ~anju-buffer-list-menu-items~ as a start to defining their own menu function.
 
 ** Main Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: main-menu-customization
+:END:
 #+CINDEX: Main Menu Customization
 #+VINDEX: anju-main-menu--reconfigure-text-mode
 #+VINDEX: anju-main-menu--reconfigure-bookmarks
