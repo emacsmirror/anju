@@ -83,7 +83,7 @@ bump-anju:
 # bump-anju-info: VERSION_BUMP:=$(shell python -m semver nextver $(VERSION) $(BUMP_LEVEL))
 bump-anju-info:
 	sed -i 's/+MACRO: version $(VERSION)/+MACRO: version $(VERSION_BUMP)/' docs/$(PACKAGE_NAME).org
-	make docs/$(PACKAGE_NAME).texi
+	make -C docs $(PACKAGE_NAME).texi
 
 bump: bump-anju bump-anju-info
 	git commit -m 'Bump version to $(VERSION_BUMP)' \
