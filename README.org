@@ -1,4 +1,3 @@
-When ready, this package is planned to be distributed on MELPA.
 
 * Anju (안주)
 :PROPERTIES:
