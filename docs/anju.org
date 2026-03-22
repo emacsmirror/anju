@@ -231,7 +231,7 @@ Window management via mouse interaction is provided for through the [[#mode-line
 * Requirements
 #+CINDEX: Requirements
 
-Anju requires Emacs 28.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
+Anju requires Emacs 29.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
 
 Certain menus require more installed software:
 

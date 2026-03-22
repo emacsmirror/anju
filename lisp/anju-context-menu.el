@@ -395,10 +395,7 @@ This function is intended to be hooked into `context-menu-functions'."
         (easy-menu-add-item menu nil
                             ["Promote Subtree ←"
                              org-outdent-item-tree
-                             :help "Promote item subtree"])
-
-        )
-
+                             :help "Promote item subtree"]))
 
       (when (anju-at-org-table-p)
         (easy-menu-add-item menu nil

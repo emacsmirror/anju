@@ -6,7 +6,7 @@
 ;; URL: https://github.com/kickingvegas/casual
 ;; Keywords: tools
 ;; Version: 1.0.1-rc.1
-;; Package-Requires: ((emacs "28.1") (magit "4.4.0") (casual "2.14.0") (markdown-mode "2.7"))
+;; Package-Requires: ((emacs "29.1") (magit "4.4.0") (casual "2.14.0") (markdown-mode "2.7"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
