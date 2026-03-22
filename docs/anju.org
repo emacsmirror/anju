@@ -5,7 +5,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.0.0
+#+MACRO: version 1.0.1-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -231,7 +231,7 @@ Window management via mouse interaction is provided for through the [[#mode-line
 * Requirements
 #+CINDEX: Requirements
 
-Anju requires Emacs 28.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
+Anju requires Emacs 29.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
 
 Certain menus require more installed software:
 
