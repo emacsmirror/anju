@@ -173,7 +173,7 @@ Derived from code found at URL
                           (if (fboundp k)
                               (funcall k buffers v)
                             (progn
-                              (message (format "WARNING: %s is undefined." (symbol-name k)))
+                              (message "WARNING: %s is undefined." (symbol-name k))
                               nil)))
                         anju-buffer-list-filter-functions)))
     (seq-reduce #'append apply-result '())))
