@@ -84,6 +84,9 @@ nil and restart Emacs."
 
 (defcustom anju-buffer-list-filter-functions
   '((anju-buffer-list-plain-filter . 7)
+    (anju-buffer-list-compilation-filter . 3)
+    (anju-buffer-list-grep-filter . 3)
+    (anju-buffer-list-xref-filter . 3)
     (anju-buffer-list-eshell-filter . 3)
     (anju-buffer-list-shell-filter . 3)
     (anju-buffer-list-info-filter . 3)
@@ -110,6 +113,9 @@ at the front of the list.
 Anju provides the following buffer filters:
 
 - `anju-buffer-list-plain-filter'
+- `anju-buffer-list-compilation-filter'
+- `anju-buffer-list-grep-filter'
+- `anju-buffer-list-xref-filter'
 - `anju-buffer-list-eshell-filter'
 - `anju-buffer-list-shell-filter'
 - `anju-buffer-list-info-filter'

@@ -143,6 +143,21 @@ Derived from code found at URL
   (with-current-buffer buf
     (eq (derived-mode-p major-mode) 'shell-mode)))
 
+(defun anju-compilation-buffer-filter (buf)
+  "Return t if BUF is a Compilation buffer."
+  (with-current-buffer buf
+    (eq (derived-mode-p major-mode) 'compilation-mode)))
+
+(defun anju-grep-buffer-filter (buf)
+  "Return t if BUF is a Grep buffer."
+  (with-current-buffer buf
+    (eq (derived-mode-p major-mode) 'grep-mode)))
+
+(defun anju-xref-buffer-filter (buf)
+  "Return t if BUF is a Xref buffer."
+  (with-current-buffer buf
+    (eq (derived-mode-p major-mode) 'xref--xref-buffer-mode)))
+
 (defun anju-buffer-list-plain-filter (buffers &optional count)
   "Filter BUFFERS for plain names only, taking the first COUNT if defined."
   (anju-buffer-list--filter #'anju-temporary-buffer-filter buffers count))
@@ -162,6 +177,18 @@ Derived from code found at URL
 (defun anju-buffer-list-shell-filter (buffers &optional count)
   "Filter BUFFERS for Shell buffers only, taking the first COUNT if defined."
   (anju-buffer-list--filter #'anju-shell-buffer-filter buffers count))
+
+(defun anju-buffer-list-compilation-filter (buffers &optional count)
+  "Filter BUFFERS for Compilation buffers only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-compilation-buffer-filter buffers count))
+
+(defun anju-buffer-list-grep-filter (buffers &optional count)
+  "Filter BUFFERS for Grep buffers only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-grep-buffer-filter buffers count))
+
+(defun anju-buffer-list-xref-filter (buffers &optional count)
+  "Filter BUFFERS for Xref buffers only, taking the first COUNT if defined."
+  (anju-buffer-list--filter #'anju-xref-buffer-filter buffers count))
 
 (defun anju-process-buffer-list-filter-functions (buffers)
   "Process `anju-process-buffer-list-filter-functions' to filter BUFFERS.
