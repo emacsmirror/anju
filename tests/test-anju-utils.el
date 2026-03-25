@@ -60,6 +60,9 @@
               (type-of anju-buffer-list-filter-functions)))
 
   (let* ((tests '(anju-buffer-list-plain-filter
+                  anju-buffer-list-compilation-filter
+                  anju-buffer-list-grep-filter
+                  anju-buffer-list-xref-filter
                   anju-buffer-list-eshell-filter
                   anju-buffer-list-shell-filter
                   anju-buffer-list-info-filter

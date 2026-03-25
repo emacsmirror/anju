@@ -20,7 +20,7 @@ Copyright © 2026 Charles Y@. Choi
 @finalout
 @titlepage
 @title Anju User Guide
-@subtitle for version 1.0.3
+@subtitle for version 1.0.4-rc.1
 @author Charles Y@. Choi (@email{kickingvegas@@gmail.com})
 @page
 @vskip 0pt plus 1filll
@@ -33,7 +33,7 @@ Copyright © 2026 Charles Y@. Choi
 @node Top
 @top Anju User Guide
 
-Version: 1.0.3
+Version: 1.0.4-rc.1
 
 Copyright © 2026 @w{Charles Y. Choi}
 
@@ -303,7 +303,7 @@ See @ref{Context Menu Customization} for more info.
 @end itemize
 @end itemize
 
-Anju is planned to have on-going development, with more commands and modes supported in future releases.  
+Anju is planned to have on-going development, with more commands and modes supported in future releases.
 
 Shown below is an screenshot of a context menu when text is selected.
 
@@ -578,6 +578,9 @@ Top-down ordering of functions will similarly determine the order of menu items 
 @vindex anju-buffer-list-filter-functions
 @vindex anju-mode-line-buffer-list-function
 @vindex anju-buffer-list-plain-filter
+@vindex anju-buffer-list-compilation-filter
+@vindex anju-buffer-list-grep-filter
+@vindex anju-buffer-list-xref-filter
 @vindex anju-buffer-list-eshell-filter
 @vindex anju-buffer-list-shell-filter
 @vindex anju-buffer-list-info-filter
@@ -616,18 +619,24 @@ at the front of the list.
 
 Anju provides the following buffer filters:
 
-@itemize
-@item
-@code{anju-buffer-list-plain-filter}
-@item
-@code{anju-buffer-list-eshell-filter}
-@item
-@code{anju-buffer-list-shell-filter}
-@item
-@code{anju-buffer-list-info-filter}
-@item
-@code{anju-buffer-list-help-filter}
-@end itemize
+@table @asis
+@item @code{anju-buffer-list-plain-filter}
+buffers whose name is not marked as special (a name wrapped in ‘*’).
+@item @code{anju-buffer-list-compilation-filter}
+buffers whose major mode is @code{compilation-mode}.
+@item @code{anju-buffer-list-grep-filter}
+buffers whose major mode is @code{grep-mode}.
+@item @code{anju-buffer-list-xref-filter}
+buffers whose major mode is @code{xref--xref-buffer-mode}.
+@item @code{anju-buffer-list-eshell-filter}
+buffers whose major mode is @code{eshell-mode.}
+@item @code{anju-buffer-list-shell-filter}
+buffers whose major mode is @code{shell-mode}.
+@item @code{anju-buffer-list-info-filter}
+buffers whose major mode is @code{Info-mode}.
+@item @code{anju-buffer-list-help-filter}
+buffers whose major mode is @code{help-mode}.
+@end table
 
 Users can customize @code{anju-buffer-list-filter-functions} to re-compose or add their own filters to define the resulting buffer list returned by @code{anju-buffer-list-menu-items}. It is recommended that the @code{customize-variable} command be used to accomplish this.
 
