@@ -54,6 +54,9 @@ VERSION_BUMP := $(shell python -m semver bump $(BUMP_LEVEL) $(VERSION))
 VERSION_LAST_TAG := $(shell git tag --sort=-creatordate | head -n 1)
 
 .PHONY: tests					\
+regression					\
+package-lint					\
+clean						\
 create-pr					\
 bump-anju					\
 bump-anju-info					\
@@ -71,10 +74,19 @@ status
 
 ## Run test regression
 tests:
-	$(MAKE) -C $(LISP_DIR) tests
+	$(MAKE) -C $(LISP_DIR) $@
 
 tests/%:
 	$(MAKE) -C tests $*
+
+regression:
+	$(MAKE) -C $(LISP_DIR) $@
+
+package-lint:
+	$(MAKE) -C $(LISP_DIR) $@
+
+clean:
+	$(MAKE) -C $(LISP_DIR) $@
 
 ## Bump Patch Version
 bump-anju:

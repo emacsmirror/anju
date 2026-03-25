@@ -22,3 +22,15 @@ tests: anju-tests
 .PHONY: anju-tests
 anju-tests:
 	$(MAKE) -C $(SRC_DIR) -f Makefile-anju.make tests
+
+.PHONY: package-lint
+package-lint:
+	$(MAKE) -C $(SRC_DIR) -f Makefile-anju.make $@
+
+.PHONY: regression
+regression:
+	$(MAKE) -C $(SRC_DIR) -f Makefile-anju.make $@
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(SRC_DIR) -f Makefile-anju.make $@
