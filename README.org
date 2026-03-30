@@ -1,4 +1,4 @@
-
+[[https://melpa.org/#/anju][file:https://melpa.org/packages/anju-badge.svg]] [[https://stable.melpa.org/#/anju][file:https://stable.melpa.org/packages/anju-badge.svg]]
 * Anju (안주)
 :PROPERTIES:
 :CUSTOM_ID: anju-안주
