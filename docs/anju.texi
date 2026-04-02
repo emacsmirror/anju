@@ -92,9 +92,16 @@ Features
 
 Context Menu
 
+* Selected Text Commands::
 * Org Mode Context Menu::
 * Dired Mode Context Menu::
 * Magit Support::
+
+Org Mode Context Menu
+
+* Org Headline::
+* Org Item::
+* Org Table::
 
 Customization
 
@@ -273,25 +280,13 @@ A left-double-click on any blank space on the mode line will checkpoint the curr
 
 @cindex Context Menu
 
-Anju both works with and enhances @code{context-menu-mode} to support features like
+Anju enhances @code{context-menu-mode} by providing context menu functions to support the following contexts:
 
 @itemize
 @item
-Selected Text Commands
-@itemize
+Selected text
 @item
-Style (bold@comma{} italic@comma{} code@comma{} etc.)
-@item
-Transform Text (upper/lower case@comma{} capitalize)
-@item
-Occur
-@item
-Toggle comment (when available)
-@item
-Write to file (@code{write-region})
-@end itemize
-@item
-Mode-specific support
+Mode-specific commands
 @itemize
 @item
 Org mode
@@ -299,38 +294,119 @@ Org mode
 Dired
 @end itemize
 @item
-Window management based on mouse position
+Window management
 @item
-Full support for @code{context-menu-mode} customization using @code{context-menu-functions}.
-@itemize
-@item
-See @ref{Context Menu Customization, , Context Menu Customization} for more info.
-@end itemize
+Full support for @code{context-menu-mode} customization (See @ref{Context Menu Customization, , Context Menu Customization}).
 @end itemize
 
-Anju is planned to have on-going development@comma{} with more commands and modes supported in future releases.
+Anju deliberately omits the display of the default mode-specific menu keymaps in the context menu as they are considered redundant to their display in the main menu. Rationale for this is described in @ref{Design Principles and Concerns, , Design Principles and Concerns}. Users can still access the default mode-specific menu keymap by using the binding @kbd{C-<mouse-3>}.
 
-Shown below is an screenshot of a context menu when text is selected.
 
-@image{images/anju-context-menu-region,,,,png}
+
+Learn more about the different areas Anju enhances context menus in the links below.
 
 @menu
+* Selected Text Commands::
 * Org Mode Context Menu::
 * Dired Mode Context Menu::
 * Magit Support::
 @end menu
 
+@node Selected Text Commands
+@subsection Selected Text Commands
+
+@cindex Selected Text Commands
+
+@image{images/anju-context-menu-region,,,,png}
+
+If a context menu is raised on selected text@comma{} the following menu items are displayed:
+
+@table @asis
+@item Style
+Applies mode-specific markup to emphasize the selected text (e.g. bold@comma{} italic@comma{} code@comma{} etc.).
+@itemize
+@item
+Available only for @code{org-mode} and @code{markdown-mode}.
+@end itemize
+
+@item Transform Text
+Applies transforms (upper/lower case@comma{} capitalize) to the selected text.
+
+@item Occur
+Run @code{occur} command to show occurrences of selected text.
+
+@item Toggle comment 
+Toggles selected text to be commented based on mode.
+@itemize
+@item
+Available only on modes derived from @code{prog-mode} and @code{org-mode}
+@end itemize
+
+@item Write Region
+Writes selected text to a user-specified file.
+@end table
+
 @node Org Mode Context Menu
 @subsection Org Mode Context Menu
 
-The screenshot below shows a context menu for Org mode. Note that the upper part of the menu changes with respect to what kind of Org element (in the example below@comma{} a list item) the point is on.
+@cindex Org Mode Context Menu
 
-@image{images/anju-context-menu-org-mode,,,,png}
+Anju provides context-sensitive support for Org mode by providing commands relevant to the type of Org element the point is in. Org elements supported by Anju are:
+
+@itemize
+@item
+Headline
+@item
+Item
+@item
+Table
+@end itemize
+
+In addition if text is selected@comma{} then support for styling it is supported.
 
 Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's @ref{Design Principles and Concerns, , Design Principles and Concerns}.
 
+It is recommended that the @code{org-mouse} package be loaded when using
+
+@menu
+* Org Headline::
+* Org Item::
+* Org Table::
+@end menu
+
+@node Org Headline
+@subsubsection Org Headline
+
+If the context menu is raised on a headline@comma{} then commands related to clocking and promotion are offered.
+
+@image{images/anju-context-menu-org-headline,,,,png}
+
+@node Org Item
+@subsubsection Org Item
+
+If the context menu is raised on a list item@comma{} then commands related to promotion and conversion to a checkbox are provided.
+
+The menu item ``To Checkbox'' will convert an item to a checkbox@comma{} with the additional behavior that if the point is at the start of the whole list@comma{} the whole list will be turned into checkboxes.
+
+@image{images/anju-context-menu-org-item,,,,png}
+
+If @code{org-mouse} is loaded@comma{} then clicking on a checkbox will toggle its state between on ('[X]') or off ('[ ]'). However@comma{} changing to an intermediate state ('[-]') is supported by the menu item ``In-Progress''. The menu item ``To Item'' will convert the checkbox back to a plain list item.
+
+@image{images/anju-context-menu-org-checkbox,,,,png}
+
+Note that checkboxes in screenshots are prettified using @code{prettify-symbols-mode}.
+
+@node Org Table
+@subsubsection Org Table
+
+If the context menu is raised in a table@comma{} then table-specific commands are shown.
+
+@image{images/anju-context-menu-org-table,,,,png}
+
 @node Dired Mode Context Menu
 @subsection Dired Mode Context Menu
+
+@cindex Dired Mode Context Menu
 
 Anju has context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
 
@@ -345,10 +421,14 @@ Note that the Dired context menu is intentionally restrained in its command offe
 @node Magit Support
 @subsection Magit Support
 
+@cindex Magit Support
+
 If Magit 4.4+ is installed@comma{} then the context menu function @code{anju-context-menu-vc} will offer Magit commands depending on context. If the context menu is raised in a file buffer@comma{} then the menu item ``Magit Dispatch…'' (@code{magit-file-dispatch}) is shown@comma{} otherwise ``Magit Status'' (@code{magit-status}).
 
 @node Main Menu
 @section Main Menu
+
+@cindex Main Menu
 
 Anju offers the following enhancements to the main menu:
 
@@ -369,6 +449,8 @@ Anju provides support for customizing the enhancements (@ref{Main Menu Customiza
 
 @node Window Management
 @section Window Management
+
+@cindex Window Management
 
 Window management via mouse interaction is provided for through the @ref{Mode Line, , mode line} and @ref{Context Menu, , context menu}. More detail is provided in those sections.
 

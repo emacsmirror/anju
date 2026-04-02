@@ -383,7 +383,7 @@ This function is intended to be hooked into `context-menu-functions'."
         (easy-menu-add-item menu nil
                             ["Promote Subtree ←"
                              org-promote-subtree
-                             :help "Demote heading subtree"]))
+                             :help "Promote heading subtree"]))
 
       (when (org-at-item-p)
         (easy-menu-add-item menu nil
@@ -404,7 +404,21 @@ This function is intended to be hooked into `context-menu-functions'."
         (easy-menu-add-item menu nil
                             ["Promote Subtree ←"
                              org-outdent-item-tree
-                             :help "Promote item subtree"]))
+                             :help "Promote item subtree"])
+
+        (if (org-at-item-checkbox-p)
+            (easy-menu-add-item menu nil
+                            ["In-Progress"
+                             casual-org-checkbox-in-progress
+                             :help "Change checkbox state to in-progress [-]"]))
+
+        (easy-menu-add-item menu nil
+                            ["Toggle List/Checkbox"
+                             casual-org-toggle-list-to-checkbox
+                             :label (if (org-at-item-checkbox-p)
+                                        "To Item"
+                                      "To Checkbox")
+                             :help "Toggle Item/Checkbox"]))
 
       (when (anju-at-org-table-p)
         (easy-menu-add-item menu nil
