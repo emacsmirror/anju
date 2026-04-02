@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(require 'cl-lib)
 (require 'anju-context-menu)
 (require 'anju-test-utils)
 
@@ -175,66 +176,58 @@
   (anju-test-context-menu-function
    #'anju-context-menu-dired
    "hi there"
-   14
+   15
    (lambda (items)
-     (let* ((item0 (seq-elt items 0))
-            (item1 (seq-elt items 1))
-            (item2 (seq-elt items 2))
-            (item3 (seq-elt items 3))
-            (item4 (seq-elt items 4))
-            (item5 (seq-elt items 5))
-            (item6 (seq-elt items 6))
-            (item7 (seq-elt items 7))
-            (item8 (seq-elt items 8))
-            (item9 (seq-elt items 9))
-            (item10 (seq-elt items 10))
-            (item11 (seq-elt items 11))
-            (item12 (seq-elt items 12))
-            (item13 (seq-elt items 13)))
-
+     (let ((i 0))
        (anju-test-menu-item
-        item0
+        (seq-elt items i)
         "Rename to…"
         #'dired-do-rename
         "Rename or move file")
 
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         "Copy to…"
         #'dired-do-copy
         "Copy file")
 
        (anju-test-menu-item
-        item2
+        (seq-elt items (cl-incf i))
         "Symlink…"
         #'dired-do-relsymlink
         "Make relative symlink")
 
        (anju-test-menu-item
-        item3
+        (seq-elt items (cl-incf i))
+        "Toggle Thumbnail"
+        #'image-dired-dired-toggle-marked-thumbs
+        "Toggle thumbnails in front of marked file names in the Dired buffer.")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
         (lambda () (format "Duplicate “%s”" (anju-filename-from-path (dired-get-filename))))
         #'anju-dired-duplicate-file
         "Duplicate selected item")
 
        (anju-test-menu-item
-        item4
+        (seq-elt items (cl-incf i))
         (lambda () (format "Insert “%s” View"
                       (anju-filename-from-path (dired-get-filename))))
         #'dired-maybe-insert-subdir
         "Insert subdir (sub-directory)")
 
-       (anju-test-menu-item item5 "--")
+       (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
 
        (anju-test-menu-item
-        item6
+        (seq-elt items (cl-incf i))
         "Move to Trash…"
         #'dired-do-delete
         "Delete all marked files.")
 
-       (anju-test-menu-item item7 "--")
+       (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
 
        (anju-test-menu-item
-        item8
+        (seq-elt items (cl-incf i))
         (lambda () (format
                "%s “%s” View"
                (if (dired-subdir-hidden-p
@@ -247,7 +240,7 @@
         "Toggle hide subdir (sub-directory)")
 
        (anju-test-menu-item
-        item9
+        (seq-elt items (cl-incf i))
         (lambda () (format
                "Remove “%s” View"
                (anju-filename-from-path
@@ -256,27 +249,25 @@
         #'dired-kill-subdir
         "Kill subdir (sub-directory)")
 
-       (should (string-equal (seq-elt item10 2) "Sort By"))
+       (should (string-equal (seq-elt (seq-elt items (cl-incf i)) 2) "Sort By"))
 
        (anju-test-menu-item
-        item11
+        (seq-elt items (cl-incf i))
         "Omit Mode"
         #'dired-omit-mode
         "Omit mode")
 
        (anju-test-menu-item
-        item12
+        (seq-elt items (cl-incf i))
         "Hide Details"
         #'dired-hide-details-mode
         "Hide directory details")
 
        (anju-test-menu-item
-        item13
+        (seq-elt items (cl-incf i))
         "📁 Dired…"
         #'dired
-        "Open Dired")
-
-       )))
+        "Open Dired"))))
   (kill-buffer))
 
 (ert-deftest test-anju-context-menu-scratch ()
@@ -532,19 +523,16 @@
    "hi there"
    3
    (lambda (items)
-     (let* ((item0 (seq-elt items 0))
-            (item1 (seq-elt items 1))
-            (item2 (seq-elt items 2)))
-       (anju-test-menu-item item0 "--")
-
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         "Magit Dispatch…"
         #'magit-file-dispatch
         "Show the status of the current Git repository in a buffer")
 
        (anju-test-menu-item
-        item2
+        (seq-elt items (cl-incf i))
         "Ediff revision…"
         #'casual-ediff-revision-from-menu
         "Ediff this file with revision"))))
