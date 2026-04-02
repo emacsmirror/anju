@@ -198,60 +198,69 @@ and convert it to Org using the pandoc utility."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (save-excursion
-    (when (mouse-posn-property (event-start click) 'dired-filename)
-      (easy-menu-add-item menu nil
-                          ["Rename to…"
-                           dired-do-rename
-                           :help "Rename or move file"])
+  (when (derived-mode-p 'dired-mode)
+    (save-excursion
+      (when (mouse-posn-property (event-start click) 'dired-filename)
+        (easy-menu-add-item menu nil
+                            ["Rename to…"
+                             dired-do-rename
+                             :help "Rename or move file"])
 
-      (easy-menu-add-item menu nil
-                          ["Copy to…"
-                           dired-do-copy
-                           :help "Copy file"])
+        (easy-menu-add-item menu nil
+                            ["Copy to…"
+                             dired-do-copy
+                             :help "Copy file"])
 
-      (easy-menu-add-item menu nil
-                          ["Symlink…"
-                           dired-do-relsymlink
-                           :help "Make relative symlink"])
+        (easy-menu-add-item menu nil
+                            ["Symlink…"
+                             dired-do-relsymlink
+                             :help "Make relative symlink"])
 
-      (easy-menu-add-item
-       menu
-       nil
-       ["Duplicate"
-        anju-dired-duplicate-file
-        :label (format "Duplicate “%s”"
-                       (anju-filename-from-path (dired-get-filename)))
+        (easy-menu-add-item menu nil
+                            ["Toggle Thumbnail"
+                             image-dired-dired-toggle-marked-thumbs
+                             :visible (string-match-p (image-file-name-regexp)
+                                                      (dired-get-filename))
+                             :help "Toggle thumbnails in front of marked \
+file names in the Dired buffer."])
 
-        :help "Duplicate selected item"])
+        (easy-menu-add-item
+         menu
+         nil
+         ["Duplicate"
+          anju-dired-duplicate-file
+          :label (format "Duplicate “%s”"
+                         (anju-filename-from-path (dired-get-filename)))
 
-      ;; (easy-menu-add-item menu nil
-      ;;                     ["Change Mode…"
-      ;;                      dired-do-chmod
-      ;;                      :help "Change mode of file (chmod)"])
+          :help "Duplicate selected item"])
 
-      (easy-menu-add-item menu nil
-                          ["Insert Subdir"
-                           dired-maybe-insert-subdir
-                           :label (format "Insert “%s” View"
-                                          (anju-filename-from-path (dired-get-filename)))
-                           :visible (file-directory-p
-                                     (dired-file-name-at-point))
-                           :help "Insert subdir (sub-directory)"])
+        ;; (easy-menu-add-item menu nil
+        ;;                     ["Change Mode…"
+        ;;                      dired-do-chmod
+        ;;                      :help "Change mode of file (chmod)"])
 
-      (anju-context-menu-item-separator menu trash-separator)
+        (easy-menu-add-item menu nil
+                            ["Insert Subdir"
+                             dired-maybe-insert-subdir
+                             :label (format "Insert “%s” View"
+                                            (anju-filename-from-path (dired-get-filename)))
+                             :visible (file-directory-p
+                                       (dired-file-name-at-point))
+                             :help "Insert subdir (sub-directory)"])
 
-      (easy-menu-add-item menu nil
-                          ["Move to Trash…"
-                           dired-do-delete
-                           :visible (file-writable-p
-                                     (dired-file-name-at-point))
-                           :help "Delete all marked files."])
+        (anju-context-menu-item-separator menu trash-separator)
 
-      (anju-context-menu-item-separator menu dired-separator))
+        (easy-menu-add-item menu nil
+                            ["Move to Trash…"
+                             dired-do-delete
+                             :visible (file-writable-p
+                                       (dired-file-name-at-point))
+                             :help "Delete all marked files."])
 
-    (mouse-set-point click)
-    (when (derived-mode-p 'dired-mode)
+        (anju-context-menu-item-separator menu dired-separator))
+
+      (mouse-set-point click)
+
       (easy-menu-add-item menu nil
                           ["Toggle Subdir View"
                            dired-hide-subdir
@@ -300,9 +309,9 @@ This function is intended to be hooked into `context-menu-functions'."
                            :help "Hide directory details"])
 
       (easy-menu-add-item menu nil
-                        ["📁 Dired…"
-                         dired
-                         :help "Open Dired"])))
+                          ["📁 Dired…"
+                           dired
+                           :help "Open Dired"])))
   menu)
 
 
@@ -540,17 +549,19 @@ This function is intended to be hooked into `context-menu-functions'."
 
       (anju-context-menu-item-separator menu vc-separator)
 
-      (if (buffer-file-name)
+      (when (package-installed-p 'magit)
+        (require 'magit)
+        (if (buffer-file-name)
+            (easy-menu-add-item
+             menu nil
+             ["Magit Dispatch…"
+              magit-file-dispatch
+              :help "Show the status of the current Git repository in a buffer"])
           (easy-menu-add-item
            menu nil
-           ["Magit Dispatch…"
-            magit-file-dispatch
-            :help "Show the status of the current Git repository in a buffer"])
-        (easy-menu-add-item
-         menu nil
-         ["Magit Status"
-          magit-status
-          :help "Show the status of the current Git repository in a buffer"]))
+           ["Magit Status"
+            magit-status
+            :help "Show the status of the current Git repository in a buffer"])))
 
       (easy-menu-add-item
        menu nil

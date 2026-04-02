@@ -19,13 +19,13 @@ include Makefile--defines.make
 PACKAGE_NAME=anju
 CASUAL_LIB_DIR=$(ANJU_BASE_DIR)/../casual/lisp
 
-ELISP_INCLUDES= \
-anju-utils.el \
+ELISP_INCLUDES=					\
+anju-utils.el					\
 anju-style-text.el
 
-ELISP_PACKAGES= \
-anju-context-menu.el \
-anju-main-menu.el \
+ELISP_PACKAGES=					\
+anju-context-menu.el				\
+anju-main-menu.el				\
 anju-mode-line.el
 
 ELISP_TEST_INCLUDES=anju-test-utils.el
@@ -36,6 +36,10 @@ PACKAGE_PATHS=					\
 -L $(EMACS_ELPA_DIR)/transient-current		\
 -L $(EMACS_ELPA_DIR)/cond-let-current		\
 -L $(EMACS_ELPA_DIR)/markdown-mode-current	\
+-L $(EMACS_ELPA_DIR)/magit-current		\
+-L $(EMACS_ELPA_DIR)/magit-section-current	\
+-L $(EMACS_ELPA_DIR)/llama-current		\
+-L $(EMACS_ELPA_DIR)/with-editor-current	\
 -L $(CASUAL_LIB_DIR)				\
 -L $(ANJU_LISP_DIR)
 

@@ -195,12 +195,15 @@ Anju has context menu support for Dired mode. The screenshot below shows the con
 
 [[file:images/anju-dired-copy-to.png]]
 
-
 If the mouse point is over a directory, the option to insert a view (aka subdir) for it in the buffer is provided.
 
 [[file:images/anju-dired-insert-subdir.png]]
 
 Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
+
+*** Magit Support
+
+If Magit 4.4+ is installed, then the context menu function ~anju-context-menu-vc~ will offer Magit commands depending on context. If the context menu is raised in a file buffer, then the menu item "Magit Dispatch…" (~magit-file-dispatch~) is shown, otherwise "Magit Status" (~magit-status~).
 
 
 ** Main Menu
@@ -227,17 +230,18 @@ Anju provides support for customizing the enhancements ([[#main-menu-customizati
 Window management via mouse interaction is provided for through the [[#mode-line][mode line]] and [[#context-menu][context menu]]. More detail is provided in those sections.
 
 
-
 * Requirements
 #+CINDEX: Requirements
 
-Anju requires Emacs 29.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
+Anju requires Emacs 29.1+, Casual 2.13+, Markdown Mode 2.7+.
 
 Certain menus require more installed software:
 
 - Anju Dired Support: GNU Coreutils (~ls~)
 - Markdown import to Org: pandoc
 
+Anju provides optional support for Magit 4.4+.
+  
 * Install
 #+CINDEX: Install
 #+VINDEX: context-menu-mode
@@ -386,6 +390,44 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 1. A visual UI is provided showing what choices for built-in context menu functions are available.
 2. Users can insert their own custom function.
 3. Top-down ordering of functions will similarly determine the order of menu items in the context menu.
+
+*** Anju Context Menu Functions
+#+VINDEX: anju-context-menu-dired
+#+VINDEX: anju-context-menu-org-mode
+#+VINDEX: anju-context-menu-scratch
+#+VINDEX: anju-context-menu-buffers
+#+VINDEX: anju-context-menu-region
+#+VINDEX: anju-context-menu-narrow
+#+VINDEX: anju-context-menu-open-in
+#+VINDEX: anju-context-menu-vc
+#+VINDEX: anju-context-menu-markup
+#+VINDEX: anju-context-menu-wordcount
+#+VINDEX: anju-context-menu-window
+                     
+Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
+
+- ~anju-context-menu-dired~ :: Dired commands.
+
+- ~anju-context-menu-org-mode~  :: Org mode commands.
+
+- ~anju-context-menu-scratch~  :: Open scratch buffer.
+
+- ~anju-context-menu-buffers~ :: Buffer navigation commands.
+
+- ~anju-context-menu-region~ :: Commands for selected text.
+
+- ~anju-context-menu-narrow~ :: Narrow-related commands.
+
+- ~anju-context-menu-open-in~ :: Open in Dired.
+
+- ~anju-context-menu-vc~ :: Version control related commands.
+  If Magit 4.4+ is installed, then calls to it are made from here.
+
+- ~anju-context-menu-markup~ :: Commands to show/hide text markup (e.g. Org, Markdown).
+
+- ~anju-context-menu-wordcount~ :: Word count command.
+
+- ~anju-context-menu-window~ :: Window management commands.
 
 ** Mode Line Buffer List Menu Customization
 :PROPERTIES:

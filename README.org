@@ -54,12 +54,15 @@ More detail on Anju's features can be found in the [[https://kickingvegas.github
 :PROPERTIES:
 :CUSTOM_ID: requirements
 :END:
-Anju requires Emacs 29.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
+Anju requires Emacs 29.1+, Casual 2.13+, Markdown Mode 2.7+.
 
 Certain menus require more installed software:
 
 - Anju Dired Support: GNU Coreutils (~ls~)
 - Markdown import to Org: pandoc
+
+Anju provides optional support for Magit 4.4+.
+    
 
 * Install
 :PROPERTIES:
