@@ -557,13 +557,13 @@ This function is intended to be hooked into `context-menu-functions'."
   (save-excursion
     (mouse-set-point click)
     (when (and (vc-responsible-backend default-directory t)
-               (not (derived-mode-p 'magit-status-mode))
                (not (use-region-p))
                (not (anju-at-org-table-p)))
 
       (anju-context-menu-item-separator menu vc-separator)
 
-      (when (package-installed-p 'magit)
+      (when (and (package-installed-p 'magit)
+                 (not (derived-mode-p 'magit-status-mode)))
         (require 'magit)
         (if (buffer-file-name)
             (easy-menu-add-item
