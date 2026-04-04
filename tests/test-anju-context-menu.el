@@ -287,6 +287,152 @@
         #'scratch-buffer
         "Switch to the *scratch* buffer.")))))
 
+(ert-deftest test-anju-context-menu-org-mode-heading ()
+  "Test for `anju-context-menu-org-mode' when point is in heading."
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-org-mode
+   7
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Clock In"
+        #'org-clock-in
+        "Clock in")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Clock Out"
+        #'org-clock-out
+        "Clock out")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Demote →"
+        #'org-do-demote
+        "Demote")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Promote ←"
+        #'org-do-promote
+        "Promote")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Demote Subtree →"
+        #'org-demote-subtree
+        "Demote heading subtree")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Promote Subtree ←"
+        #'org-promote-subtree
+        "Promote heading subtree")))
+   (lambda (filename description)
+     (insert "* heading 1")
+     (goto-char (point-min))
+     (save-buffer))))
+
+
+(ert-deftest test-anju-context-menu-org-mode-list-item ()
+  "Test for `anju-context-menu-org-mode' when point is in list item."
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-org-mode
+   6
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Demote →"
+        #'org-indent-item
+        "Demote")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Promote ←"
+        #'org-outdent-item
+        "Promote")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Demote Subtree →"
+        #'org-indent-item-tree
+        "Demote item subtree")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Promote Subtree ←"
+        #'org-outdent-item-tree
+        "Promote item subtree")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (if (org-at-item-checkbox-p)
+                  "To Item"
+                "To Checkbox"))
+        #'casual-org-toggle-list-to-checkbox
+        "Toggle Item/Checkbox")))
+   (lambda (filename description)
+     (insert "- item 1")
+     (goto-char (point-min))
+     (save-buffer))))
+
+(ert-deftest test-anju-context-menu-org-mode-checkbox-item ()
+  "Test for `anju-context-menu-org-mode' when point is in list item."
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-org-mode
+   7
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Demote →"
+        #'org-indent-item
+        "Demote")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Promote ←"
+        #'org-outdent-item
+        "Promote")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Demote Subtree →"
+        #'org-indent-item-tree
+        "Demote item subtree")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Promote Subtree ←"
+        #'org-outdent-item-tree
+        "Promote item subtree")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "In-Progress"
+        #'casual-org-checkbox-in-progress
+        "Change checkbox state to in-progress [-]")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (if (org-at-item-checkbox-p)
+                  "To Item"
+                "To Checkbox"))
+        #'casual-org-toggle-list-to-checkbox
+        "Toggle Item/Checkbox")))
+   (lambda (filename description)
+     (insert "- [ ] item 1")
+     (goto-char (point-min))
+     (save-buffer))))
+
 (ert-deftest test-anju-context-menu-org-mode-table ()
   "Test for `anju-context-menu-org-mode' when point is in table."
 

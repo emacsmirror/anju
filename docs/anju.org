@@ -159,37 +159,87 @@ A left-double-click on any blank space on the mode line will checkpoint the curr
 :END:
 #+CINDEX: Context Menu
 
-Anju both works with and enhances ~context-menu-mode~ to support features like
+Anju enhances ~context-menu-mode~ by providing context menu functions to support the following contexts:
 
-- Selected Text Commands
-  - Style (bold, italic, code, etc.)
-  - Transform Text (upper/lower case, capitalize)
-  - Occur
-  - Toggle comment (when available)
-  - Write to file (~write-region~)
-- Mode-specific support
+- Selected text
+- Mode-specific commands
   - Org mode
   - Dired
-- Window management based on mouse position
-- Full support for ~context-menu-mode~ customization using ~context-menu-functions~.
-  - See [[#context-menu-customization][Context Menu Customization]] for more info.
+- Window management
+- Full support for ~context-menu-mode~ customization (See [[#context-menu-customization][Context Menu Customization]]).
 
-Anju is planned to have on-going development, with more commands and modes supported in future releases.
+Anju deliberately omits the display of the default mode-specific menu keymaps in the context menu as they are considered redundant to their display in the main menu. Rationale for this is described in [[#design-principles][Design Principles and Concerns]]. Users can still access the default mode-specific menu keymap by using the binding {{{kbd(C-<mouse-3>)}}}.
 
-Shown below is an screenshot of a context menu when text is selected.
+
+
+Learn more about the different areas Anju enhances context menus in the links below.
+
+*** Selected Text Commands
+#+CINDEX: Selected Text Commands
 
 [[file:images/anju-context-menu-region.png]]
 
+If a context menu is raised on selected text, the following menu items are displayed:
+
+- Style :: Applies mode-specific markup to emphasize the selected text (e.g. bold, italic, code, etc.).
+  - Available only for ~org-mode~ and ~markdown-mode~.
+
+- Transform Text :: Applies transforms (upper/lower case, capitalize) to the selected text.
+
+- Occur :: Run ~occur~ command to show occurrences of selected text.
+
+- Toggle comment  :: Toggles selected text to be commented based on mode.
+  - Available only on modes derived from ~prog-mode~ and ~org-mode~
+
+- Write Region :: Writes selected text to a user-specified file.
+
+
 *** Org Mode Context Menu
+#+CINDEX: Org Mode Context Menu
 
-The screenshot below shows a context menu for Org mode. Note that the upper part of the menu changes with respect to what kind of Org element (in the example below, a list item) the point is on.
+Anju provides context-sensitive support for Org mode by providing commands relevant to the type of Org element the point is in. Org elements supported by Anju are:
 
-[[file:images/anju-context-menu-org-mode.png]]
+- Headline
+- Item
+- Table
+
+In addition if text is selected, then support for styling it is supported.
 
 Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
 
+It is recommended that the ~org-mouse~ package be loaded when using
+
+**** Org Headline
+
+If the context menu is raised on a headline, then commands related to clocking and promotion are offered.
+
+[[file:images/anju-context-menu-org-headline.png]]
+
+
+**** Org Item
+
+If the context menu is raised on a list item, then commands related to promotion and conversion to a checkbox are provided.
+
+The menu item "To Checkbox" will convert an item to a checkbox, with the additional behavior that if the point is at the start of the whole list, the whole list will be turned into checkboxes.
+
+[[file:images/anju-context-menu-org-item.png]]
+
+If ~org-mouse~ is loaded, then clicking on a checkbox will toggle its state between on ('[X]') or off ('[ ]'). However, changing to an intermediate state ('[-]') is supported by the menu item "In-Progress". The menu item "To Item" will convert the checkbox back to a plain list item.
+
+[[file:images/anju-context-menu-org-checkbox.png]]
+
+Note that checkboxes in screenshots are prettified using ~prettify-symbols-mode~.
+
+**** Org Table
+
+If the context menu is raised in a table, then table-specific commands are shown.
+
+[[file:images/anju-context-menu-org-table.png]]
+
+
 
 *** Dired Mode Context Menu
+#+CINDEX: Dired Mode Context Menu
 
 Anju has context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
 
@@ -202,11 +252,13 @@ If the mouse point is over a directory, the option to insert a view (aka subdir)
 Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
 
 *** Magit Support
+#+CINDEX: Magit Support
 
 If Magit 4.4+ is installed, then the context menu function ~anju-context-menu-vc~ will offer Magit commands depending on context. If the context menu is raised in a file buffer, then the menu item "Magit Dispatch…" (~magit-file-dispatch~) is shown, otherwise "Magit Status" (~magit-status~).
 
 
 ** Main Menu
+#+CINDEX: Main Menu
 
 Anju offers the following enhancements to the main menu:
 
@@ -226,6 +278,7 @@ Anju provides support for customizing the enhancements ([[#main-menu-customizati
  to the main menu.
 
 ** Window Management
+#+CINDEX: Window Management
 
 Window management via mouse interaction is provided for through the [[#mode-line][mode line]] and [[#context-menu][context menu]]. More detail is provided in those sections.
 
@@ -241,7 +294,7 @@ Certain menus require more installed software:
 - Markdown import to Org: pandoc
 
 Anju provides optional support for Magit 4.4+.
-  
+
 * Install
 #+CINDEX: Install
 #+VINDEX: context-menu-mode
@@ -403,7 +456,7 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 #+VINDEX: anju-context-menu-markup
 #+VINDEX: anju-context-menu-wordcount
 #+VINDEX: anju-context-menu-window
-                     
+
 Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
 
 - ~anju-context-menu-dired~ :: Dired commands.
