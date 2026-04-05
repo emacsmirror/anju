@@ -24,6 +24,9 @@
 
 ;;; Code:
 (require 'bookmark)
+(require 'make-mode)
+(require 'org)
+(require 'markdown-mode)
 (require 'anju-utils)
 (require 'anju-style-text)
 (require 'casual-bookmarks)
@@ -148,6 +151,49 @@
 
   (easy-menu-add-item text-mode-menu nil anju-transform-text-menu "Auto Fill")
   (easy-menu-add-item text-mode-menu nil anju-style-menu "Auto Fill"))
+
+
+
+;; -------------------------------------------------------------------
+;; Imenu Configuration
+
+
+(defun anju-imenu-add-menubar-index ()
+  "Add imenu index to menubar."
+  (condition-case err (imenu-add-menubar-index)
+    (imenu-unavailable
+     (let ((inhibit-message t))
+       (message "Warning: %s" (error-message-string err))))))
+
+(defun anju-imenu-auto-rescan ()
+  "Set local `imenu-auto-rescan' to t."
+  (setq-local imenu-auto-rescan t))
+
+(defun anju-main-menu--reconfigure-imenu ()
+  "Configure main menu to include index menu for different modes.
+
+Current modes affected:
+- `prog-mode'
+- `makefile-mode'
+- `org-mode'
+- `markdown-mode'
+
+Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
+
+  (let ((hooks '(markdown-mode-hook
+                 makefile-mode-hook
+                 prog-mode-hook
+                 org-mode-hook)))
+
+    (mapc (lambda (hook)
+            (if (eq hook 'prog-mode-hook)
+                (add-hook hook #'anju-imenu-add-menubar-index)
+              (add-hook hook #'imenu-add-menubar-index))
+            (add-hook hook #'anju-imenu-auto-rescan))
+          hooks)
+
+    (if (<= org-imenu-depth 2)
+        (setopt org-imenu-depth 7))))
 
 (provide 'anju-main-menu)
 ;;; anju-main-menu.el ends here
