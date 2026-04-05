@@ -268,14 +268,25 @@ To support usage of Emacs bookmarks, the following menu is added to the main men
 
 [[file:images/anju-main-menu-bookmarks.png]]
 
-#+TEXINFO: @subheading Re-organization of the Help menu
+
+#+TEXINFO: @subheading Index menu (imenu)
+
+Anju adds the index menu ([[info:emacs#Imenu][emacs#Imenu]]) to the main menu bar for modes that support it. Anju will configure the following modes with ~imenu-add-menubar-index~:
+
+- ~prog-mode~ derived modes
+- ~makefile-mode~
+- ~org-mode~
+- ~markdown-mode~
+
+
+
+#+TEXINFO: @subheading Help menu
 
 An opinionated re-organization of the Help menu is provided.
 
 [[file:images/anju-main-menu-help.png]]
 
-Anju provides support for customizing the enhancements ([[#main-menu-customization][Main Menu Customization]])
- to the main menu.
+Anju provides support for customizing all the above enhancements to the main menu. See [[#main-menu-customization][Main Menu Customization]] for more detail.
 
 ** Window Management
 #+CINDEX: Window Management
@@ -367,13 +378,15 @@ Anju has a number of customizable variables that determine the behavior of ~anju
 
 - ~anju-unset-legacy-mouse-bindings-enable~ :: Remove bindings using ~mouse-2~.
 
-- ~anju-reconfigure-main-menu-enable~ :: Reconfigure the main menu.
+- ~anju-reconfigure-main-menu-enable~ :: Top-level variable to reconfigure the main menu.
 
-  The variable  ~anju-reconfigure-main-menu-hook~ is a list of functions which each modify a different section of the main menu.
+  If ~anju-reconfigure-main-menu-enable~ is ~t~, the following variables determine how the main menu is reconfigured:
 
-  If ~anju-reconfigure-main-menu-enable~ is ~t~, the variable ~anju-help-menu-remove-emacs-tutorial~ can control if the menu entries for the Emacs tutorial are shown.
+  - ~anju-reconfigure-main-menu-hook~ :: a list of functions, each modifying a sub-menu of the main menu.
 
-By default, all the above ~*-enable~ variables are turned on (~t~).  Users preferring to make granular changes to ~anju-init~ can invoke ~M-x~ ~customize-group~ ~anju~.
+  - ~anju-help-menu-remove-emacs-tutorial~ :: control if the Emacs tutorial menu items are shown.
+
+By default, all the above ~*-enable~ variables are set to ~t~.  Users preferring to make granular changes to ~anju-init~ can invoke ~M-x~ ~customize-group~ ~anju~.
 
 
 ** Context Menu Customization
@@ -553,6 +566,7 @@ Users who wish define their own menu should override this value with their own f
 #+VINDEX: anju-main-menu--reconfigure-text-mode
 #+VINDEX: anju-main-menu--reconfigure-bookmarks
 #+VINDEX: anju-main-menu--reconfigure-help
+#+VINDEX: anju-main-menu--reconfigure-imenu
 #+VINDEX: anju-help-menu-remove-emacs-tutorial
 
 Anju modifies the main menu via the customizable hook variable ~anju-reconfigure-main-menu-hook~. This hook is run in the command ~anju-init~.
@@ -560,9 +574,19 @@ Anju modifies the main menu via the customizable hook variable ~anju-reconfigure
 By default, the following hook functions are run:
 
 - ~anju-main-menu--reconfigure-text-mode~ :: Reconfigures Text menu for text mode buffers.
+
 - ~anju-main-menu--reconfigure-bookmarks~ :: Adds Bookmarks menu to main menu.
+
 - ~anju-main-menu--reconfigure-help~ :: Reconfigures Help menu.
   - Set the customizable variable ~anju-help-menu-remove-emacs-tutorial~ to ~t~ if removing the tutorial entries is desired.
+
+- ~anju-main-menu--reconfigure-imenu~ :: Adds an index menu (imenu) to the following modes:
+  - ~prog-mode~
+  - ~makefile-mode~
+  - ~org-mode~
+  - ~markdown-mode~
+
+Execution of any of the above functions can be set to preference in ~anju-reconfigure-main-menu-hook~.    
 
 ~anju-reconfigure-main-menu-hook~ can be modified to add additional custom hook functions. Users who wish to do this should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps][elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu][elisp#Easy Menu]]) library.
 

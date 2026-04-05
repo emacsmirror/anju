@@ -127,6 +127,9 @@ add their own filters to define the resulting buffer list returned by
 
   :type '(alist
           :key-type (choice (function-item anju-buffer-list-plain-filter)
+                            (function-item anju-buffer-list-compilation-filter)
+                            (function-item anju-buffer-list-grep-filter)
+                            (function-item anju-buffer-list-xref-filter)
                             (function-item anju-buffer-list-eshell-filter)
                             (function-item anju-buffer-list-shell-filter)
                             (function-item anju-buffer-list-info-filter)
@@ -138,12 +141,22 @@ add their own filters to define the resulting buffer list returned by
 (defcustom anju-reconfigure-main-menu-hook
   '(anju-main-menu--reconfigure-bookmarks
     anju-main-menu--reconfigure-text-mode
-    anju-main-menu--reconfigure-help)
-  "Main menu mode hooks to run in `anju-init'."
+    anju-main-menu--reconfigure-help
+    anju-main-menu--reconfigure-imenu)
+  "Main menu mode hooks to run in `anju-init'.
+
+This hook is a list of functions that reconfigure the main menu. It is
+initialized with the following functions:
+
+- `anju-main-menu--reconfigure-bookmarks'
+- `anju-main-menu--reconfigure-text-mode'
+- `anju-main-menu--reconfigure-help'
+- `anju-main-menu--reconfigure-imenu'"
   :type 'hook
   :options '(anju-main-menu--reconfigure-bookmarks
              anju-main-menu--reconfigure-text-mode
-             anju-main-menu--reconfigure-help)
+             anju-main-menu--reconfigure-help
+             anju-main-menu--reconfigure-imenu)
   :group 'anju)
 
 (defvar anju--frame-register-alist nil
