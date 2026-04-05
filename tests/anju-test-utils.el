@@ -100,7 +100,8 @@ This function."
 - EXTENSION : tempfile extension
 - CMF : context menu function
 - COUNT: Count of menu items
-- FN : function with a list of menu items as the argument"
+- FN : function with a list of menu items as the argument
+- FILEFN : function to apply to file."
 
   (anju-test-file-testbench
    extension

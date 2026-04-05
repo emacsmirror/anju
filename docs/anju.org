@@ -5,7 +5,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.0.5
+#+MACRO: version 1.0.6-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -159,42 +159,91 @@ A left-double-click on any blank space on the mode line will checkpoint the curr
 :END:
 #+CINDEX: Context Menu
 
-Anju both works with and enhances ~context-menu-mode~ to support features like
+Anju enhances ~context-menu-mode~ by providing context menu functions to support the following contexts:
 
-- Selected Text Commands
-  - Style (bold, italic, code, etc.)
-  - Transform Text (upper/lower case, capitalize)
-  - Occur
-  - Toggle comment (when available)
-  - Write to file (~write-region~)
-- Mode-specific support
+- Selected text
+- Mode-specific commands
   - Org mode
   - Dired
-- Window management based on mouse position
-- Full support for ~context-menu-mode~ customization using ~context-menu-functions~.
-  - See [[#context-menu-customization][Context Menu Customization]] for more info.
+- Window management
+- Full support for ~context-menu-mode~ customization (See [[#context-menu-customization][Context Menu Customization]]).
 
-Anju is planned to have on-going development, with more commands and modes supported in future releases.
+Anju deliberately omits the display of the default mode-specific menu keymaps in the context menu as they are considered redundant to their display in the main menu. Rationale for this is described in [[#design-principles][Design Principles and Concerns]]. Users can still access the default mode-specific menu keymap by using the binding {{{kbd(C-<mouse-3>)}}}.
 
-Shown below is an screenshot of a context menu when text is selected.
+
+
+Learn more about the different areas Anju enhances context menus in the links below.
+
+*** Selected Text Commands
+#+CINDEX: Selected Text Commands
 
 [[file:images/anju-context-menu-region.png]]
 
+If a context menu is raised on selected text, the following menu items are displayed:
+
+- Style :: Applies mode-specific markup to emphasize the selected text (e.g. bold, italic, code, etc.).
+  - Available only for ~org-mode~ and ~markdown-mode~.
+
+- Transform Text :: Applies transforms (upper/lower case, capitalize) to the selected text.
+
+- Occur :: Run ~occur~ command to show occurrences of selected text.
+
+- Toggle comment  :: Toggles selected text to be commented based on mode.
+  - Available only on modes derived from ~prog-mode~ and ~org-mode~
+
+- Write Region :: Writes selected text to a user-specified file.
+
+
 *** Org Mode Context Menu
+#+CINDEX: Org Mode Context Menu
 
-The screenshot below shows a context menu for Org mode. Note that the upper part of the menu changes with respect to what kind of Org element (in the example below, a list item) the point is on.
+Anju provides context-sensitive support for Org mode by providing commands relevant to the type of Org element the point is in. Org elements supported by Anju are:
 
-[[file:images/anju-context-menu-org-mode.png]]
+- Headline
+- Item
+- Table
+
+In addition if text is selected, then support for styling it is supported.
 
 Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
 
+It is recommended that the ~org-mouse~ package be loaded when using
+
+**** Org Headline
+
+If the context menu is raised on a headline, then commands related to clocking and promotion are offered.
+
+[[file:images/anju-context-menu-org-headline.png]]
+
+
+**** Org Item
+
+If the context menu is raised on a list item, then commands related to promotion and conversion to a checkbox are provided.
+
+The menu item "To Checkbox" will convert an item to a checkbox, with the additional behavior that if the point is at the start of the whole list, the whole list will be turned into checkboxes.
+
+[[file:images/anju-context-menu-org-item.png]]
+
+If ~org-mouse~ is loaded, then clicking on a checkbox will toggle its state between on ('[X]') or off ('[ ]'). However, changing to an intermediate state ('[-]') is supported by the menu item "In-Progress". The menu item "To Item" will convert the checkbox back to a plain list item.
+
+[[file:images/anju-context-menu-org-checkbox.png]]
+
+Note that checkboxes in screenshots are prettified using ~prettify-symbols-mode~.
+
+**** Org Table
+
+If the context menu is raised in a table, then table-specific commands are shown.
+
+[[file:images/anju-context-menu-org-table.png]]
+
+
 
 *** Dired Mode Context Menu
+#+CINDEX: Dired Mode Context Menu
 
 Anju has context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
 
 [[file:images/anju-dired-copy-to.png]]
-
 
 If the mouse point is over a directory, the option to insert a view (aka subdir) for it in the buffer is provided.
 
@@ -202,8 +251,14 @@ If the mouse point is over a directory, the option to insert a view (aka subdir)
 
 Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
 
+*** Magit Support
+#+CINDEX: Magit Support
+
+If Magit 4.4+ is installed, then the context menu function ~anju-context-menu-vc~ will offer Magit commands depending on context. If the context menu is raised in a file buffer, then the menu item "Magit Dispatch…" (~magit-file-dispatch~) is shown, otherwise "Magit Status" (~magit-status~).
+
 
 ** Main Menu
+#+CINDEX: Main Menu
 
 Anju offers the following enhancements to the main menu:
 
@@ -213,30 +268,43 @@ To support usage of Emacs bookmarks, the following menu is added to the main men
 
 [[file:images/anju-main-menu-bookmarks.png]]
 
-#+TEXINFO: @subheading Re-organization of the Help menu
+
+#+TEXINFO: @subheading Index menu (imenu)
+
+Anju adds the index menu ([[info:emacs#Imenu][emacs#Imenu]]) to the main menu bar for modes that support it. Anju will configure the following modes with ~imenu-add-menubar-index~:
+
+- ~prog-mode~ derived modes
+- ~makefile-mode~
+- ~org-mode~
+- ~markdown-mode~
+
+
+
+#+TEXINFO: @subheading Help menu
 
 An opinionated re-organization of the Help menu is provided.
 
 [[file:images/anju-main-menu-help.png]]
 
-Anju provides support for customizing the enhancements ([[#main-menu-customization][Main Menu Customization]])
- to the main menu.
+Anju provides support for customizing all the above enhancements to the main menu. See [[#main-menu-customization][Main Menu Customization]] for more detail.
 
 ** Window Management
+#+CINDEX: Window Management
 
 Window management via mouse interaction is provided for through the [[#mode-line][mode line]] and [[#context-menu][context menu]]. More detail is provided in those sections.
-
 
 
 * Requirements
 #+CINDEX: Requirements
 
-Anju requires Emacs 29.1+, Magit 4.4+, Casual 2.13+, Markdown Mode 2.7+.
+Anju requires Emacs 29.1+, Casual 2.13+, Markdown Mode 2.7+.
 
 Certain menus require more installed software:
 
 - Anju Dired Support: GNU Coreutils (~ls~)
 - Markdown import to Org: pandoc
+
+Anju provides optional support for Magit 4.4+.
 
 * Install
 #+CINDEX: Install
@@ -310,13 +378,15 @@ Anju has a number of customizable variables that determine the behavior of ~anju
 
 - ~anju-unset-legacy-mouse-bindings-enable~ :: Remove bindings using ~mouse-2~.
 
-- ~anju-reconfigure-main-menu-enable~ :: Reconfigure the main menu.
+- ~anju-reconfigure-main-menu-enable~ :: Top-level variable to reconfigure the main menu.
 
-  The variable  ~anju-reconfigure-main-menu-hook~ is a list of functions which each modify a different section of the main menu.
+  If ~anju-reconfigure-main-menu-enable~ is ~t~, the following variables determine how the main menu is reconfigured:
 
-  If ~anju-reconfigure-main-menu-enable~ is ~t~, the variable ~anju-help-menu-remove-emacs-tutorial~ can control if the menu entries for the Emacs tutorial are shown.
+  - ~anju-reconfigure-main-menu-hook~ :: a list of functions, each modifying a sub-menu of the main menu.
 
-By default, all the above ~*-enable~ variables are turned on (~t~).  Users preferring to make granular changes to ~anju-init~ can invoke ~M-x~ ~customize-group~ ~anju~.
+  - ~anju-help-menu-remove-emacs-tutorial~ :: control if the Emacs tutorial menu items are shown.
+
+By default, all the above ~*-enable~ variables are set to ~t~.  Users preferring to make granular changes to ~anju-init~ can invoke ~M-x~ ~customize-group~ ~anju~.
 
 
 ** Context Menu Customization
@@ -386,6 +456,44 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 1. A visual UI is provided showing what choices for built-in context menu functions are available.
 2. Users can insert their own custom function.
 3. Top-down ordering of functions will similarly determine the order of menu items in the context menu.
+
+*** Anju Context Menu Functions
+#+VINDEX: anju-context-menu-dired
+#+VINDEX: anju-context-menu-org-mode
+#+VINDEX: anju-context-menu-scratch
+#+VINDEX: anju-context-menu-buffers
+#+VINDEX: anju-context-menu-region
+#+VINDEX: anju-context-menu-narrow
+#+VINDEX: anju-context-menu-open-in
+#+VINDEX: anju-context-menu-vc
+#+VINDEX: anju-context-menu-markup
+#+VINDEX: anju-context-menu-wordcount
+#+VINDEX: anju-context-menu-window
+
+Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
+
+- ~anju-context-menu-dired~ :: Dired commands.
+
+- ~anju-context-menu-org-mode~  :: Org mode commands.
+
+- ~anju-context-menu-scratch~  :: Open scratch buffer.
+
+- ~anju-context-menu-buffers~ :: Buffer navigation commands.
+
+- ~anju-context-menu-region~ :: Commands for selected text.
+
+- ~anju-context-menu-narrow~ :: Narrow-related commands.
+
+- ~anju-context-menu-open-in~ :: Open in Dired.
+
+- ~anju-context-menu-vc~ :: Version control related commands.
+  If Magit 4.4+ is installed, then calls to it are made from here.
+
+- ~anju-context-menu-markup~ :: Commands to show/hide text markup (e.g. Org, Markdown).
+
+- ~anju-context-menu-wordcount~ :: Word count command.
+
+- ~anju-context-menu-window~ :: Window management commands.
 
 ** Mode Line Buffer List Menu Customization
 :PROPERTIES:
@@ -458,6 +566,7 @@ Users who wish define their own menu should override this value with their own f
 #+VINDEX: anju-main-menu--reconfigure-text-mode
 #+VINDEX: anju-main-menu--reconfigure-bookmarks
 #+VINDEX: anju-main-menu--reconfigure-help
+#+VINDEX: anju-main-menu--reconfigure-imenu
 #+VINDEX: anju-help-menu-remove-emacs-tutorial
 
 Anju modifies the main menu via the customizable hook variable ~anju-reconfigure-main-menu-hook~. This hook is run in the command ~anju-init~.
@@ -465,9 +574,19 @@ Anju modifies the main menu via the customizable hook variable ~anju-reconfigure
 By default, the following hook functions are run:
 
 - ~anju-main-menu--reconfigure-text-mode~ :: Reconfigures Text menu for text mode buffers.
+
 - ~anju-main-menu--reconfigure-bookmarks~ :: Adds Bookmarks menu to main menu.
+
 - ~anju-main-menu--reconfigure-help~ :: Reconfigures Help menu.
   - Set the customizable variable ~anju-help-menu-remove-emacs-tutorial~ to ~t~ if removing the tutorial entries is desired.
+
+- ~anju-main-menu--reconfigure-imenu~ :: Adds an index menu (imenu) to the following modes:
+  - ~prog-mode~
+  - ~makefile-mode~
+  - ~org-mode~
+  - ~markdown-mode~
+
+Execution of any of the above functions can be set to preference in ~anju-reconfigure-main-menu-hook~.    
 
 ~anju-reconfigure-main-menu-hook~ can be modified to add additional custom hook functions. Users who wish to do this should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps][elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu][elisp#Easy Menu]]) library.
 
