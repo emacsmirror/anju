@@ -322,11 +322,10 @@ file names in the Dired buffer."])
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (anju-at-org-table-p))
-               (not (use-region-p)))
+  (when (and (not (anju-at-org-table-p))
+             (not (use-region-p)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu journal-separator)
       (easy-menu-add-item menu nil ["Scratch"
                                     scratch-buffer
@@ -346,10 +345,9 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (save-excursion
-    (mouse-set-point click)
-
-    (when (derived-mode-p 'org-mode)
+  (when (derived-mode-p 'org-mode)
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu org-separator)
       (when (org-at-heading-p)
 
@@ -408,9 +406,9 @@ This function is intended to be hooked into `context-menu-functions'."
 
         (if (org-at-item-checkbox-p)
             (easy-menu-add-item menu nil
-                            ["In-Progress"
-                             casual-org-checkbox-in-progress
-                             :help "Change checkbox state to in-progress [-]"]))
+                                ["In-Progress"
+                                 casual-org-checkbox-in-progress
+                                 :help "Change checkbox state to in-progress [-]"]))
 
         (easy-menu-add-item menu nil
                             ["Toggle List/Checkbox"
@@ -459,11 +457,10 @@ This function is intended to be hooked into `context-menu-functions'."
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (use-region-p))
-               (not (anju-at-org-table-p)))
+  (when (and (not (use-region-p))
+             (not (anju-at-org-table-p)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu buffer-navigation-separator)
       (easy-menu-add-item menu nil ["← Buffer"
                                     previous-buffer
@@ -486,9 +483,9 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (anju-at-org-table-p)) (not (derived-mode-p 'Info-mode)))
+  (when (and (not (anju-at-org-table-p)) (not (derived-mode-p 'Info-mode)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu narrow-separator)
       (cond ((use-region-p)
              (easy-menu-add-item menu nil
@@ -531,13 +528,12 @@ from current buffer"]))))
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (use-region-p))
-               (not (anju-at-org-table-p))
-               (buffer-file-name)
-               (not (derived-mode-p 'dired-mode)))
-
+  (when (and (not (use-region-p))
+             (not (anju-at-org-table-p))
+             (buffer-file-name)
+             (not (derived-mode-p 'dired-mode)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu open-in-separator)
       (easy-menu-add-item menu nil
                           ["📁 Open in Dired"
@@ -553,13 +549,12 @@ This function is intended to be hooked into `context-menu-functions'."
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
+  (when (and (vc-responsible-backend default-directory t)
+             (not (use-region-p))
+             (not (anju-at-org-table-p)))
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (vc-responsible-backend default-directory t)
-               (not (use-region-p))
-               (not (anju-at-org-table-p)))
-
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu vc-separator)
 
       (when (and (package-installed-p 'magit)
@@ -593,10 +588,9 @@ This function is intended to be hooked into `context-menu-functions'."
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (use-region-p)
+  (when (use-region-p)
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu transform-text-separator)
       (easy-menu-add-item menu nil
                           ["Occur"
@@ -632,10 +626,9 @@ containing a match for selected word"])
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (not (use-region-p))
+  (when (not (use-region-p))
+    (save-excursion
+      (mouse-set-point click)
       (pcase (derived-mode-p major-mode)
         ('org-mode
          (when (not (anju-at-org-table-p))
@@ -672,9 +665,9 @@ temporarily visible (Visible mode)"])))
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
+  (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu count-words-separator)
       (easy-menu-add-item menu nil ["Count Words"
                                     count-words

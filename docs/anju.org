@@ -418,11 +418,10 @@ The following example Elisp illustrates an implementation of a context menu func
     - CLICK: event
 
     This function is intended to be hooked into `context-menu-functions'."
-
-      (save-excursion
-        (mouse-set-point click)
-
-        (when (derived-mode-p 'text-mode) ; context predicate
+      (when (and (derived-mode-p 'text-mode)
+                 (not (anju-at-org-table-p))) ; context predicate
+        (save-excursion
+          (mouse-set-point click)
           (anju-context-menu-item-separator menu count-words-separator)
           (easy-menu-add-item menu nil ["Count Words"
                                         count-words
@@ -443,11 +442,11 @@ The /context/ is determined by a predicate which can take into account different
   - Cursor (Point) position
   - Mouse position
 
-In the example above, the context predicate is ~(derived-mode-p 'text-mode)~.  Note that it is defined at a higher level to avoid instantiating menu items if the context does not apply.
+In the example above, the context predicate tests if the major mode is derived from ~text-mode~ /and/ if point is not inside an Org table (~anju-at-org-table-p~).  Note that it is defined at a higher level to avoid instantiating menu items if the context does not apply.
 
 The context predicate can be embedded in the menu item definition itself. See more about this with the ~:visible~ and ~:active~ keywords for the macro ~easy-menu-define~.
 
-It is up to the implementer to determine where to best apply the context predicate.
+It is up to the implementer to determine where to best define and apply the context predicate.
 
 #+TEXINFO: @subheading Customizing context-menu-functions
 
