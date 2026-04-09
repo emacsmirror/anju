@@ -88,6 +88,9 @@ package-lint:
 clean:
 	$(MAKE) -C $(LISP_DIR) $@
 
+docs:
+	$(MAKE) -C docs $@
+
 ## Bump Patch Version
 bump-anju:
 	sed -i 's/;; Version: $(VERSION)/;; Version: $(VERSION_BUMP)/' $(MAIN_EL)

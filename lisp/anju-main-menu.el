@@ -150,8 +150,9 @@
   (easy-menu-remove-item text-mode-menu nil "---")
 
   (easy-menu-add-item text-mode-menu nil anju-transform-text-menu "Auto Fill")
-  (easy-menu-add-item text-mode-menu nil anju-style-menu "Auto Fill"))
-
+  (easy-menu-add-item text-mode-menu nil anju-style-menu "Auto Fill")
+  (easy-menu-add-item text-mode-menu nil anju-center-text-menu "Auto Fill")
+  (easy-menu-add-item text-mode-menu nil anju-fill-text-menu "Auto Fill"))
 
 
 ;; -------------------------------------------------------------------
