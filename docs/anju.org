@@ -117,11 +117,11 @@ The only exception Anju makes in this matter is to keep the Emacs default bindin
 
 Anju offers many enhancements to the mouse interactions provided by Emacs. These enhancements are detailed in the following sections below.
 
-** Mode Line
+** Mode Line Features
 :PROPERTIES:
 :CUSTOM_ID: mode-line
 :END:
-#+CINDEX: Mode Line
+#+CINDEX: Mode Line Features
 
 The following mode line enhancements are provided by Anju:
 
@@ -153,11 +153,11 @@ Note: usage of "window" refers to the Emacs definition of it. Refer to [[info:em
 
 A left-double-click on any blank space on the mode line will checkpoint the current window configuration, then maximize the current window (~delete-other-windows~). Re-doing the left-double-click will restore the prior window configuration.
 
-** Context Menu
+** Context Menu Features
 :PROPERTIES:
 :CUSTOM_ID: context-menu
 :END:
-#+CINDEX: Context Menu
+#+CINDEX: Context Menu Features
 
 Anju enhances ~context-menu-mode~ by providing context menu functions to support the following contexts:
 
@@ -257,39 +257,95 @@ Note that the Dired context menu is intentionally restrained in its command offe
 If Magit 4.4+ is installed, then the context menu function ~anju-context-menu-vc~ will offer Magit commands depending on context. If the context menu is raised in a file buffer, then the menu item "Magit Dispatch…" (~magit-file-dispatch~) is shown, otherwise "Magit Status" (~magit-status~).
 
 
-** Main Menu
-#+CINDEX: Main Menu
+** Main Menu Features
+#+CINDEX: Main Menu Features
 
-Anju offers the following enhancements to the main menu:
+Anju enhances the main menu bar of Emacs by making opinionated changes to its existing menus as well as adding several new ones. These changes are configurable per menu in the main menu (e.g. "File", "Edit", "Options", etc.). See [[#main-menu-customization][Main Menu Customization]] for more detail.
 
-#+TEXINFO: @subheading Bookmarks menu
+The following 
 
-To support usage of Emacs bookmarks, the following menu is added to the main menu.
+***  Bookmarks Menu Features
+#+CINDEX: Bookmarks Menu Features
+
+Anju adds a *Bookmarks* menu to the main menu to work with Emacs-specific bookmarks.
+
 
 [[file:images/anju-main-menu-bookmarks.png]]
 
 
-#+TEXINFO: @subheading Index menu (imenu)
+The menu hierarchy of the *Bookmarks* menu is described below with the actual command shown in parenthesis next to its label.
 
-Anju adds the index menu ([[info:emacs#Imenu][emacs#Imenu]]) to the main menu bar for modes that support it. Anju will configure the following modes with ~imenu-add-menubar-index~:
+- Edit Bookmarks (~list-bookmarks~)
+- Add Bookmark… (~bookmark-set-no-overwrite~)
+- Jump to Bookmark… (~bookmark-jump~)
+  
+
+***  Text Menu Features
+#+CINDEX: Text Menu Features
+
+[[file:images/anju-main-menu-text.png]]
+
+If the major mode of the current buffer is derived from ~text-mode~, then a *Text* menu is displayed in the main menu bar.
+
+The menu hierarchy of the *Text* menu is described below with the actual command shown in parenthesis next to its label.
+
+- Transform Text (~anju-transform-text-menu~)
+  - Make Upper Case (~upcase-region~)
+  - Make Lower Case (~downcase-region~)
+  - Capitalize (~capitalize-region~)
+    
+- Style (~anju-style-menu~)
+  - Bold (~anju-style-bold~)
+  - Italic (~anju-style-italic~)
+  - Code (~anju-style-code~)
+  - Underline (~anju-style-underline~)
+  - Verbatim (~anju-style-verbatim~)
+  - Strike Through (~anju-style-strike-through~)
+  - Remove (~anju-style-remove~)
+    
+- Center (~anju-center-text-menu~)
+  - Line (~center-line~)
+  - Region (~center-region~)
+  - Paragraph (~center-paragraph~)
+  
+- Fill (~anju-fill-text-menu~)
+  - Paragraph (~fill-paragraph~)
+  - Region (~fill-region~)
+  - Region as paragraph (~fill-region-as-paragraph~)
+  - Individual paragraphs (~fill-individual-paragraphs~)
+  - Non-uniform paragraphs (~fill-nonuniform-paragraphs~)
+    
+- Auto Fill (~toggle-text-mode-auto-fill~)
+
+Note the *Style* menu is visible only for Org and Markdown modes.
+
+***  Index Menu (imenu) Features
+#+CINDEX: Index Menu Features
+
+[[file:images/anju-main-menu-imenu.png]]
+
+
+For certain modes that support Imenu ([[info:emacs#Imenu][emacs#Imenu]]), Anju will add an *Index* menu to the main menu bar via the function  ~imenu-add-menubar-index~.
+
+Modes supported this way by Anju are:
 
 - ~prog-mode~ derived modes
-- ~makefile-mode~
 - ~org-mode~
 - ~markdown-mode~
+- ~makefile-mode~
 
+***  Help Menu Features
+#+CINDEX: Help Menu Features
 
-
-#+TEXINFO: @subheading Help menu
-
-An opinionated re-organization of the Help menu is provided.
+Anju re-organizes the *Help* menu as shown below. The re-organization emphasizes showing documentation in a new frame, takes out non-help related menu items, and offers more concision.
 
 [[file:images/anju-main-menu-help.png]]
 
-Anju provides support for customizing all the above enhancements to the main menu. See [[#main-menu-customization][Main Menu Customization]] for more detail.
+For experienced users, the "Emacs Tutorial" menu items can be removed via the customizable variable ~anju-help-menu-remove-emacs-tutorial~ ([[#help-menu-customization][Help Menu Customization]]). 
 
-** Window Management
-#+CINDEX: Window Management
+
+** Window Management Features
+#+CINDEX: Window Management Features
 
 Window management via mouse interaction is provided for through the [[#mode-line][mode line]] and [[#context-menu][context menu]]. More detail is provided in those sections.
 
@@ -382,7 +438,7 @@ Anju has a number of customizable variables that determine the behavior of ~anju
 
   If ~anju-reconfigure-main-menu-enable~ is ~t~, the following variables determine how the main menu is reconfigured:
 
-  - ~anju-reconfigure-main-menu-hook~ :: a list of functions, each modifying a sub-menu of the main menu.
+  - ~anju-reconfigure-main-menu-hook~ :: a list of functions, each modifying a menu of the main menu.
 
   - ~anju-help-menu-remove-emacs-tutorial~ :: control if the Emacs tutorial menu items are shown.
 
@@ -562,47 +618,72 @@ Users who wish define their own menu should override this value with their own f
 :CUSTOM_ID: main-menu-customization
 :END:
 #+CINDEX: Main Menu Customization
+
+Anju organizes its customization of the main menu bar via the customizable hook variable ~anju-reconfigure-main-menu-hook~.
+
+~anju-reconfigure-main-menu-hook~ is a list of hook functions,  where each function is designed to modify a menu of the main menu bar (e.g. "File", "Edit", "Options", etc.). This hook is run in the command ~anju-init~.
+
+Detailed below are the different hook functions provided for by Anju.
+
+Users are free to implement their own hook functions to add to ~anju-reconfigure-main-menu-hook~. Users who wish to do this should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps][elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu][elisp#Easy Menu]]) library.
+
+Note that Anju's implementation of hook functions each only affecting a menu in the main menu bar is by convention.
+
+*** Text Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: text-menu-customization
+:END:
 #+VINDEX: anju-main-menu--reconfigure-text-mode
+
+~anju-main-menu--reconfigure-text~ is a hook function which reorganizes the *Text* menu in the main menu bar.
+
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
+
+Note that the *Text* menu is only displayed when the current major mode is derived from ~text-mode~.
+
+
+  
+*** Bookmarks Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: bookmarks-menu-customization
+:END:
 #+VINDEX: anju-main-menu--reconfigure-bookmarks
+
+~anju-main-menu--reconfigure-bookmarks~ is a hook function which adds the *Bookmarks* menu in the main menu bar.
+
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
+
+*** Help Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: help-menu-customization
+:END:
 #+VINDEX: anju-main-menu--reconfigure-help
-#+VINDEX: anju-main-menu--reconfigure-imenu
 #+VINDEX: anju-help-menu-remove-emacs-tutorial
 
-Anju modifies the main menu via the customizable hook variable ~anju-reconfigure-main-menu-hook~. This hook is run in the command ~anju-init~.
+~anju-main-menu--reconfigure-help~ is a hook function which reorganizes the *Help* menu in the main menu bar.
 
-By default, the following hook functions are run:
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
 
-- ~anju-main-menu--reconfigure-text-mode~ :: Reconfigures Text menu for text mode buffers.
+If removing the Emacs tutorial menu items from the *Help* menu is desired, set the customizable variable ~anju-help-menu-remove-emacs-tutorial~ to ~t~.
 
-- ~anju-main-menu--reconfigure-bookmarks~ :: Adds Bookmarks menu to main menu.
 
-- ~anju-main-menu--reconfigure-help~ :: Reconfigures Help menu.
-  - Set the customizable variable ~anju-help-menu-remove-emacs-tutorial~ to ~t~ if removing the tutorial entries is desired.
+*** Imenu Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: imenu-menu-customization
+:END:
+#+VINDEX: anju-main-menu--reconfigure-imenu
 
-- ~anju-main-menu--reconfigure-imenu~ :: Adds an index menu (imenu) to the following modes:
-  - ~prog-mode~
+~anju-main-menu--reconfigure-imenu~ is a hook function which adds the *Index* menu in the main menu bar.
+
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
+
+Anju's support for Imenu covers the following modes:
+
+  - ~prog-mode~ derived modes
   - ~makefile-mode~
   - ~org-mode~
   - ~markdown-mode~
 
-Execution of any of the above functions can be set to preference in ~anju-reconfigure-main-menu-hook~.    
-
-~anju-reconfigure-main-menu-hook~ can be modified to add additional custom hook functions. Users who wish to do this should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps][elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu][elisp#Easy Menu]]) library.
-
-Shown below is an example Elisp function which modifies the “Text” menu section of the main menu for modes which derive from ~text-mode~.
-
-  #+BEGIN_SRC elisp :lexical no
-  (defun anju-main-menu--reconfigure-text-mode ()
-    "Reconfigure Text mode menu."
-    (easy-menu-remove-item text-mode-menu nil "Center Line")
-    (easy-menu-remove-item text-mode-menu nil "Center Region")
-    (easy-menu-remove-item text-mode-menu nil "Center Paragraph")
-    (easy-menu-remove-item text-mode-menu nil "Paragraph Indent")
-    (easy-menu-remove-item text-mode-menu nil "---")
-
-    (easy-menu-add-item text-mode-menu nil anju-transform-text-menu "Auto Fill")
-    (easy-menu-add-item text-mode-menu nil anju-style-menu "Auto Fill"))
-  #+END_SRC
 
 * Future Work
 #+CINDEX: Future Work

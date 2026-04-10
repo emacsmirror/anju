@@ -263,6 +263,45 @@ conform to extent <= (max/2) - 2"
     ["Capitalize" capitalize-region
      :help "Convert the selected region to capitalized form"]))
 
+
+(easy-menu-define anju-center-text-menu nil
+  "Keymap for centering text."
+  '("Center"
+    :enable (not buffer-read-only)
+    ["Line" center-line
+     :help "Center the line point is on, within the width specified by ‘fill-column’"]
+
+    ["Region" center-region
+     :enable (use-region-p)
+     :help "Center each nonblank line starting in the region"]
+
+    ["Paragraph" center-paragraph
+     :help "Center each nonblank line in the paragraph at or after point"]))
+
+(easy-menu-define anju-fill-text-menu nil
+  "Keymap for centering text."
+  '("Fill"
+    :enable (not buffer-read-only)
+    ["Paragraph" fill-paragraph
+     :help "Fill paragraph at or after point"]
+
+    ["Region" fill-region
+     :enable (use-region-p)
+     :help "Fill each of the paragraphs in the region"]
+
+    ["Region as paragraph" fill-region-as-paragraph
+     :enable (use-region-p)
+     :help "Fill the region as if it were a single paragraph"]
+
+    ["Individual paragraphs" fill-individual-paragraphs
+     :enable (use-region-p)
+     :help "Fill paragraphs of uniform indentation within the region"]
+
+    ["Non-uniform paragraphs" fill-nonuniform-paragraphs
+     :enable (use-region-p)
+     :help "Fill paragraphs within the region, allowing varying indentation within each"]))
+
+
 
 ;; -------------------------------------------------------------------
 ;; Delete Window Logic
