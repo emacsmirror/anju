@@ -31,6 +31,64 @@
 (require 'anju-style-text)
 (require 'casual-bookmarks)
 
+
+;; -------------------------------------------------------------------
+;; File Menu Customization
+(easy-menu-define anju-window-swap-menu nil
+  "Keymap for mouse window swap menu."
+  '("Swap Window"
+    :visible (not (one-window-p t))
+    ["↑" windmove-swap-states-up
+     :visible (window-in-direction 'above)
+     :help "Swap window up"]
+
+    ["↓" windmove-swap-states-down
+     :visible (window-in-direction 'below)
+     :help "Swap window down"]
+
+    ["←" windmove-swap-states-left
+     :visible (window-in-direction 'left)
+     :help "Swap window left"]
+
+    ["→" windmove-swap-states-right
+     :visible (window-in-direction 'right)
+     :help "Swap window right"]))
+
+(defun anju-main-menu--reconfigure-file-menu ()
+  "Reconfigure File menu."
+  (easy-menu-add-item global-map '(menu-bar file)
+                      anju-window-swap-menu
+                      'one-window)
+
+  (when anju-file-menu-replace-make-frame-on
+    (define-key global-map [menu-bar file make-frame-on-display] nil t)
+    (define-key global-map [menu-bar file make-frame-on-monitor] nil t)
+
+    (easy-menu-add-item (lookup-key global-map [menu-bar file]) nil
+                        ["New Frame on Display Server..."
+                         make-frame-on-display
+                         :visible (and (fboundp 'make-frame-on-display)
+                                       (eq (window-system) 'x))
+                         :help "Open a new frame on a display server"]
+                        'delete-this-frame)
+    (easy-menu-add-item (lookup-key global-map [menu-bar file]) nil
+                        ["New Frame on Monitor..."
+                         make-frame-on-monitor
+                         :visible
+                         (and (fboundp 'make-frame-on-monitor)
+                              (> (length (display-monitor-attributes-list)) 1)
+                              (if (eq (window-system) 'ns) ; this is fixed in 31+
+                                  (version<= "31" emacs-version)
+                                  t))
+                         :help "Open a new frame on another monitor"]
+                        'delete-this-frame)))
+
+
+;; -------------------------------------------------------------------
+;; Options Menu
+(defun anju-main-menu--reconfigure-options-menu ()
+  "Reconfigure Options menu."
+  (define-key global-map [menu-bar options cua-mode] nil t))
 
 
 ;; -------------------------------------------------------------------
