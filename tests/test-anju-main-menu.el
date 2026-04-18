@@ -54,15 +54,15 @@
                             #'windmove-swap-states-right
                             "Swap window right")))))
 
-(ert-deftest test-anju-main-menu--reconfigure-file-menu ()
-  (anju-main-menu--reconfigure-file-menu)
+(ert-deftest test-anju-main-menu--reconfigure-file ()
+  (anju-main-menu--reconfigure-file)
 
   (let ((swap-map (lookup-key global-map [menu-bar file Swap\ Window])))
     (should swap-map)
     (should (eq (car swap-map) 'keymap))))
 
-(ert-deftest test-anju-main-menu--reconfigure-options-menu ()
-  (anju-main-menu--reconfigure-options-menu)
+(ert-deftest test-anju-main-menu--reconfigure-options ()
+  (anju-main-menu--reconfigure-options)
 
   (let ((cua-mode (lookup-key global-map [menu-bar options cua-mode])))
     (should (not cua-mode))))

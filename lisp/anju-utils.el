@@ -83,7 +83,7 @@ nil and restart Emacs."
   :group 'anju)
 
 (defcustom anju-file-menu-replace-make-frame-on t
-  "If non-nil, remove new frame on menu items in the main menu bar File menu.
+  "If non-nil, replace new frame on menu items in the main menu bar File menu.
 
 To return to behavior that is not modified by Anju, set this value to
 nil and restart Emacs."
@@ -147,8 +147,8 @@ add their own filters to define the resulting buffer list returned by
   :group 'anju)
 
 (defcustom anju-reconfigure-main-menu-hook
-  '(anju-main-menu--reconfigure-file-menu
-    anju-main-menu--reconfigure-options-menu
+  '(anju-main-menu--reconfigure-file
+    anju-main-menu--reconfigure-options
     anju-main-menu--reconfigure-bookmarks
     anju-main-menu--reconfigure-text-mode
     anju-main-menu--reconfigure-help
@@ -158,13 +158,15 @@ add their own filters to define the resulting buffer list returned by
 This hook is a list of functions that reconfigure the main menu. It is
 initialized with the following functions:
 
+- `anju-main-menu--reconfigure-file'
+- `anju-main-menu--reconfigure-options'
 - `anju-main-menu--reconfigure-bookmarks'
 - `anju-main-menu--reconfigure-text-mode'
 - `anju-main-menu--reconfigure-help'
 - `anju-main-menu--reconfigure-imenu'"
   :type 'hook
-  :options '(anju-main-menu--reconfigure-file-menu
-             anju-main-menu--reconfigure-options-menu
+  :options '(anju-main-menu--reconfigure-file
+             anju-main-menu--reconfigure-options
              anju-main-menu--reconfigure-bookmarks
              anju-main-menu--reconfigure-text-mode
              anju-main-menu--reconfigure-help

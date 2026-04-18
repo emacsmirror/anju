@@ -54,7 +54,7 @@
      :visible (window-in-direction 'right)
      :help "Swap window right"]))
 
-(defun anju-main-menu--reconfigure-file-menu ()
+(defun anju-main-menu--reconfigure-file ()
   "Reconfigure File menu."
   (easy-menu-add-item global-map '(menu-bar file)
                       anju-window-swap-menu
@@ -86,7 +86,7 @@
 
 ;; -------------------------------------------------------------------
 ;; Options Menu
-(defun anju-main-menu--reconfigure-options-menu ()
+(defun anju-main-menu--reconfigure-options ()
   "Reconfigure Options menu."
   (define-key global-map [menu-bar options cua-mode] nil t))
 
