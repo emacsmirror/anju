@@ -153,6 +153,7 @@ Note: usage of "window" refers to the Emacs definition of it. Refer to [[info:em
 
 A left-double-click on any blank space on the mode line will checkpoint the current window configuration, then maximize the current window (~delete-other-windows~). Re-doing the left-double-click will restore the prior window configuration.
 
+
 ** Context Menu Features
 :PROPERTIES:
 :CUSTOM_ID: context-menu
@@ -169,8 +170,6 @@ Anju enhances ~context-menu-mode~ by providing context menu functions to support
 - Full support for ~context-menu-mode~ customization (See [[#context-menu-customization][Context Menu Customization]]).
 
 Anju deliberately omits the display of the default mode-specific menu keymaps in the context menu as they are considered redundant to their display in the main menu. Rationale for this is described in [[#design-principles][Design Principles and Concerns]]. Users can still access the default mode-specific menu keymap by using the binding {{{kbd(C-<mouse-3>)}}}.
-
-
 
 Learn more about the different areas Anju enhances context menus in the links below.
 
@@ -260,25 +259,44 @@ If Magit 4.4+ is installed, then the context menu function ~anju-context-menu-vc
 ** Main Menu Features
 #+CINDEX: Main Menu Features
 
-Anju enhances the main menu bar of Emacs by making opinionated changes to its existing menus as well as adding several new ones. These changes are configurable per menu in the main menu (e.g. "File", "Edit", "Options", etc.). See [[#main-menu-customization][Main Menu Customization]] for more detail.
+Anju enhances the main menu bar of Emacs by making opinionated changes to its existing menus as well as adding several new ones. These changes are configurable per menu in the main menu (e.g. "File", "Edit", "Options", etc.). For more detail, see [[#main-menu-customization][Main Menu Customization]].
 
-The following 
+
+*** File Menu Features
+#+CINDEX: File Menu Features
+
+Anju makes these following modifications to the main menu bar *File* menu:
+
+- Adds a “Swap Window ›” sub-menu.
+- Updates the “New Frame on Display Server...” menu item to only display on an X11 system.
+- Updates the “New Frame on Monitor…” menu item to only display if more than one monitor is detected.
+
+For the macOS NS variant of Emacs, the above update to “New Frame on Monitor…” will only work on Emacs version 31+.
+
+These modifications are optional. For more detail, see [[#file-menu-customization][File Menu Customization]].
+
+*** Options Menu Features
+#+CINDEX: Options Menu Features
+
+Anju makes the presumption that most Emacs users do not use the CUA mode configuration in the main menu bar *Options* menu. As such, the “Cut/Paste with C-x/C-c/C-v (CUA Mode)” menu item is removed.
+
+This modification is optional. For more detail, see [[#options-menu-customization][Options Menu Customization]].
 
 ***  Bookmarks Menu Features
 #+CINDEX: Bookmarks Menu Features
 
 Anju adds a *Bookmarks* menu to the main menu to work with Emacs-specific bookmarks.
 
-
 [[file:images/anju-main-menu-bookmarks.png]]
 
+This modification is optional. For more detail, see [[#bookmarks-menu-customization][Bookmarks Menu Customization]].
 
 The menu hierarchy of the *Bookmarks* menu is described below with the actual command shown in parenthesis next to its label.
 
 - Edit Bookmarks (~list-bookmarks~)
 - Add Bookmark… (~bookmark-set-no-overwrite~)
 - Jump to Bookmark… (~bookmark-jump~)
-  
+
 
 ***  Text Menu Features
 #+CINDEX: Text Menu Features
@@ -293,7 +311,7 @@ The menu hierarchy of the *Text* menu is described below with the actual command
   - Make Upper Case (~upcase-region~)
   - Make Lower Case (~downcase-region~)
   - Capitalize (~capitalize-region~)
-    
+
 - Style (~anju-style-menu~)
   - Bold (~anju-style-bold~)
   - Italic (~anju-style-italic~)
@@ -302,22 +320,25 @@ The menu hierarchy of the *Text* menu is described below with the actual command
   - Verbatim (~anju-style-verbatim~)
   - Strike Through (~anju-style-strike-through~)
   - Remove (~anju-style-remove~)
-    
+
 - Center (~anju-center-text-menu~)
   - Line (~center-line~)
   - Region (~center-region~)
   - Paragraph (~center-paragraph~)
-  
+
 - Fill (~anju-fill-text-menu~)
   - Paragraph (~fill-paragraph~)
   - Region (~fill-region~)
   - Region as paragraph (~fill-region-as-paragraph~)
   - Individual paragraphs (~fill-individual-paragraphs~)
   - Non-uniform paragraphs (~fill-nonuniform-paragraphs~)
-    
+
 - Auto Fill (~toggle-text-mode-auto-fill~)
 
 Note the *Style* menu is visible only for Org and Markdown modes.
+
+This modification is optional. For more detail, see [[#text-menu-customization][Text Menu Customization]].
+
 
 ***  Index Menu (imenu) Features
 #+CINDEX: Index Menu Features
@@ -334,6 +355,8 @@ Modes supported this way by Anju are:
 - ~markdown-mode~
 - ~makefile-mode~
 
+This modification is optional. For more detail, see [[#imenu-menu-customization][Imenu Menu Customization]].
+
 ***  Help Menu Features
 #+CINDEX: Help Menu Features
 
@@ -341,7 +364,9 @@ Anju re-organizes the *Help* menu as shown below. The re-organization emphasizes
 
 [[file:images/anju-main-menu-help.png]]
 
-For experienced users, the "Emacs Tutorial" menu items can be removed via the customizable variable ~anju-help-menu-remove-emacs-tutorial~ ([[#help-menu-customization][Help Menu Customization]]). 
+This modification is optional. For more detail, see [[#help-menu-customization][Help Menu Customization]].
+
+For experienced users, the "Emacs Tutorial" menu items can be removed via the customizable variable ~anju-help-menu-remove-emacs-tutorial~.
 
 
 ** Window Management Features
@@ -629,40 +654,78 @@ Users are free to implement their own hook functions to add to ~anju-reconfigure
 
 Note that Anju's implementation of hook functions each only affecting a menu in the main menu bar is by convention.
 
+*** File Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: file-menu-customization
+:END:
+#+CINDEX: File Menu Customization
+#+VINDEX: anju-main-menu--reconfigure-file
+
+~anju-main-menu--reconfigure-file~ is a hook function which modifies the *File* menu in the main menu bar.
+
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the checkbox interface provided by the ~customize-variable~ command.
+
+~anju-main-menu--reconfigure-file~ will read the customizable variable ~anju-file-menu-replace-make-frame-on~ (default ~t~). If ~anju-file-menu-replace-make-frame-on~ is non-nil, then the following menu items are replaced with more context-specific behavior:
+
+- “New Frame on Display Server...” - will only display if on an X11 system.
+- “New Frame on Monitor...” - will only display if more than one monitor is detected.
+
+*** Options Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: options-menu-customization
+:END:
+#+CINDEX: Options Menu Customization
+#+VINDEX: anju-main-menu--reconfigure-options
+
+~anju-main-menu--reconfigure-options~ is a hook function which modifies the *Options* menu in the main menu bar.
+
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the checkbox interface provided by the ~customize-variable~ command.
+
+
+
+# TODO: Add this section
+# *** Edit Menu Customization
+# :PROPERTIES:
+# :CUSTOM_ID: edit-menu-customization
+# :END:
+# #+CINDEX: Edit Menu Customization
+# #+VINDEX: anju-main-menu--reconfigure-edit-menu
+
 *** Text Menu Customization
 :PROPERTIES:
 :CUSTOM_ID: text-menu-customization
 :END:
+#+CINDEX: Text Menu Customization
 #+VINDEX: anju-main-menu--reconfigure-text-mode
 
-~anju-main-menu--reconfigure-text~ is a hook function which reorganizes the *Text* menu in the main menu bar.
+~anju-main-menu--reconfigure-textmode~ is a hook function which reorganizes the *Text* menu in the main menu bar.
 
-By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the checkbox interface provided by the ~customize-variable~ command.
 
 Note that the *Text* menu is only displayed when the current major mode is derived from ~text-mode~.
 
-
-  
 *** Bookmarks Menu Customization
 :PROPERTIES:
 :CUSTOM_ID: bookmarks-menu-customization
 :END:
+#+CINDEX: Bookmarks Menu Customization
 #+VINDEX: anju-main-menu--reconfigure-bookmarks
 
 ~anju-main-menu--reconfigure-bookmarks~ is a hook function which adds the *Bookmarks* menu in the main menu bar.
 
-By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the checkbox interface provided by the ~customize-variable~ command.
 
 *** Help Menu Customization
 :PROPERTIES:
 :CUSTOM_ID: help-menu-customization
 :END:
+#+CINDEX: Help Menu Customization
 #+VINDEX: anju-main-menu--reconfigure-help
 #+VINDEX: anju-help-menu-remove-emacs-tutorial
 
 ~anju-main-menu--reconfigure-help~ is a hook function which reorganizes the *Help* menu in the main menu bar.
 
-By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the checkbox interface provided by the ~customize-variable~ command.
 
 If removing the Emacs tutorial menu items from the *Help* menu is desired, set the customizable variable ~anju-help-menu-remove-emacs-tutorial~ to ~t~.
 
@@ -671,11 +734,12 @@ If removing the Emacs tutorial menu items from the *Help* menu is desired, set t
 :PROPERTIES:
 :CUSTOM_ID: imenu-menu-customization
 :END:
+#+CINDEX: Imenu Menu Customization
 #+VINDEX: anju-main-menu--reconfigure-imenu
 
 ~anju-main-menu--reconfigure-imenu~ is a hook function which adds the *Index* menu in the main menu bar.
 
-By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the ~customize-variable~ command which provides a checkbox interface for enabling this function.
+By default this function is in ~anju-reconfigure-main-menu-hook~. Enabling or disabling this function can be done via the checkbox interface provided by the ~customize-variable~ command.
 
 Anju's support for Imenu covers the following modes:
 
