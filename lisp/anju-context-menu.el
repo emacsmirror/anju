@@ -626,25 +626,25 @@ containing a match for selected word"])
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-  (when (not (use-region-p))
+  (when (and (not (use-region-p))
+             (member (derived-mode-p major-mode) '(org-mode markdown-mode)))
     (save-excursion
       (mouse-set-point click)
       (pcase (derived-mode-p major-mode)
         ('org-mode
-         (when (not (anju-at-org-table-p))
-           (anju-context-menu-item-separator menu org-mode-operations-separator)
-           (easy-menu-add-item menu nil
-                               ["Toggle Images"
-                                casual-org-toggle-images
-                                :help "Toggle images"])
+         (anju-context-menu-item-separator menu org-mode-operations-separator)
+         (easy-menu-add-item menu nil
+                             ["Toggle Images"
+                              casual-org-toggle-images
+                              :help "Toggle images"])
 
-           (easy-menu-add-item menu nil
-                               ["Show Markup"
-                                visible-mode
-                                :style toggle
-                                :selected visible-mode
-                                :help "Toggle making all invisible text \
-temporarily visible (Visible mode)"])))
+         (easy-menu-add-item menu nil
+                             ["Show Markup"
+                              visible-mode
+                              :style toggle
+                              :selected visible-mode
+                              :help "Toggle making all invisible text \
+temporarily visible (Visible mode)"]))
 
         ('markdown-mode
          (anju-context-menu-item-separator menu markdown-mode-operations-separator)

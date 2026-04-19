@@ -158,6 +158,8 @@ add their own filters to define the resulting buffer list returned by
 This hook is a list of functions that reconfigure the main menu. It is
 initialized with the following functions:
 
+- `anju-main-menu--reconfigure-file'
+- `anju-main-menu--reconfigure-options'
 - `anju-main-menu--reconfigure-bookmarks'
 - `anju-main-menu--reconfigure-text-mode'
 - `anju-main-menu--reconfigure-help'
