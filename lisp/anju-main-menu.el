@@ -23,13 +23,17 @@
 ;;
 
 ;;; Code:
+(require 'simple)
+(require 'misc)
 (require 'bookmark)
 (require 'make-mode)
 (require 'org)
+(require 'whitespace)
 (require 'markdown-mode)
 (require 'anju-utils)
 (require 'anju-style-text)
 (require 'casual-bookmarks)
+(require 'casual-editkit)
 
 
 ;; -------------------------------------------------------------------
@@ -55,7 +59,10 @@
      :help "Swap window right"]))
 
 (defun anju-main-menu--reconfigure-file ()
-  "Reconfigure File menu."
+  "Hook function to reconfigure File menu in main menu bar.
+
+This function is intended to be used in
+`anju-reconfigure-main-menu-hook'."
   (easy-menu-add-item global-map '(menu-bar file)
                       anju-window-swap-menu
                       'one-window)
@@ -64,14 +71,14 @@
     (define-key global-map [menu-bar file make-frame-on-display] nil t)
     (define-key global-map [menu-bar file make-frame-on-monitor] nil t)
 
-    (easy-menu-add-item (lookup-key global-map [menu-bar file]) nil
+    (easy-menu-add-item global-map '(menu-bar file)
                         ["New Frame on Display Server..."
                          make-frame-on-display
                          :visible (and (fboundp 'make-frame-on-display)
                                        (eq (window-system) 'x))
                          :help "Open a new frame on a display server"]
                         'delete-this-frame)
-    (easy-menu-add-item (lookup-key global-map [menu-bar file]) nil
+    (easy-menu-add-item global-map '(menu-bar file)
                         ["New Frame on Monitor..."
                          make-frame-on-monitor
                          :visible
@@ -85,19 +92,166 @@
 
 
 ;; -------------------------------------------------------------------
-;; Options Menu
+;; Options Menu Customization
 (defun anju-main-menu--reconfigure-options ()
-  "Reconfigure Options menu."
+  "Hook function to reconfigure Options menu in main menu bar.
+
+This function is intended to be used in
+`anju-reconfigure-main-menu-hook'."
   (define-key global-map [menu-bar options cua-mode] nil t))
+
+
+
+;; -------------------------------------------------------------------
+;; Edit Menu Customization
+(easy-menu-define anju-transpose-menu nil
+  "Keymap for Transpose menu."
+  '("Transpose ⇄"
+    :visible (not buffer-read-only)
+    :enable (not (use-region-p))
+    ["Characters" transpose-chars
+     :help "Interchange characters around point, moving forward one character."]
+
+    ["Words" transpose-words
+     :help "Interchange words around point, leaving point at end of them."]
+
+    ["Lines" transpose-lines
+     :help "Exchange current line and previous line, leaving point after both."]
+
+    ["Sentences" transpose-sentences
+     :help "Interchange the current sentence with the next one."]
+
+    ["Paragraphs" transpose-paragraphs
+     :help "Interchange the current paragraph with the next one."]
+
+    ["Regions" transpose-regions
+     :help "region STARTR1 to ENDR1 with STARTR2 to ENDR2."]
+
+    ["Balanced Expressions (sexps)" transpose-sexps
+     :help "Like C-t (‘transpose-chars’), but applies to balanced \
+expressions (sexps)."]))
+
+(easy-menu-define anju-move-text-menu nil
+  "Keymap for Move Text menu."
+  '("Move Text"
+    :visible (not buffer-read-only)
+    :enable (not (use-region-p))
+    ["Word →" casual-editkit-move-word-forward
+     :help "Move word to the right of point forward one word."]
+
+    ["Word ←" casual-editkit-move-word-backward
+     :help "Move word to the right of point backward one word."]
+
+    ["Sentence →" casual-editkit-move-sentence-forward
+     :help "Move sentence to the right of point forward one sentence."]
+
+    ["Sentence ←" casual-editkit-move-sentence-backward
+     :help "Move sentence to the right of point backward one sentence."]
+
+    ["Balanced Expression (sexp) →" casual-editkit-move-sexp-forward
+     :help "Move balanced expression (sexp) to the right of point forward \
+one sexp."]
+
+    ["Balanced Expression (sexp) ←" casual-editkit-move-sexp-backward
+     :help "Move balanced expression (sexp) to the right of point backward \
+one sexp."]))
+
+(easy-menu-define anju-delete-space-menu nil
+  "Keymap for Delete text menu."
+  '("Delete"
+    :visible (not buffer-read-only)
+    ["Join Line" join-line
+     :help "Join this line to previous and fix up \
+whitespace at join"]
+
+    ["Just One Space" just-one-space
+     :help "Delete all spaces and tabs around point, leaving \
+one space."]
+
+    ["Delete Horizontal Space" delete-horizontal-space
+     :help "Delete all spaces and tabs around point."]
+
+    ["Delete Blank Lines" delete-blank-lines
+     :help "On blank line, delete all surrounding blank lines, \
+leaving just one."]
+
+    ["Whitespace Cleanup" whitespace-cleanup
+     :help "Cleanup some blank problems in all buffer or at region."]
+
+    ["Delete Trailing Whitespace" delete-trailing-whitespace
+     :help "Delete trailing whitespace between START and END."]
+
+    ["Zap up to…" zap-up-to-char
+     :help "Kill up to, but not including occurrence of CHAR"]
+
+    ["Zap to…" zap-to-char
+     :help "Kill up to and including occurrence of CHAR"]))
+
+
+(defun anju-main-menu--reconfigure-edit ()
+"Hook function to reconfigure Edit menu in main menu bar.
+
+This function is intended to be used in
+`anju-reconfigure-main-menu-hook'."
+
+  (easy-menu-add-item global-map '(menu-bar edit search)
+                      [rgrep rgrep
+                       :label "Search in Files…"
+                       :help "Recursively grep for REGEXP in FILES in directory tree rooted at DIR."]
+                      'project-search)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      anju-transpose-menu 'fill)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      anju-move-text-menu 'fill)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      anju-delete-space-menu 'fill)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      [flush-lines flush-lines
+                       :label "Flush Lines…"
+                       :help "Delete lines containing matches for REGEXP."
+                       :visible (not buffer-read-only)]
+                      'fill)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      [keep-lines keep-lines
+                       :label "Keep Lines…"
+                       :help "Delete all lines except those containing matches \
+for REGEXP."
+                       :visible (not buffer-read-only)]
+                      'fill)
+
+  (when (eq window-system 'ns)
+    (easy-menu-add-item global-map '(menu-bar edit)
+                        [ns-popup-color-panel ns-popup-color-panel
+                         :label "Colors"
+                         :help "Show macOS Color Picker."
+                         :visible (eq window-system 'ns)])
+
+    (easy-menu-add-item global-map '(menu-bar edit)
+                        [ns-do-show-character-palette
+                         ns-do-show-character-palette
+                         :label "Emoji & Symbols"
+                         :help "Show macOS Character Palette."
+                         :visible (eq window-system 'ns)]))
+
+  (define-key global-map [menu-bar edit execute-extended-command] nil t))
+
 
 
 ;; -------------------------------------------------------------------
 ;; Reconfigure Bookmarks Menu
 (defun anju-main-menu--reconfigure-bookmarks ()
-  "Reconfigure Bookmarks Menu."
+  "Hook function to add Bookmarks menu to the main menu bar.
+
+This function is intended to be used in
+`anju-reconfigure-main-menu-hook'."
   (easy-menu-add-item global-map '(menu-bar)
                       casual-bookmarks-main-menu
-                      "Tools")
+                      'tools)
 
   (define-key global-map [menu-bar edit bookmark] nil t))
 
@@ -108,7 +262,10 @@
 
 
 (defun anju-main-menu--reconfigure-help ()
-  "Reconfigure help menu."
+  "Hook function to reconfigure Help menu in main menu bar.
+
+This function is intended to be used in
+`anju-reconfigure-main-menu-hook'."
   (easy-menu-add-item global-map '(menu-bar help-menu)
                       ["Info in New Frame"
                        (lambda ()
@@ -176,8 +333,8 @@
                       'describe-copying)
 
   (when anju-help-menu-remove-emacs-tutorial
-    (define-key global-map [menu-bar help-menu  emacs-tutorial] nil t)
-    (define-key global-map [menu-bar help-menu  emacs-tutorial-language-specific] nil t))
+    (define-key global-map [menu-bar help-menu emacs-tutorial] nil t)
+    (define-key global-map [menu-bar help-menu emacs-tutorial-language-specific] nil t))
 
   (define-key global-map [menu-bar help-menu  emacs-psychotherapist] nil t)
   (define-key global-map [menu-bar help-menu  more-manuals] nil t)
@@ -229,7 +386,10 @@
   (setq-local imenu-auto-rescan t))
 
 (defun anju-main-menu--reconfigure-imenu ()
-  "Configure main menu to include index menu for different modes.
+  "Hook function to add Index menu to the main menu bar.
+
+This function is intended to be used in
+`anju-reconfigure-main-menu-hook'.
 
 Current modes affected:
 - `prog-mode'
