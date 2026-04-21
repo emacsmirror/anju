@@ -180,17 +180,19 @@ Learn more about the different areas Anju enhances context menus in the links be
 
 If a context menu is raised on selected text, the following menu items are displayed:
 
+- Occur :: Run ~occur~ command to show occurrences of selected text.
+
 - Style :: Applies mode-specific markup to emphasize the selected text (e.g. bold, italic, code, etc.).
   - Available only for ~org-mode~ and ~markdown-mode~.
 
 - Transform Text :: Applies transforms (upper/lower case, capitalize) to the selected text.
 
-- Occur :: Run ~occur~ command to show occurrences of selected text.
-
 - Toggle comment  :: Toggles selected text to be commented based on mode.
   - Available only on modes derived from ~prog-mode~ and ~org-mode~
 
 - Write Region :: Writes selected text to a user-specified file.
+
+- Look Up :: If a word is selected, uses ~dictionary~ to look up its definition.
 
 
 *** Org Mode Context Menu
@@ -208,14 +210,16 @@ Note that the Org mode context menu is intentionally restrained in its command o
 
 It is recommended that the ~org-mouse~ package be loaded when using
 
-**** Org Headline
+**** Org Headline Context Menu
+#+CINDEX: Org Headline Context Menu
 
 If the context menu is raised on a headline, then commands related to clocking and promotion are offered.
 
 [[file:images/anju-context-menu-org-headline.png]]
 
 
-**** Org Item
+**** Org Item Context Menu
+#+CINDEX: Org Item Context Menu
 
 If the context menu is raised on a list item, then commands related to promotion and conversion to a checkbox are provided.
 
@@ -229,12 +233,25 @@ If ~org-mouse~ is loaded, then clicking on a checkbox will toggle its state betw
 
 Note that checkboxes in screenshots are prettified using ~prettify-symbols-mode~.
 
-**** Org Table
+**** Org Table Context Menu
+#+CINDEX: Org Table Context Menu
 
 If the context menu is raised in a table, then table-specific commands are shown.
 
 [[file:images/anju-context-menu-org-table.png]]
 
+**** Org Paste Context Menu
+#+CINDEX: Org Paste Context Menu
+
+[[file:images/anju-context-menu-enhanced-paste.png]]
+
+Anju adds more “Paste” commands that will display given the right context.
+
+- Paste Last Org Link :: If it exists, this command will insert the last stored Org link.
+
+- Paste Markdown as Org :: If the clipboard (latest yank) is known by the user to be Markdown text, this command will convert the clipboard text to Org via ~pandoc~, then paste (yank) it into the buffer.
+
+- Paste Media :: If an image as been copied into the clipboard, this menu item will "paste" it via the ~yank-media~ command.
 
 
 *** Dired Mode Context Menu
@@ -334,9 +351,16 @@ The commands provided by the above additions to the *Edit* menu are shown below.
   - Zap up to… (~zap-up-to-char~)
   - Zap to… (~zap-to-char~)
 
-- Colors (~ns-popup-color-panel~) (only on  macOS NS)
+- Flush Lines… (~flush-lines~)
+
+- Keep Lines… (~keep-lines~)
+
+- Duplicate (~duplicate-dwim~)
 
 - Emoji & Symbols (~ns-do-show-character-palette~) (only on macOS NS)
+
+- Colors (~ns-popup-color-panel~) (only on  macOS NS)
+
 
 Note that a menu command can be run again immediately after it has been issued using the ~repeat~ command (binding {{{kbd(C-x z)}}}). This is useful when using the move text commands.
 
@@ -566,13 +590,12 @@ The following example Elisp illustrates an implementation of a context menu func
     - CLICK: event
 
     This function is intended to be hooked into `context-menu-functions'."
-      (when (and (derived-mode-p 'text-mode)
-                 (not (anju-at-org-table-p))) ; context predicate
+      (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
         (save-excursion
           (mouse-set-point click)
           (anju-context-menu-item-separator menu count-words-separator)
-          (easy-menu-add-item menu nil ["Count Words"
-                                        count-words
+          (easy-menu-add-item menu nil [count-words count-words
+                                        :label "Count Words"
                                         :help "Count words"])))
       menu)
   #+END_SRC
@@ -592,7 +615,7 @@ The /context/ is determined by a predicate which can take into account different
 
 In the example above, the context predicate tests if the major mode is derived from ~text-mode~ /and/ if point is not inside an Org table (~anju-at-org-table-p~).  Note that it is defined at a higher level to avoid instantiating menu items if the context does not apply.
 
-The context predicate can be embedded in the menu item definition itself. See more about this with the ~:visible~ and ~:active~ keywords for the macro ~easy-menu-define~.
+The context predicate can be embedded in the menu item definition itself. See more about this with the ~:visible~ and ~:active~ keywords for the macro ~easy-menu-define~ ([[info:elisp#Easy Menu][elisp#Easy Menu]]).
 
 It is up to the implementer to determine where to best define and apply the context predicate.
 
@@ -610,12 +633,14 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 #+VINDEX: anju-context-menu-scratch
 #+VINDEX: anju-context-menu-buffers
 #+VINDEX: anju-context-menu-region
+#+VINDEX: anju-context-menu-region-extension
 #+VINDEX: anju-context-menu-narrow
 #+VINDEX: anju-context-menu-open-in
 #+VINDEX: anju-context-menu-vc
 #+VINDEX: anju-context-menu-markup
 #+VINDEX: anju-context-menu-wordcount
 #+VINDEX: anju-context-menu-window
+#+VINDEX: anju-context-menu-dictionary
 
 Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
 
@@ -628,6 +653,10 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-buffers~ :: Buffer navigation commands.
 
 - ~anju-context-menu-region~ :: Commands for selected text.
+
+- ~anju-context-menu-region-extension~ :: Commands for extending the menu items provided by the built-in ~context-menu-region~ hook. Anju puts the Org-dependent “Paste” commands here.
+
+- ~anju-context-menu-dictionary~ :: Look up definition of selected word with ~dictionary~.
 
 - ~anju-context-menu-narrow~ :: Narrow-related commands.
 

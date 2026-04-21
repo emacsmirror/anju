@@ -201,7 +201,7 @@
         (seq-elt items (cl-incf i))
         "Toggle Thumbnail"
         #'image-dired-dired-toggle-marked-thumbs
-        "Toggle thumbnails in front of marked file names in the Dired buffer.")
+        "Toggle thumbnails in front of marked file names in the Dired buffer")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -222,7 +222,7 @@
         (seq-elt items (cl-incf i))
         "Move to Trash…"
         #'dired-do-delete
-        "Delete all marked files.")
+        "Delete all marked files")
 
        (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
 
@@ -285,7 +285,30 @@
         item1
         "Scratch"
         #'scratch-buffer
-        "Switch to the *scratch* buffer.")))))
+        "Switch to the *scratch* buffer")))))
+
+
+(ert-deftest test-anju-context-menu-dictionary ()
+  "Test for `anju-context-menu-dictionary'."
+
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-dictionary
+   1
+   (lambda (items)
+     (let ((item0 (seq-elt items 0)))
+       (anju-test-menu-item
+        item0
+        (lambda () (format "Look Up “%s”" (substring-no-properties (thing-at-point 'word))))
+        #'dictionary-search-word-at-mouse
+        "Look up selected region in dictionary")))
+
+   (lambda (filename description)
+     (insert "Hi There\nImma going fishing.\n")
+     (save-buffer)
+     (goto-char (point-min))
+     (mark-word)
+     (activate-mark))))
 
 (ert-deftest test-anju-context-menu-org-mode-heading ()
   "Test for `anju-context-menu-org-mode' when point is in heading."
@@ -475,7 +498,7 @@
         item5
         "Edit Table Formulas"
         #'org-table-edit-formulas
-        "Edit the formulas of the current table in a separate buffer.")
+        "Edit the formulas of the current table in a separate buffer")
 
        (anju-test-menu-item
         item6

@@ -87,6 +87,7 @@ package-lint:
 
 clean:
 	$(MAKE) -C $(LISP_DIR) $@
+	$(MAKE) -C docs $@
 
 docs:
 	$(MAKE) -C docs $@
