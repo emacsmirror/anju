@@ -72,21 +72,23 @@ This function is intended to be used in
     (define-key global-map [menu-bar file make-frame-on-monitor] nil t)
 
     (easy-menu-add-item global-map '(menu-bar file)
-                        ["New Frame on Display Server..."
+                        [make-frame-on-display
                          make-frame-on-display
+                         :label "New Frame on Display Server..."
                          :visible (and (fboundp 'make-frame-on-display)
                                        (eq (window-system) 'x))
                          :help "Open a new frame on a display server"]
                         'delete-this-frame)
     (easy-menu-add-item global-map '(menu-bar file)
-                        ["New Frame on Monitor..."
+                        [make-frame-on-monitor
                          make-frame-on-monitor
+                         :label "New Frame on Monitor..."
                          :visible
                          (and (fboundp 'make-frame-on-monitor)
                               (> (length (display-monitor-attributes-list)) 1)
                               (if (eq (window-system) 'ns) ; this is fixed in 31+
                                   (version<= "31" emacs-version)
-                                  t))
+                                t))
                          :help "Open a new frame on another monitor"]
                         'delete-this-frame)))
 
@@ -110,26 +112,26 @@ This function is intended to be used in
     :visible (not buffer-read-only)
     :enable (not (use-region-p))
     ["Characters" transpose-chars
-     :help "Interchange characters around point, moving forward one character."]
+     :help "Interchange characters around point, moving forward one character"]
 
     ["Words" transpose-words
-     :help "Interchange words around point, leaving point at end of them."]
+     :help "Interchange words around point, leaving point at end of them"]
 
     ["Lines" transpose-lines
-     :help "Exchange current line and previous line, leaving point after both."]
+     :help "Exchange current line and previous line, leaving point after both"]
 
     ["Sentences" transpose-sentences
-     :help "Interchange the current sentence with the next one."]
+     :help "Interchange the current sentence with the next one"]
 
     ["Paragraphs" transpose-paragraphs
-     :help "Interchange the current paragraph with the next one."]
+     :help "Interchange the current paragraph with the next one"]
 
     ["Regions" transpose-regions
-     :help "region STARTR1 to ENDR1 with STARTR2 to ENDR2."]
+     :help "region STARTR1 to ENDR1 with STARTR2 to ENDR2"]
 
     ["Balanced Expressions (sexps)" transpose-sexps
      :help "Like C-t (‘transpose-chars’), but applies to balanced \
-expressions (sexps)."]))
+expressions (sexps)"]))
 
 (easy-menu-define anju-move-text-menu nil
   "Keymap for Move Text menu."
@@ -137,24 +139,24 @@ expressions (sexps)."]))
     :visible (not buffer-read-only)
     :enable (not (use-region-p))
     ["Word →" casual-editkit-move-word-forward
-     :help "Move word to the right of point forward one word."]
+     :help "Move word to the right of point forward one word"]
 
     ["Word ←" casual-editkit-move-word-backward
-     :help "Move word to the right of point backward one word."]
+     :help "Move word to the right of point backward one word"]
 
     ["Sentence →" casual-editkit-move-sentence-forward
-     :help "Move sentence to the right of point forward one sentence."]
+     :help "Move sentence to the right of point forward one sentence"]
 
     ["Sentence ←" casual-editkit-move-sentence-backward
-     :help "Move sentence to the right of point backward one sentence."]
+     :help "Move sentence to the right of point backward one sentence"]
 
     ["Balanced Expression (sexp) →" casual-editkit-move-sexp-forward
      :help "Move balanced expression (sexp) to the right of point forward \
-one sexp."]
+one sexp"]
 
     ["Balanced Expression (sexp) ←" casual-editkit-move-sexp-backward
      :help "Move balanced expression (sexp) to the right of point backward \
-one sexp."]))
+one sexp"]))
 
 (easy-menu-define anju-delete-space-menu nil
   "Keymap for Delete text menu."
@@ -166,20 +168,20 @@ whitespace at join"]
 
     ["Just One Space" just-one-space
      :help "Delete all spaces and tabs around point, leaving \
-one space."]
+one space"]
 
     ["Delete Horizontal Space" delete-horizontal-space
-     :help "Delete all spaces and tabs around point."]
+     :help "Delete all spaces and tabs around point"]
 
     ["Delete Blank Lines" delete-blank-lines
      :help "On blank line, delete all surrounding blank lines, \
-leaving just one."]
+leaving just one"]
 
     ["Whitespace Cleanup" whitespace-cleanup
-     :help "Cleanup some blank problems in all buffer or at region."]
+     :help "Cleanup some blank problems in all buffer or at region"]
 
     ["Delete Trailing Whitespace" delete-trailing-whitespace
-     :help "Delete trailing whitespace between START and END."]
+     :help "Delete trailing whitespace between START and END"]
 
     ["Zap up to…" zap-up-to-char
      :help "Kill up to, but not including occurrence of CHAR"]
@@ -197,7 +199,7 @@ This function is intended to be used in
   (easy-menu-add-item global-map '(menu-bar edit search)
                       [rgrep rgrep
                        :label "Search in Files…"
-                       :help "Recursively grep for REGEXP in FILES in directory tree rooted at DIR."]
+                       :help "Recursively grep for REGEXP in FILES in directory tree rooted at DIR"]
                       'project-search)
 
   (easy-menu-add-item global-map '(menu-bar edit)
@@ -212,7 +214,7 @@ This function is intended to be used in
   (easy-menu-add-item global-map '(menu-bar edit)
                       [flush-lines flush-lines
                        :label "Flush Lines…"
-                       :help "Delete lines containing matches for REGEXP."
+                       :help "Delete lines containing matches for REGEXP"
                        :visible (not buffer-read-only)]
                       'fill)
 
@@ -224,18 +226,25 @@ for REGEXP."
                        :visible (not buffer-read-only)]
                       'fill)
 
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      [duplicate-dwim duplicate-dwim
+                       :label "Duplicate"
+                       :help "Duplicate the current line or region"
+                       :visible (not buffer-read-only)]
+                      'fill)
+
   (when (eq window-system 'ns)
     (easy-menu-add-item global-map '(menu-bar edit)
                         [ns-popup-color-panel ns-popup-color-panel
                          :label "Colors"
-                         :help "Show macOS Color Picker."
+                         :help "Show macOS Color Picker"
                          :visible (eq window-system 'ns)])
 
     (easy-menu-add-item global-map '(menu-bar edit)
                         [ns-do-show-character-palette
                          ns-do-show-character-palette
                          :label "Emoji & Symbols"
-                         :help "Show macOS Character Palette."
+                         :help "Show macOS Character Palette"
                          :visible (eq window-system 'ns)]))
 
   (define-key global-map [menu-bar edit execute-extended-command] nil t))
@@ -260,87 +269,30 @@ This function is intended to be used in
 ;; -------------------------------------------------------------------
 ;; Help Menu Customization
 
+(defun anju-info-in-new-frame ()
+  "Create new frame with `info' window."
+  (interactive)
+  (anju-utils--command-in-new-frame #'info))
+
+(defun anju-new-info-in-new-frame ()
+  "Create new frame with new `info' instance."
+  (interactive)
+  (anju-utils--command-in-new-frame #'info-display-manual))
+
+(defun anju-man-in-new-frame ()
+  "Create new frame with `man' instance."
+  (interactive)
+  (anju-utils--command-in-new-frame #'man))
 
 (defun anju-main-menu--reconfigure-help ()
   "Hook function to reconfigure Help menu in main menu bar.
 
 This function is intended to be used in
 `anju-reconfigure-main-menu-hook'."
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Info in New Frame"
-                       (lambda ()
-                         (interactive)
-                         (anju-utils--command-in-new-frame #'info))
-                       :help "Show Info manual in new frame."]
-                      'emacs-tutorial)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["New Info in New Frame…"
-                       (lambda ()
-                         (interactive)
-                         (anju-utils--command-in-new-frame #'info-display-manual))
-                       :help "Show new Info manual in new frame."]
-                      'emacs-tutorial)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Man Page in New Frame…"
-                       (lambda ()
-                         (interactive)
-                         (anju-utils--command-in-new-frame #'man))
-                       :help "Show man page in new frame."]
-                      'emacs-tutorial)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Describe Symbol…"
-                       describe-symbol
-                       :help "Describe symbol."]
-                      'emacs-tutorial)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Describe Key or Mouse…"
-                       describe-key
-                       :help "Describe key or mouse operation."]
-                      'emacs-tutorial)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Library Commentary…"
-                       finder-commentary
-                       :help "Show commentary for Elisp library."]
-                      'emacs-tutorial)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Emacs FAQ"
-                       view-emacs-FAQ
-                       :help "View Emacs FAQ."]
-                      'describe-copying)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Emacs News"
-                       view-emacs-news
-                       :help "View Emacs news about this release."]
-                      'describe-copying)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Emacs Known Problems"
-                       view-emacs-problems
-                       :help "View Emacs known problems."]
-                      'describe-copying)
-
-  (easy-menu-add-item global-map '(menu-bar help-menu)
-                      ["Send Bug Report…"
-                       report-emacs-bug
-                       :help "Send Emacs bug report."]
-                      'describe-copying)
-
-  (when anju-help-menu-remove-emacs-tutorial
-    (define-key global-map [menu-bar help-menu emacs-tutorial] nil t)
-    (define-key global-map [menu-bar help-menu emacs-tutorial-language-specific] nil t))
-
   (define-key global-map [menu-bar help-menu  emacs-psychotherapist] nil t)
   (define-key global-map [menu-bar help-menu  more-manuals] nil t)
   (define-key global-map [menu-bar help-menu  emacs-manual] nil t)
   (define-key global-map [menu-bar help-menu  getting-new-versions] nil t)
-  (define-key global-map [menu-bar help-menu  describe-copying] nil t)
   (define-key global-map [menu-bar help-menu  describe-no-warranty] nil t)
   (define-key global-map [menu-bar help-menu  about-gnu-project] nil t)
   (define-key global-map [menu-bar help-menu  external-packages] nil t)
@@ -350,7 +302,77 @@ This function is intended to be used in
   (define-key global-map [menu-bar help-menu  emacs-manual-bug] nil t)
   (define-key global-map [menu-bar help-menu  send-emacs-bug-report] nil t)
   (define-key global-map [menu-bar help-menu  getting-new-versions] nil t)
-  (define-key global-map [menu-bar help-menu  about-gnu-project] nil t))
+  (define-key global-map [menu-bar help-menu  about-gnu-project] nil t)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [anju-info-in-new-frame anju-info-in-new-frame
+                       :label "Info in New Frame"
+                       :help "Show Info manual in new frame"]
+                      'emacs-tutorial)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [anju-new-info-in-new-frame anju-new-info-in-new-frame
+                       :label "New Info in New Frame…"
+                       :help "Show new Info manual in new frame"]
+                      'emacs-tutorial)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [anju-man-in-new-frame anju-man-in-new-frame
+                       :label "Man Page in New Frame…"
+                       :help "Show man page in new frame"]
+                      'emacs-tutorial)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [describe-symbol describe-symbol
+                       :label "Describe Symbol…"
+                       :help "Describe symbol"]
+                      'emacs-tutorial)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [describe-key describe-key
+                       :label "Describe Key or Mouse…"
+                       :help "Describe key or mouse operation"]
+                      'emacs-tutorial)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [finder-commentary finder-commentary
+                       :label "Library Commentary…"
+                       :help "Show commentary for Elisp library"]
+                      'emacs-tutorial)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [emacs-faq view-emacs-FAQ
+                       :label "Emacs FAQ"
+                       :help "View Emacs FAQ"]
+                      'describe-copying)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [emacs-news
+                       view-emacs-news
+                       :label "Emacs News"
+                       :help "View Emacs news about this release"]
+                      'describe-copying)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [emacs-known-problems
+                       view-emacs-problems
+                       :label "Emacs Known Problems"
+                       :help "View Emacs known problems"]
+                      'describe-copying)
+
+  (easy-menu-add-item global-map '(menu-bar help-menu)
+                      [send-emacs-bug-report
+                       report-emacs-bug
+                       :label "Send Bug Report…"
+                       :help "Send Emacs bug report"]
+                      'describe-copying)
+
+  (when anju-help-menu-remove-emacs-tutorial
+    (define-key global-map [menu-bar help-menu emacs-tutorial] nil t)
+    (define-key global-map [menu-bar help-menu emacs-tutorial-language-specific] nil t))
+
+  (define-key global-map [menu-bar help-menu  describe-copying] nil t))
+
 
 
 ;; -------------------------------------------------------------------

@@ -587,11 +587,21 @@ Zap to… (@code{zap-to-char})
 @end itemize
 
 @item
-Colors (@code{ns-popup-color-panel}) (only on  macOS NS)
+Flush Lines… (@code{flush-lines})
+
+@item
+Keep Lines… (@code{keep-lines})
+
+@item
+Duplicate (@code{duplicate-dwim})
 
 @item
 Emoji & Symbols (@code{ns-do-show-character-palette}) (only on macOS NS)
+
+@item
+Colors (@code{ns-popup-color-panel}) (only on  macOS NS)
 @end itemize
+
 
 Note that a menu command can be run again immediately after it has been issued using the @code{repeat} command (binding @kbd{C-x z}). This is useful when using the move text commands.
 
@@ -912,13 +922,12 @@ The following example Elisp illustrates an implementation of a context menu func
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-  (when (and (derived-mode-p 'text-mode)
-             (not (anju-at-org-table-p))) ; context predicate
+  (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu count-words-separator)
-      (easy-menu-add-item menu nil ["Count Words"
-                                    count-words
+      (easy-menu-add-item menu nil [count-words count-words
+                                    :label "Count Words"
                                     :help "Count words"])))
   menu)
 @end lisp
@@ -948,7 +957,7 @@ Mouse position
 
 In the example above@comma{} the context predicate tests if the major mode is derived from @code{text-mode} @emph{and} if point is not inside an Org table (@code{anju-at-org-table-p}).  Note that it is defined at a higher level to avoid instantiating menu items if the context does not apply.
 
-The context predicate can be embedded in the menu item definition itself. See more about this with the @code{:visible} and @code{:active} keywords for the macro @code{easy-menu-define}.
+The context predicate can be embedded in the menu item definition itself. See more about this with the @code{:visible} and @code{:active} keywords for the macro @code{easy-menu-define} (@ref{Easy Menu,elisp#Easy Menu,,elisp,}).
 
 It is up to the implementer to determine where to best define and apply the context predicate.
 
