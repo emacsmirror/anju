@@ -350,6 +350,8 @@ The commands provided by the above additions to the *Edit* menu are shown below.
   - Delete Trailing Whitespace (~delete-trailing-whitespace~)
   - Zap up to… (~zap-up-to-char~)
   - Zap to… (~zap-to-char~)
+    
+- Flush Lines… (~flush-lines~)
 
 - Flush Lines… (~flush-lines~)
 
