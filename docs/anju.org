@@ -361,8 +361,13 @@ The commands provided by the above additions to the *Edit* menu are shown below.
 
 - Emoji & Symbols (~ns-do-show-character-palette~) (only on macOS NS)
 
-- Colors (~ns-popup-color-panel~) (only on  macOS NS)
+- Keep Lines… (~keep-lines~)
 
+- Duplicate (~duplicate-dwim~)
+
+
+- Colors (~ns-popup-color-panel~) (only on  macOS NS)
+  
 
 Note that a menu command can be run again immediately after it has been issued using the ~repeat~ command (binding {{{kbd(C-x z)}}}). This is useful when using the move text commands.
 
