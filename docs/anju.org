@@ -180,17 +180,19 @@ Learn more about the different areas Anju enhances context menus in the links be
 
 If a context menu is raised on selected text, the following menu items are displayed:
 
+- Occur :: Run ~occur~ command to show occurrences of selected text.
+
 - Style :: Applies mode-specific markup to emphasize the selected text (e.g. bold, italic, code, etc.).
   - Available only for ~org-mode~ and ~markdown-mode~.
 
 - Transform Text :: Applies transforms (upper/lower case, capitalize) to the selected text.
 
-- Occur :: Run ~occur~ command to show occurrences of selected text.
-
 - Toggle comment  :: Toggles selected text to be commented based on mode.
   - Available only on modes derived from ~prog-mode~ and ~org-mode~
 
 - Write Region :: Writes selected text to a user-specified file.
+
+- Look Up :: If a word is selected, uses ~dictionary~ to look up its definition.
 
 
 *** Org Mode Context Menu
@@ -208,14 +210,16 @@ Note that the Org mode context menu is intentionally restrained in its command o
 
 It is recommended that the ~org-mouse~ package be loaded when using
 
-**** Org Headline
+**** Org Headline Context Menu
+#+CINDEX: Org Headline Context Menu
 
 If the context menu is raised on a headline, then commands related to clocking and promotion are offered.
 
 [[file:images/anju-context-menu-org-headline.png]]
 
 
-**** Org Item
+**** Org Item Context Menu
+#+CINDEX: Org Item Context Menu
 
 If the context menu is raised on a list item, then commands related to promotion and conversion to a checkbox are provided.
 
@@ -229,12 +233,25 @@ If ~org-mouse~ is loaded, then clicking on a checkbox will toggle its state betw
 
 Note that checkboxes in screenshots are prettified using ~prettify-symbols-mode~.
 
-**** Org Table
+**** Org Table Context Menu
+#+CINDEX: Org Table Context Menu
 
 If the context menu is raised in a table, then table-specific commands are shown.
 
 [[file:images/anju-context-menu-org-table.png]]
 
+**** Org Paste Context Menu
+#+CINDEX: Org Paste Context Menu
+
+[[file:images/anju-context-menu-enhanced-paste.png]]
+
+Anju adds more “Paste” commands that will display given the right context.
+
+- Paste Last Org Link :: If it exists, this command will insert the last stored Org link.
+
+- Paste Markdown as Org :: If the clipboard (latest yank) is known by the user to be Markdown text, this command will convert the clipboard text to Org via ~pandoc~, then paste (yank) it into the buffer.
+
+- Paste Media :: If an image as been copied into the clipboard, this menu item will "paste" it via the ~yank-media~ command.
 
 
 *** Dired Mode Context Menu
@@ -336,11 +353,18 @@ The commands provided by the above additions to the *Edit* menu are shown below.
     
 - Flush Lines… (~flush-lines~)
 
+- Flush Lines… (~flush-lines~)
+
 - Keep Lines… (~keep-lines~)
 
 - Duplicate (~duplicate-dwim~)
 
 - Emoji & Symbols (~ns-do-show-character-palette~) (only on macOS NS)
+
+- Keep Lines… (~keep-lines~)
+
+- Duplicate (~duplicate-dwim~)
+
 
 - Colors (~ns-popup-color-panel~) (only on  macOS NS)
   
@@ -616,12 +640,14 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 #+VINDEX: anju-context-menu-scratch
 #+VINDEX: anju-context-menu-buffers
 #+VINDEX: anju-context-menu-region
+#+VINDEX: anju-context-menu-region-extension
 #+VINDEX: anju-context-menu-narrow
 #+VINDEX: anju-context-menu-open-in
 #+VINDEX: anju-context-menu-vc
 #+VINDEX: anju-context-menu-markup
 #+VINDEX: anju-context-menu-wordcount
 #+VINDEX: anju-context-menu-window
+#+VINDEX: anju-context-menu-dictionary
 
 Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
 
@@ -634,6 +660,10 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-buffers~ :: Buffer navigation commands.
 
 - ~anju-context-menu-region~ :: Commands for selected text.
+
+- ~anju-context-menu-region-extension~ :: Commands for extending the menu items provided by the built-in ~context-menu-region~ hook. Anju puts the Org-dependent “Paste” commands here.
+
+- ~anju-context-menu-dictionary~ :: Look up definition of selected word with ~dictionary~.
 
 - ~anju-context-menu-narrow~ :: Narrow-related commands.
 

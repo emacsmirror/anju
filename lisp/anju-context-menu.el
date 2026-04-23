@@ -28,6 +28,7 @@
 (require 'org)
 (require 'org-table)
 (require 'ol)
+(require 'dictionary)
 (require 'yank-media)
 (require 'anju-utils)
 (require 'anju-style-text)
@@ -150,9 +151,9 @@ and convert it to Org using the pandoc utility."
 (defun anju-context-menu-region-extension (menu click)
   "Region menu using MENU and CLICK."
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (derived-mode-p 'org-mode)
+  (when (derived-mode-p 'org-mode)
+    (save-excursion
+      (mouse-set-point click)
       (easy-menu-add-item menu nil
                           [org-insert-last-stored-link
                            org-insert-last-stored-link
@@ -175,7 +176,6 @@ and convert it to Org using the pandoc utility."
                            :label "Paste Media"
                            :visible (and (not buffer-read-only)
                                          (display-graphic-p)
-                                         (derived-mode-p 'org-mode)
                                          (anju-yank-media-p))
                            :help "Paste (yank) media"]
                           "Clear")))
@@ -711,6 +711,25 @@ This function is intended to be hooked into `context-menu-functions'."
                                     :help "Count words"])))
   menu)
 
+(defun anju-context-menu-dictionary (menu click)
+  "Context menu hook function for the dictionary command.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (use-region-p)
+    (save-excursion
+      (mouse-set-point click)
+      (easy-menu-add-item
+       menu nil
+       ["Look Up"
+        dictionary-search-word-at-mouse
+        :label (format "Look Up “%s”" (substring-no-properties (thing-at-point 'word)))
+        :help "Look up selected region in dictionary"])))
+  menu)
+
 
 (defun anju-context-menu-window (menu click)
   "Context menu hook function for wordcount commands.
@@ -757,6 +776,7 @@ function into `context-menu-functions' over `add-hook'."
                      anju-context-menu-scratch
                      anju-context-menu-buffers
                      anju-context-menu-region
+                     anju-context-menu-dictionary
                      anju-context-menu-narrow
                      anju-context-menu-open-in
                      anju-context-menu-vc
@@ -787,6 +807,7 @@ function into `context-menu-functions' over `add-hook'."
                    anju-context-menu-open-in
                    anju-context-menu-region-extension
                    anju-context-menu-vc
+                   anju-context-menu-dictionary
                    anju-context-menu-region
                    anju-context-menu-markup
                    anju-context-menu-wordcount
