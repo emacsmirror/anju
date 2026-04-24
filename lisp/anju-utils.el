@@ -82,6 +82,14 @@ nil and restart Emacs."
   :type 'boolean
   :group 'anju)
 
+(defcustom anju-file-menu-replace-make-frame-on t
+  "If non-nil, replace new frame on menu items in the main menu bar File menu.
+
+To return to behavior that is not modified by Anju, set this value to
+nil and restart Emacs."
+  :type 'boolean
+  :group 'anju)
+
 (defcustom anju-buffer-list-filter-functions
   '((anju-buffer-list-plain-filter . 7)
     (anju-buffer-list-compilation-filter . 3)
@@ -139,7 +147,10 @@ add their own filters to define the resulting buffer list returned by
   :group 'anju)
 
 (defcustom anju-reconfigure-main-menu-hook
-  '(anju-main-menu--reconfigure-bookmarks
+  '(anju-main-menu--reconfigure-file
+    anju-main-menu--reconfigure-edit
+    anju-main-menu--reconfigure-options
+    anju-main-menu--reconfigure-bookmarks
     anju-main-menu--reconfigure-text-mode
     anju-main-menu--reconfigure-help
     anju-main-menu--reconfigure-imenu)
@@ -148,12 +159,18 @@ add their own filters to define the resulting buffer list returned by
 This hook is a list of functions that reconfigure the main menu. It is
 initialized with the following functions:
 
+- `anju-main-menu--reconfigure-file'
+- `anju-main-menu--reconfigure-edit'
+- `anju-main-menu--reconfigure-options'
 - `anju-main-menu--reconfigure-bookmarks'
 - `anju-main-menu--reconfigure-text-mode'
 - `anju-main-menu--reconfigure-help'
 - `anju-main-menu--reconfigure-imenu'"
   :type 'hook
-  :options '(anju-main-menu--reconfigure-bookmarks
+  :options '(anju-main-menu--reconfigure-file
+             anju-main-menu--reconfigure-edit
+             anju-main-menu--reconfigure-options
+             anju-main-menu--reconfigure-bookmarks
              anju-main-menu--reconfigure-text-mode
              anju-main-menu--reconfigure-help
              anju-main-menu--reconfigure-imenu)
@@ -262,6 +279,45 @@ conform to extent <= (max/2) - 2"
      :help "Convert selected region to lower case"]
     ["Capitalize" capitalize-region
      :help "Convert the selected region to capitalized form"]))
+
+
+(easy-menu-define anju-center-text-menu nil
+  "Keymap for centering text."
+  '("Center"
+    :enable (not buffer-read-only)
+    ["Line" center-line
+     :help "Center the line point is on, within the width specified by ‘fill-column’"]
+
+    ["Region" center-region
+     :enable (use-region-p)
+     :help "Center each nonblank line starting in the region"]
+
+    ["Paragraph" center-paragraph
+     :help "Center each nonblank line in the paragraph at or after point"]))
+
+(easy-menu-define anju-fill-text-menu nil
+  "Keymap for centering text."
+  '("Fill"
+    :enable (not buffer-read-only)
+    ["Paragraph" fill-paragraph
+     :help "Fill paragraph at or after point"]
+
+    ["Region" fill-region
+     :enable (use-region-p)
+     :help "Fill each of the paragraphs in the region"]
+
+    ["Region as paragraph" fill-region-as-paragraph
+     :enable (use-region-p)
+     :help "Fill the region as if it were a single paragraph"]
+
+    ["Individual paragraphs" fill-individual-paragraphs
+     :enable (use-region-p)
+     :help "Fill paragraphs of uniform indentation within the region"]
+
+    ["Non-uniform paragraphs" fill-nonuniform-paragraphs
+     :enable (use-region-p)
+     :help "Fill paragraphs within the region, allowing varying indentation within each"]))
+
 
 
 ;; -------------------------------------------------------------------

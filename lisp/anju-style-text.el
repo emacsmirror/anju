@@ -145,14 +145,12 @@ contiguous without spaces."
   "Keymap for Emphasize Menu."
   '("Style"
     :enable (and (use-region-p) (not buffer-read-only))
+    :visible (anju-style-mode-supported-p)
     ["Bold" anju-style-bold
-     :visible (anju-style-mode-supported-p)
      :help "Bold selected region"]
     ["Italic" anju-style-italic
-     :visible (anju-style-mode-supported-p)
      :help "Italic selected region"]
     ["Code" anju-style-code
-     :visible (anju-style-mode-supported-p)
      :help "Code selected region"]
     ["Underline" anju-style-underline
      :visible (derived-mode-p 'org-mode)
@@ -161,7 +159,6 @@ contiguous without spaces."
      :visible (derived-mode-p 'org-mode)
      :help "Verbatim selected region"]
     ["Strike Through" anju-style-strike-through
-     :visible (anju-style-mode-supported-p)
      :help "Strike-through selected region"]
     ["Remove" anju-style-remove
      :visible (and (derived-mode-p 'org-mode) visible-mode)

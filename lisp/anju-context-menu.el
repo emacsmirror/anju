@@ -28,6 +28,7 @@
 (require 'org)
 (require 'org-table)
 (require 'ol)
+(require 'dictionary)
 (require 'yank-media)
 (require 'anju-utils)
 (require 'anju-style-text)
@@ -150,29 +151,31 @@ and convert it to Org using the pandoc utility."
 (defun anju-context-menu-region-extension (menu click)
   "Region menu using MENU and CLICK."
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (derived-mode-p 'org-mode)
+  (when (derived-mode-p 'org-mode)
+    (save-excursion
+      (mouse-set-point click)
       (easy-menu-add-item menu nil
-                          ["Paste Last Org Link"
+                          [org-insert-last-stored-link
                            org-insert-last-stored-link
+                           :label "Paste Last Org Link"
                            :visible (and (not buffer-read-only) (anju-org-stored-links-p))
                            :help "Insert the last link stored in org-stored-links"]
                           "Clear")
 
       (easy-menu-add-item menu nil
-                          ["Paste Markdown as Org"
+                          [anju-yank-markdown-as-org
                            anju-yank-markdown-as-org
+                           :label "Paste Markdown as Org"
                            :visible (not buffer-read-only)
                            :help "Convert clipboard (latest yank) of Markdown text to Org, then paste"]
                           "Clear")
 
       (easy-menu-add-item menu nil
-                          ["Paste Media"
+                          [yank-media
                            yank-media
+                           :label "Paste Media"
                            :visible (and (not buffer-read-only)
                                          (display-graphic-p)
-                                         (derived-mode-p 'org-mode)
                                          (anju-yank-media-p))
                            :help "Paste (yank) media"]
                           "Clear")))
@@ -202,27 +205,31 @@ This function is intended to be hooked into `context-menu-functions'."
     (save-excursion
       (when (mouse-posn-property (event-start click) 'dired-filename)
         (easy-menu-add-item menu nil
-                            ["Rename to…"
+                            [dired-do-rename
                              dired-do-rename
+                             :label "Rename to…"
                              :help "Rename or move file"])
 
         (easy-menu-add-item menu nil
-                            ["Copy to…"
+                            [dired-do-copy
                              dired-do-copy
+                             :label "Copy to…"
                              :help "Copy file"])
 
         (easy-menu-add-item menu nil
-                            ["Symlink…"
+                            [dired-do-relsymlink
                              dired-do-relsymlink
+                             :label "Symlink…"
                              :help "Make relative symlink"])
 
         (easy-menu-add-item menu nil
-                            ["Toggle Thumbnail"
+                            [image-dired-dired-toggle-marked-thumbs
                              image-dired-dired-toggle-marked-thumbs
+                             :label "Toggle Thumbnail"
                              :visible (string-match-p (image-file-name-regexp)
                                                       (dired-get-filename))
                              :help "Toggle thumbnails in front of marked \
-file names in the Dired buffer."])
+file names in the Dired buffer"])
 
         (easy-menu-add-item
          menu
@@ -240,8 +247,9 @@ file names in the Dired buffer."])
         ;;                      :help "Change mode of file (chmod)"])
 
         (easy-menu-add-item menu nil
-                            ["Insert Subdir"
+                            [dired-maybe-insert-subdir
                              dired-maybe-insert-subdir
+                             :label "Insert Subdir"
                              :label (format "Insert “%s” View"
                                             (anju-filename-from-path (dired-get-filename)))
                              :visible (file-directory-p
@@ -251,18 +259,19 @@ file names in the Dired buffer."])
         (anju-context-menu-item-separator menu trash-separator)
 
         (easy-menu-add-item menu nil
-                            ["Move to Trash…"
+                            [dired-do-delete
                              dired-do-delete
+                             :label "Move to Trash…"
                              :visible (file-writable-p
                                        (dired-file-name-at-point))
-                             :help "Delete all marked files."])
+                             :help "Delete all marked files"])
 
         (anju-context-menu-item-separator menu dired-separator))
 
       (mouse-set-point click)
 
       (easy-menu-add-item menu nil
-                          ["Toggle Subdir View"
+                          [dired-hide-subdir
                            dired-hide-subdir
                            :label (format
                                    "%s “%s” View"
@@ -279,7 +288,7 @@ file names in the Dired buffer."])
                            :help "Toggle hide subdir (sub-directory)"])
 
       (easy-menu-add-item menu nil
-                          ["Remove Subdir"
+                          [dired-kill-subdir
                            dired-kill-subdir
                            :label (format
                                    "Remove “%s” View"
@@ -295,22 +304,24 @@ file names in the Dired buffer."])
       (easy-menu-add-item menu nil casual-dired-sort-menu)
 
       (easy-menu-add-item menu nil
-                          ["Omit Mode"
+                          [dired-omit-mode
                            dired-omit-mode
+                           :label "Omit Mode"
                            :style toggle
                            :selected dired-omit-mode
                            :help "Omit mode"])
 
       (easy-menu-add-item menu nil
-                          ["Hide Details"
+                          [dired-hide-details-mode
                            dired-hide-details-mode
+                           :label "Hide Details"
                            :style toggle
                            :selected dired-hide-details-mode
                            :help "Hide directory details"])
 
       (easy-menu-add-item menu nil
-                          ["📁 Dired…"
-                           dired
+                          [dired dired
+                           :label "📁 Dired…"
                            :help "Open Dired"])))
   menu)
 
@@ -322,15 +333,15 @@ file names in the Dired buffer."])
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (anju-at-org-table-p))
-               (not (use-region-p)))
+  (when (and (not (anju-at-org-table-p))
+             (not (use-region-p)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu journal-separator)
-      (easy-menu-add-item menu nil ["Scratch"
+      (easy-menu-add-item menu nil [scratch-buffer
                                     scratch-buffer
-                                    :help "Switch to the *scratch* buffer."])))
+                                    :label "Scratch"
+                                    :help "Switch to the *scratch* buffer"])))
   menu)
 
 (defun anju-org-table-recalculate ()
@@ -346,74 +357,84 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (save-excursion
-    (mouse-set-point click)
-
-    (when (derived-mode-p 'org-mode)
+  (when (derived-mode-p 'org-mode)
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu org-separator)
       (when (org-at-heading-p)
 
         (easy-menu-add-item menu nil
-                            ["Clock In"
+                            [org-clock-in
                              org-clock-in
+                             :label "Clock In"
                              :visible (not (org-clocking-p))
                              :help "Clock in"])
 
         (easy-menu-add-item menu nil
-                            ["Clock Out"
+                            [org-clock-out
                              org-clock-out
+                             :label "Clock Out"
                              :visible (org-clocking-p)
                              :help "Clock out"])
 
         (easy-menu-add-item menu nil
-                            ["Demote →"
+                            [org-do-demote
                              org-do-demote
+                             :label "Demote →"
                              :help "Demote"])
 
         (easy-menu-add-item menu nil
-                            ["Promote ←"
+                            [org-do-promote
                              org-do-promote
+                             :label "Promote ←"
                              :help "Promote"])
 
         (easy-menu-add-item menu nil
-                            ["Demote Subtree →"
+                            [org-demote-subtree
                              org-demote-subtree
+                             :label "Demote Subtree →"
                              :help "Demote heading subtree"])
 
         (easy-menu-add-item menu nil
-                            ["Promote Subtree ←"
+                            [org-promote-subtree
                              org-promote-subtree
+                             :label "Promote Subtree ←"
                              :help "Promote heading subtree"]))
 
       (when (org-at-item-p)
         (easy-menu-add-item menu nil
-                            ["Demote →"
+                            [org-indent-item
                              org-indent-item
+                             :label "Demote →"
                              :help "Demote"])
 
         (easy-menu-add-item menu nil
-                            ["Promote ←"
+                            [org-outdent-item
                              org-outdent-item
+                             :label "Promote ←"
                              :help "Promote"])
 
         (easy-menu-add-item menu nil
-                            ["Demote Subtree →"
+                            [org-indent-item-tree
                              org-indent-item-tree
+                             :label "Demote Subtree →"
                              :help "Demote item subtree"])
 
         (easy-menu-add-item menu nil
-                            ["Promote Subtree ←"
+                            [org-outdent-item-tree
                              org-outdent-item-tree
+                             :label "Promote Subtree ←"
                              :help "Promote item subtree"])
 
         (if (org-at-item-checkbox-p)
             (easy-menu-add-item menu nil
-                            ["In-Progress"
-                             casual-org-checkbox-in-progress
-                             :help "Change checkbox state to in-progress [-]"]))
+                                [casual-org-checkbox-in-progress
+                                 casual-org-checkbox-in-progress
+                                 :label "In-Progress"
+                                 :help "Change checkbox state to in-progress [-]"]))
 
         (easy-menu-add-item menu nil
-                            ["Toggle List/Checkbox"
+                            [casual-org-toggle-list-to-checkbox
                              casual-org-toggle-list-to-checkbox
                              :label (if (org-at-item-checkbox-p)
                                         "To Item"
@@ -422,7 +443,7 @@ This function is intended to be hooked into `context-menu-functions'."
 
       (when (anju-at-org-table-p)
         (easy-menu-add-item menu nil
-                            ["Table Cell Info"
+                            [casual-org-table-copy-reference-dwim
                              casual-org-table-copy-reference-dwim
                              :label (casual-org-table--reference-dwim)
                              :help "Copy Org table reference (field or range) into kill ring via mouse"])
@@ -430,25 +451,29 @@ This function is intended to be hooked into `context-menu-functions'."
         (easy-menu-add-item menu nil anju-org-table-region-menu)
 
         (easy-menu-add-item menu nil
-                            ["Show Coordinates"
+                            [org-table-toggle-coordinate-overlays
                              org-table-toggle-coordinate-overlays
+                             :label "Show Coordinates"
                              :style toggle
                              :selected org-table-coordinate-overlays
                              :help "Toggle the display of row/column numbers in tables"])
 
         (easy-menu-add-item menu nil
-                            ["Recalculate"
+                            [anju-org-table-recalculate
                              anju-org-table-recalculate
+                             :label "Recalculate"
                              :help "Recalculate table"])
 
         (easy-menu-add-item menu nil
-                            ["Edit Table Formulas"
+                            [org-table-edit-formulas
                              org-table-edit-formulas
-                             :help "Edit the formulas of the current table in a separate buffer."])
+                             :label "Edit Table Formulas"
+                             :help "Edit the formulas of the current table in a separate buffer"])
 
         ;; (easy-menu-add-item menu nil cc/insert-org-plot-menu)
-        (easy-menu-add-item menu nil ["Run gnuplot"
+        (easy-menu-add-item menu nil [org-plot/gnuplot
                                       org-plot/gnuplot
+                                      :label "Run gnuplot"
                                       :help "Plot table using gnuplot"]))))
   menu)
 
@@ -459,22 +484,24 @@ This function is intended to be hooked into `context-menu-functions'."
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (use-region-p))
-               (not (anju-at-org-table-p)))
+  (when (and (not (use-region-p))
+             (not (anju-at-org-table-p)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu buffer-navigation-separator)
-      (easy-menu-add-item menu nil ["← Buffer"
+      (easy-menu-add-item menu nil [previous-buffer
                                     previous-buffer
+                                    :label "← Buffer"
                                     :help "Go to previous buffer"])
 
-      (easy-menu-add-item menu nil ["→ Buffer"
+      (easy-menu-add-item menu nil [next-buffer
                                     next-buffer
+                                    :label "→ Buffer"
                                     :help "Go to next buffer"])
 
-      (easy-menu-add-item menu nil ["≣ List All Buffers"
+      (easy-menu-add-item menu nil [ibuffer
                                     ibuffer
+                                    :label "≣ List All Buffers"
                                     :help "List all buffers"])))
   menu)
 
@@ -486,38 +513,43 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (anju-at-org-table-p)) (not (derived-mode-p 'Info-mode)))
+  (when (and (not (anju-at-org-table-p)) (not (derived-mode-p 'Info-mode)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu narrow-separator)
       (cond ((use-region-p)
              (easy-menu-add-item menu nil
-                                 ["Narrow Region" narrow-to-region
+                                 [narrow-to-region narrow-to-region
                                   :label (anju-menu-label "Narrow Region")
                                   :help "Restrict editing in this buffer \
 to the current region"]))
 
             ((and (not (buffer-narrowed-p)) (derived-mode-p 'prog-mode))
              (easy-menu-add-item menu nil
-                                 ["Narrow to defun" narrow-to-defun
+                                 [narrow-to-defun narrow-to-defun
+                                  :label "Narrow to defun"
                                   :help "Restrict editing in this buffer \
 to the current defun"]))
 
             ((and (not (buffer-narrowed-p)) (derived-mode-p 'org-mode))
              (easy-menu-add-item menu nil
-                                 ["Narrow to subtree" org-narrow-to-subtree
+                                 [org-narrow-to-subtree org-narrow-to-subtree
+                                  :label "Narrow to subtree"
                                   :help "Restrict editing in this buffer \
 to the current subtree"]))
 
             ((and (not (buffer-narrowed-p)) (derived-mode-p 'markdown-mode))
              (easy-menu-add-item menu nil
-                                 ["Narrow to subtree" markdown-narrow-to-subtree
+                                 [markdown-narrow-to-subtree
+                                  markdown-narrow-to-subtree
+                                  :label "Narrow to subtree"
                                   :help "Restrict editing in this buffer \
 to the current subtree"])))
 
       (when (and (buffer-narrowed-p) (not (derived-mode-p 'Info-mode)))
         (easy-menu-add-item menu nil
-                            ["Widen buffer" widen
+                            [widen widen
+                             :label "Widen buffer"
                              :help "Remove narrowing restrictions \
 from current buffer"]))))
   menu)
@@ -531,17 +563,16 @@ from current buffer"]))))
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (not (use-region-p))
-               (not (anju-at-org-table-p))
-               (buffer-file-name)
-               (not (derived-mode-p 'dired-mode)))
-
+  (when (and (not (use-region-p))
+             (not (anju-at-org-table-p))
+             (buffer-file-name)
+             (not (derived-mode-p 'dired-mode)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu open-in-separator)
       (easy-menu-add-item menu nil
-                          ["📁 Open in Dired"
-                           dired-jump-other-window
+                          [dired-jump-other-window dired-jump-other-window
+                           :label "📁 Open in Dired"
                            :help "Open file in Dired"])))
   menu)
 
@@ -553,13 +584,12 @@ This function is intended to be hooked into `context-menu-functions'."
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
+  (when (and (vc-responsible-backend default-directory t)
+             (not (use-region-p))
+             (not (anju-at-org-table-p)))
 
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (vc-responsible-backend default-directory t)
-               (not (use-region-p))
-               (not (anju-at-org-table-p)))
-
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu vc-separator)
 
       (when (and (package-installed-p 'magit)
@@ -568,19 +598,19 @@ This function is intended to be hooked into `context-menu-functions'."
         (if (buffer-file-name)
             (easy-menu-add-item
              menu nil
-             ["Magit Dispatch…"
-              magit-file-dispatch
+             [magit-file-dispatch magit-file-dispatch
+              :label "Magit Dispatch…"
               :help "Show the status of the current Git repository in a buffer"])
           (easy-menu-add-item
            menu nil
-           ["Magit Status"
-            magit-status
+           [magit-status magit-status
+            :label "Magit Status"
             :help "Show the status of the current Git repository in a buffer"])))
 
       (easy-menu-add-item
        menu nil
-       ["Ediff revision…"
-        casual-ediff-revision-from-menu
+       [casual-ediff-revision-from-menu casual-ediff-revision-from-menu
+        :label "Ediff revision…"
         :visible (and (bound-and-true-p buffer-file-name)
                       (vc-registered (buffer-file-name)))
         :help "Ediff this file with revision"])))
@@ -593,14 +623,12 @@ This function is intended to be hooked into `context-menu-functions'."
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (use-region-p)
+  (when (use-region-p)
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu transform-text-separator)
       (easy-menu-add-item menu nil
-                          ["Occur"
-                           anju-occur-selected-region
+                          [anju-occur-selected-region anju-occur-selected-region
                            :label (anju-menu-label "Occur")
                            :help "Show all lines in the current buffer \
 containing a match for selected word"])
@@ -613,14 +641,14 @@ containing a match for selected word"])
 
       (if (or (derived-mode-p 'prog-mode) (derived-mode-p 'org-mode))
           (easy-menu-add-item menu nil
-                              ["Toggle Comment"
-                               comment-dwim
+                              [comment-dwim comment-dwim
+                               :label "Toggle Comment"
                                :visible (not buffer-read-only)
                                :help "Toggle comment on selected region"]))
 
       (easy-menu-add-item menu nil
-                          ["Write Region…"
-                           write-region
+                          [write-region write-region
+                           :label "Write Region…"
                            :help "Write current region into specified file"])))
   menu)
 
@@ -632,32 +660,34 @@ containing a match for selected word"])
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-
-  (save-excursion
-    (mouse-set-point click)
-    (when (not (use-region-p))
+  (when (and (not (use-region-p))
+             (member (derived-mode-p major-mode) '(org-mode markdown-mode)))
+    (save-excursion
+      (mouse-set-point click)
       (pcase (derived-mode-p major-mode)
         ('org-mode
-         (when (not (anju-at-org-table-p))
-           (anju-context-menu-item-separator menu org-mode-operations-separator)
-           (easy-menu-add-item menu nil
-                               ["Toggle Images"
-                                casual-org-toggle-images
-                                :help "Toggle images"])
+         (anju-context-menu-item-separator menu org-mode-operations-separator)
+         (easy-menu-add-item menu nil
+                             [casual-org-toggle-images
+                              casual-org-toggle-images
+                              :label "Toggle Images"
+                              :help "Toggle images"])
 
-           (easy-menu-add-item menu nil
-                               ["Show Markup"
-                                visible-mode
-                                :style toggle
-                                :selected visible-mode
-                                :help "Toggle making all invisible text \
-temporarily visible (Visible mode)"])))
+         (easy-menu-add-item menu nil
+                             [visible-mode
+                              visible-mode
+                              :label "Show Markup"
+                              :style toggle
+                              :selected visible-mode
+                              :help "Toggle making all invisible text \
+temporarily visible (Visible mode)"]))
 
         ('markdown-mode
          (anju-context-menu-item-separator menu markdown-mode-operations-separator)
          (easy-menu-add-item menu nil
-                             ["Hide Markup"
+                             [markdown-toggle-markup-hiding
                               markdown-toggle-markup-hiding
+                              :label "Hide Markup"
                               :style toggle
                               :selected markdown-hide-markup
                               :help "Toggle the display or hiding of markup"]))
@@ -672,13 +702,32 @@ temporarily visible (Visible mode)"])))
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-  (save-excursion
-    (mouse-set-point click)
-    (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
+  (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
+    (save-excursion
+      (mouse-set-point click)
       (anju-context-menu-item-separator menu count-words-separator)
-      (easy-menu-add-item menu nil ["Count Words"
-                                    count-words
+      (easy-menu-add-item menu nil [count-words count-words
+                                    :label "Count Words"
                                     :help "Count words"])))
+  menu)
+
+(defun anju-context-menu-dictionary (menu click)
+  "Context menu hook function for the dictionary command.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (use-region-p)
+    (save-excursion
+      (mouse-set-point click)
+      (easy-menu-add-item
+       menu nil
+       ["Look Up"
+        dictionary-search-word-at-mouse
+        :label (format "Look Up “%s”" (substring-no-properties (thing-at-point 'word)))
+        :help "Look up selected region in dictionary"])))
   menu)
 
 
@@ -727,6 +776,7 @@ function into `context-menu-functions' over `add-hook'."
                      anju-context-menu-scratch
                      anju-context-menu-buffers
                      anju-context-menu-region
+                     anju-context-menu-dictionary
                      anju-context-menu-narrow
                      anju-context-menu-open-in
                      anju-context-menu-vc
@@ -757,6 +807,7 @@ function into `context-menu-functions' over `add-hook'."
                    anju-context-menu-open-in
                    anju-context-menu-region-extension
                    anju-context-menu-vc
+                   anju-context-menu-dictionary
                    anju-context-menu-region
                    anju-context-menu-markup
                    anju-context-menu-wordcount

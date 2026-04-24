@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(require 'cl-lib)
 (require 'anju-utils)
 (require 'anju-test-utils)
 
@@ -90,34 +91,112 @@
 ;;   "Test for `anju-middle-truncate'."
 ;;   (should (unless anju-test-fail-uncovered-tests "Untested")))
 
+(defun test--anju-transform-text-menu (kmap)
+  (anju-test-keymap
+   kmap
+   "Transform Text"
+   3
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "Make Upper Case"
+        #'upcase-region
+        "Convert selected region to upper case")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Make Lower Case"
+        #'downcase-region
+        "Convert selected region to lower case")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Capitalize"
+        #'capitalize-region
+        "Convert the selected region to capitalized form")))))
+
+
 (ert-deftest test-anju-transform-text-menu ()
   "Test for `anju-transform-text-menu'."
+  (test--anju-transform-text-menu anju-transform-text-menu))
 
-  (anju-test-keymap anju-transform-text-menu
-                    "Transform Text"
-                    3
-                    (lambda (items)
-                      (let* ((item0 (seq-elt items 0))
-                             (item1 (seq-elt items 1))
-                             (item2 (seq-elt items 2)))
 
-                        (anju-test-menu-item
-                         item0
-                         "Make Upper Case"
-                         #'upcase-region
-                         "Convert selected region to upper case")
+(defun test--anju-center-text-menu (kmap)
+  (anju-test-keymap
+   kmap
+   "Center"
+   3
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "Line"
+        #'center-line
+        "Center the line point is on, within the width specified by ‘fill-column’")
 
-                        (anju-test-menu-item
-                         item1
-                         "Make Lower Case"
-                         #'downcase-region
-                         "Convert selected region to lower case")
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Region"
+        #'center-region
+        "Center each nonblank line starting in the region")
 
-                        (anju-test-menu-item
-                         item2
-                         "Capitalize"
-                         #'capitalize-region
-                         "Convert the selected region to capitalized form")))))
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Paragraph"
+        #'center-paragraph
+        "Center each nonblank line in the paragraph at or after point")
+       ))))
+
+
+(ert-deftest test-anju-center-text-menu ()
+  "Test for `anju-center-text-menu'."
+  (test--anju-center-text-menu anju-center-text-menu))
+
+
+(defun test--anju-fill-text-menu (kmap)
+  (anju-test-keymap
+   kmap
+   "Fill"
+   5
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "Paragraph"
+        #'fill-paragraph
+        "Fill paragraph at or after point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Region"
+        #'fill-region
+        "Fill each of the paragraphs in the region")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Region as paragraph"
+        #'fill-region-as-paragraph
+        "Fill the region as if it were a single paragraph")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Individual paragraphs"
+        #'fill-individual-paragraphs
+        "Fill paragraphs of uniform \
+indentation within the region")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Non-uniform paragraphs"
+        #'fill-nonuniform-paragraphs
+        "Fill paragraphs within the region, \
+allowing varying indentation within each")))))
+
+(ert-deftest test-anju-fill-text-menu ()
+  "Test for `anju-fill-text-menu'."
+  (test--anju-fill-text-menu anju-fill-text-menu))
+
 
 ;; (ert-deftest test-anju--scrub-frame-register-list ()
 ;;   "Test for `anju--scrub-frame-register-list'."
