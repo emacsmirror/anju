@@ -312,6 +312,8 @@ Anju makes the following modifications to the main menu bar *Edit* menu:
 
 - Adds the menu item “Keep Lines…”.
 
+- Adds the menu item “Duplicate”.
+
 On the macOS NS variant of Emacs, the following menu items are added.
 
 - “Colors” - display the macOS system color picker dialog.
@@ -328,6 +330,7 @@ The commands provided by the above additions to the *Edit* menu are shown below.
 - Transpose ⇄
   - Characters (~transpose-chars~)
   - Words (~transpose-words~)
+  - Lines (~transpose-lines~)
   - Sentences (~transpose-sentences~)
   - Paragraphs (~transpose-paragraphs~)
   - Regions (~transpose-regions~)
@@ -353,20 +356,13 @@ The commands provided by the above additions to the *Edit* menu are shown below.
     
 - Flush Lines… (~flush-lines~)
 
-- Flush Lines… (~flush-lines~)
-
 - Keep Lines… (~keep-lines~)
 
 - Duplicate (~duplicate-dwim~)
-
-- Emoji & Symbols (~ns-do-show-character-palette~) (only on macOS NS)
-
-- Keep Lines… (~keep-lines~)
-
-- Duplicate (~duplicate-dwim~)
-
 
 - Colors (~ns-popup-color-panel~) (only on  macOS NS)
+
+- Emoji & Symbols (~ns-do-show-character-palette~) (only on macOS NS)
   
 
 Note that a menu command can be run again immediately after it has been issued using the ~repeat~ command (binding {{{kbd(C-x z)}}}). This is useful when using the move text commands.
