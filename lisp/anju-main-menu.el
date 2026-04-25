@@ -170,17 +170,20 @@ whitespace at join"]
      :help "Delete all spaces and tabs around point, leaving \
 one space"]
 
-    ["Delete Horizontal Space" delete-horizontal-space
+    ["Horizontal Space" delete-horizontal-space
      :help "Delete all spaces and tabs around point"]
 
-    ["Delete Blank Lines" delete-blank-lines
+    ["Pair" delete-pair
+     :help "Delete a pair of characters enclosing ARG sexps that follow point"]
+
+    ["Blank Lines" delete-blank-lines
      :help "On blank line, delete all surrounding blank lines, \
 leaving just one"]
 
     ["Whitespace Cleanup" whitespace-cleanup
      :help "Cleanup some blank problems in all buffer or at region"]
 
-    ["Delete Trailing Whitespace" delete-trailing-whitespace
+    ["Trailing Whitespace" delete-trailing-whitespace
      :help "Delete trailing whitespace between START and END"]
 
     ["Zap up to…" zap-up-to-char
