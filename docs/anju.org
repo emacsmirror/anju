@@ -347,10 +347,11 @@ The commands provided by the above additions to the *Edit* menu are shown below.
 - Delete
   - Join Line (~join-line~)
   - Just One Space (~just-one-space~)
-  - Delete Horizontal Space (~delete-horizontal-space~)
-  - Delete Blank Lines (~delete-blank-lines~)
+  - Horizontal Space (~delete-horizontal-space~)
+  - Pair (~delete-pair~)
+  - Blank Lines (~delete-blank-lines~)
   - Whitespace Cleanup (~whitespace-cleanup~)
-  - Delete Trailing Whitespace (~delete-trailing-whitespace~)
+  - Trailing Whitespace (~delete-trailing-whitespace~)
   - Zap up to… (~zap-up-to-char~)
   - Zap to… (~zap-to-char~)
     

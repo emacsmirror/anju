@@ -187,7 +187,7 @@ one sexp")))))
   (anju-test-keymap
    kmap
    "Delete"
-   8
+   9
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -206,13 +206,19 @@ one space")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
-        "Delete Horizontal Space"
+        "Horizontal Space"
         #'delete-horizontal-space
         "Delete all spaces and tabs around point")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
-        "Delete Blank Lines"
+        "Pair"
+        #'delete-pair
+        "Delete a pair of characters enclosing ARG sexps that follow point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Blank Lines"
         #'delete-blank-lines
         "On blank line, delete all surrounding blank lines, \
 leaving just one")
@@ -225,10 +231,9 @@ leaving just one")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
-        "Delete Trailing Whitespace"
+        "Trailing Whitespace"
         #'delete-trailing-whitespace
         "Delete trailing whitespace between START and END")
-
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
