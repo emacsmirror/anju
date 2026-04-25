@@ -5,7 +5,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.2.1
+#+MACRO: version 1.2.2-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -347,10 +347,11 @@ The commands provided by the above additions to the *Edit* menu are shown below.
 - Delete
   - Join Line (~join-line~)
   - Just One Space (~just-one-space~)
-  - Delete Horizontal Space (~delete-horizontal-space~)
-  - Delete Blank Lines (~delete-blank-lines~)
+  - Horizontal Space (~delete-horizontal-space~)
+  - Pair (~delete-pair~)
+  - Blank Lines (~delete-blank-lines~)
   - Whitespace Cleanup (~whitespace-cleanup~)
-  - Delete Trailing Whitespace (~delete-trailing-whitespace~)
+  - Trailing Whitespace (~delete-trailing-whitespace~)
   - Zap up to… (~zap-up-to-char~)
   - Zap to… (~zap-to-char~)
     
