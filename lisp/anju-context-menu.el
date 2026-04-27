@@ -202,8 +202,9 @@ and convert it to Org using the pandoc utility."
 This function is intended to be hooked into `context-menu-functions'."
 
   (when (derived-mode-p 'dired-mode)
+    (mouse-set-point click)
     (save-excursion
-      (when (mouse-posn-property (event-start click) 'dired-filename)
+      (when (dired-file-name-at-point)
         (easy-menu-add-item menu nil
                             [dired-do-rename
                              dired-do-rename
@@ -221,6 +222,13 @@ This function is intended to be hooked into `context-menu-functions'."
                              dired-do-relsymlink
                              :label "Symlink…"
                              :help "Make relative symlink"])
+
+        (easy-menu-add-item menu nil
+                            [dired-copy-filename-as-kill
+                             dired-copy-filename-as-kill
+                             :label "Copy name"
+                             :help "Copy names of marked (or next ARG) files \
+into the kill ring"])
 
         (easy-menu-add-item menu nil
                             [image-dired-dired-toggle-marked-thumbs
@@ -255,7 +263,6 @@ file names in the Dired buffer"])
                              :visible (file-directory-p
                                        (dired-file-name-at-point))
                              :help "Insert subdir (sub-directory)"])
-
         (anju-context-menu-item-separator menu trash-separator)
 
         (easy-menu-add-item menu nil
@@ -268,38 +275,39 @@ file names in the Dired buffer"])
 
         (anju-context-menu-item-separator menu dired-separator))
 
-      (mouse-set-point click)
+      ;; (mouse-set-point click)
 
-      (easy-menu-add-item menu nil
-                          [dired-hide-subdir
-                           dired-hide-subdir
-                           :label (format
-                                   "%s “%s” View"
-                                   (if (dired-subdir-hidden-p
-                                        (dired-current-directory))
-                                       "Show" "Hide")
-                                   (anju-filename-from-path
-                                    (directory-file-name
-                                     (dired-current-directory))))
-                           :visible (and (dired-current-directory)
-                                         (> (line-number-at-pos) 1) ; hack!
-                                         (> (- (length dired-subdir-alist) 1) 0)
-                                         (not (dired-file-name-at-point)))
-                           :help "Toggle hide subdir (sub-directory)"])
+      (when (not (dired-file-name-at-point))
+        (easy-menu-add-item menu nil
+                            [dired-hide-subdir
+                             dired-hide-subdir
+                             :label (format
+                                     "%s “%s” View"
+                                     (if (dired-subdir-hidden-p
+                                          (dired-current-directory))
+                                         "Show" "Hide")
+                                     (anju-filename-from-path
+                                      (directory-file-name
+                                       (dired-current-directory))))
+                             :visible (and (dired-current-directory)
+                                           (> (line-number-at-pos) 1) ; hack!
+                                           (> (- (length dired-subdir-alist) 1) 0)
+                                           (not (dired-file-name-at-point)))
+                             :help "Toggle hide subdir (sub-directory)"])
 
-      (easy-menu-add-item menu nil
-                          [dired-kill-subdir
-                           dired-kill-subdir
-                           :label (format
-                                   "Remove “%s” View"
-                                   (anju-filename-from-path
-                                    (directory-file-name
-                                     (dired-current-directory))))
-                           :visible (and (dired-current-directory)
-                                         (> (line-number-at-pos) 1) ; hack!
-                                         (> (- (length dired-subdir-alist) 1) 0)
-                                         (not (dired-file-name-at-point)))
-                           :help "Kill subdir (sub-directory)"])
+        (easy-menu-add-item menu nil
+                            [dired-kill-subdir
+                             dired-kill-subdir
+                             :label (format
+                                     "Remove “%s” View"
+                                     (anju-filename-from-path
+                                      (directory-file-name
+                                       (dired-current-directory))))
+                             :visible (and (dired-current-directory)
+                                           (> (line-number-at-pos) 1) ; hack!
+                                           (> (- (length dired-subdir-alist) 1) 0)
+                                           (not (dired-file-name-at-point)))
+                             :help "Kill subdir (sub-directory)"]))
 
       (easy-menu-add-item menu nil casual-dired-sort-menu)
 

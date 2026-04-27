@@ -459,11 +459,11 @@ If an image as been copied into the clipboard, this menu item will ``paste'' it 
 
 Anju has context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
 
-@image{images/anju-dired-copy-to,,,,png}
+@image{images/anju-context-menu-dired-copy-to,,,,png}
 
 If the mouse point is over a directory, the option to insert a view (aka subdir) for it in the buffer is provided.
 
-@image{images/anju-dired-insert-subdir,,,,png}
+@image{images/anju-context-menu-dired-insert-subdir,,,,png}
 
 Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's @ref{Design Principles and Concerns}.
 
