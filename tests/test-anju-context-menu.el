@@ -176,7 +176,7 @@
   (anju-test-context-menu-function
    #'anju-context-menu-dired
    "hi there"
-   15
+   14
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -196,6 +196,12 @@
         "Symlink…"
         #'dired-do-relsymlink
         "Make relative symlink")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Copy name"
+        #'dired-copy-filename-as-kill
+        "Copy names of marked (or next ARG) files into the kill ring")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -226,8 +232,42 @@
 
        (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
 
+       (should (string-equal (seq-elt (seq-elt items (cl-incf i)) 2) "Sort By"))
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
+        "Omit Mode"
+        #'dired-omit-mode
+        "Omit mode")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Hide Details"
+        #'dired-hide-details-mode
+        "Hide directory details")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "📁 Dired…"
+        #'dired
+        "Open Dired"))))
+  (kill-buffer))
+
+
+(ert-deftest test-anju-context-menu-dired-subdir ()
+  "Test for `anju-context-menu-dired' subdir commands."
+  (dired "~/Projects/elisp/anju/")
+  (dired-goto-file (expand-file-name "~/Projects/elisp/anju/tests"))
+  (dired-maybe-insert-subdir (expand-file-name "~/Projects/elisp/anju/tests"))
+  (dired-goto-subdir (expand-file-name "~/Projects/elisp/anju/tests"))
+  (anju-test-context-menu-function
+   #'anju-context-menu-dired
+   "hi there"
+   6
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
         (lambda () (format
                "%s “%s” View"
                (if (dired-subdir-hidden-p
@@ -249,25 +289,7 @@
         #'dired-kill-subdir
         "Kill subdir (sub-directory)")
 
-       (should (string-equal (seq-elt (seq-elt items (cl-incf i)) 2) "Sort By"))
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        "Omit Mode"
-        #'dired-omit-mode
-        "Omit mode")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        "Hide Details"
-        #'dired-hide-details-mode
-        "Hide directory details")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        "📁 Dired…"
-        #'dired
-        "Open Dired"))))
+       )))
   (kill-buffer))
 
 (ert-deftest test-anju-context-menu-scratch ()
