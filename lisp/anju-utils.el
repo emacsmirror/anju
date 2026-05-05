@@ -373,5 +373,15 @@ conform to extent <= (max/2) - 2"
       (anju--window-configuration-to-register)
       (delete-other-windows window interactive))))
 
+
+(defun anju-filename-from-path (path)
+  "Extract filename from full PATH."
+  (let* ((extension (file-name-extension path))
+         (base (file-name-base path)))
+    (if extension
+        (concat base "." extension)
+      base)))
+
+
 (provide 'anju-utils)
 ;;; anju-utils.el ends here
