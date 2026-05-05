@@ -29,6 +29,9 @@
 (require 'org-table)
 (require 'ol)
 (require 'dictionary)
+(require 'elisp-mode)
+(require 'hideshow)
+(require 'edebug)
 (require 'yank-media)
 (require 'anju-utils)
 (require 'anju-style-text)
@@ -379,6 +382,346 @@ This function is intended to be hooked into `context-menu-functions'."
                                       :label "Run gnuplot"
                                       :help "Plot table using gnuplot"]))))
   menu)
+
+
+;; -------------------------------------------------------------------
+;; Context Menu: Emacs Lisp Mode
+
+
+(defun anju-form-name-at-point ()
+  "Name of form at point."
+  (save-excursion
+    (beginning-of-defun)
+    (let* ((fn (list-at-point))
+           (form-name (seq-elt fn 1)))
+      (if (symbolp form-name)
+          form-name))))
+
+(defun anju-form-delaration-at-point ()
+  "Declaration of form at point as string."
+  (save-excursion
+    (beginning-of-defun)
+    (let* ((fn (list-at-point))
+           (form-declaration (seq-elt fn 0)))
+      (if (symbolp form-declaration)
+          form-declaration))))
+
+
+(defun anju-point-in-ertdeftest-p ()
+  "Predicate if point is in an ERT test."
+  (string-equal "ert-deftest" (anju-form-delaration-at-point)))
+
+(defun anju-ert-run-test-at-point ()
+  "Run the ERT test at point."
+  (interactive)
+  (let ((test-name (anju-form-name-at-point)))
+        ;; (message "ERT: %s" test-name)
+        (ert test-name)))
+
+
+(defun anju-edebug-mode-p ()
+  "Predicate if `edebug-mode' is on."
+  (if edebug-mode t nil))
+
+(defun anju-edebug-defun ()
+  "Convenience function to instrument function for Edebug."
+  (interactive)
+  (setq current-prefix-arg '(4))
+  (call-interactively #'eval-defun))
+
+(easy-menu-define anju-edebug-mode-menu nil
+  "Keymap for Edebug mode menu."
+  '("Mode"
+    ["Step" edebug-step-mode
+     :help "Stop at the next stop point encountered"]
+
+    ["Go to ●" edebug-go-mode
+     :help "Run until the next breakpoint"]
+
+    ["Continue" edebug-continue-mode
+     :help "Pause one second at each breakpoint, and then continue"]
+
+    ["Next" edebug-next-mode
+     :help "Stop at the next stop point encountered after an expression"]
+
+    ["Trace" edebug-trace-mode
+     :help "Pause (normally one second) at each Edebug stop point"]))
+
+
+(easy-menu-define anju-edebug-breakpoint-menu nil
+  "Keymap for Edebug breakpoint menu."
+  '("Breakpoint"
+
+    ["Set Breakpoint ●" edebug-set-breakpoint
+     :help "Set breakpoint"]
+
+    ["Set Conditional ⦿" edebug-set-conditional-breakpoint
+     :help "Set conditional breakpoint"]
+
+    ["Next ●" edebug-next-breakpoint
+     :help "Next breakpoint"]
+
+    ["Unset ●" edebug-unset-breakpoint
+     :help "Unset breakpoint"]
+
+    ["Unset all ●" edebug-unset-breakpoints
+     :help "Unset all breakpoints"]))
+
+
+(easy-menu-define anju-edebug-sexp-menu nil
+  "Keymap for Edebug breakpoint menu."
+  '("Sexp"
+
+    ["Forward" edebug-forward-sexp
+     :help "Forward sexp"]
+
+    ["Step-in" edebug-step-in
+     :help "Step in sexp"]
+
+    ["Step-out" edebug-step-out
+     :help "Step out sexp"]))
+
+
+(easy-menu-define anju-hideshow-menu nil
+  "Keymap for hideshow menu."
+  '("Hide/Show"
+    :visible hs-minor-mode
+
+    [hs-toggle-hiding
+     hs-toggle-hiding
+     :label (if (hs-already-hidden-p) "Show Block" "Hide Block")
+     :help "Toggle hiding"]
+
+    ["Hide All" hs-hide-all
+     :enable (not (hs-already-hidden-p))
+     :help "Hide all"]
+
+    ["Show All" hs-show-all
+     :help "Show all"]))
+
+(defun anju-context-menu-elisp (menu click)
+  "Context menu hook function for Elisp commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (and (derived-mode-p 'emacs-lisp-mode)
+             (not (derived-mode-p 'edebug-eval-mode)))
+
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu emacs-lisp-separator)
+
+      (if (anju-edebug-mode-p)
+          (progn
+            (easy-menu-add-item menu nil
+                                ["Step" edebug-step-mode
+                                 :help "Step"])
+
+            (easy-menu-add-item menu nil
+                                ["Here" edebug-goto-here
+                                 :help "Here"])
+
+            (easy-menu-add-item menu nil
+                                anju-edebug-mode-menu)
+
+
+            (easy-menu-add-item menu nil
+                                anju-edebug-sexp-menu)
+
+            (easy-menu-add-item menu nil
+                                anju-edebug-breakpoint-menu)
+
+            (easy-menu-add-item menu nil
+                                ["Eval…" edebug-eval-expression
+                                 :help "Eval expression"])
+
+            (easy-menu-add-item menu nil
+                                ["Previous" edebug-previous-result
+                                 :help "Previous result"])
+
+            (easy-menu-add-item menu nil
+                                ["Suspend Edebug" edebug-view-outside
+                                 :help "Suspend Edebug, run edebug-where to resume"])
+
+            (easy-menu-add-item menu nil
+                                ["Watchlist" edebug-visit-eval-list
+                                 :help "Open watchlist"])
+
+            (easy-menu-add-item menu nil
+                                ["Stop execution" edebug-stop
+                                 :help "Stop Edebug execution, useful for exiting from trace or continue loop"])
+
+            (easy-menu-add-item menu nil
+                                ["Exit" edebug-top-level-nonstop
+                                 :help "Quit Edebug Nonstop"]))
+
+        (easy-menu-add-item
+         menu nil
+         [eval-last-sexp
+          eval-last-sexp
+          :label "Eval Last Sexp"
+          :help "Evaluate sexp before point; print value in the echo area"])
+
+        (easy-menu-add-item
+         menu nil
+         [eval-defun
+          eval-defun
+          :label (format "Eval “%s”" (anju-form-name-at-point))
+          :visible (anju-form-name-at-point)
+          :help "Evaluate the top level form point is in"])
+
+        (easy-menu-add-item
+         menu nil
+         [anju-edebug-defun
+          anju-edebug-defun
+          :label (format "Edebug “%s”" (anju-form-name-at-point))
+          :visible (anju-form-name-at-point)
+          :help "Evaluate the top level form point is in, stepping through with Edebug"])
+
+        (easy-menu-add-item
+         menu nil
+         [elisp-eval-region-or-buffer
+          elisp-eval-region-or-buffer
+          :label (if (use-region-p) "Eval Region" "Eval Buffer")
+          :help "Evaluate region or buffer"])
+
+        (easy-menu-add-item
+         menu nil
+         anju-hideshow-menu)
+
+        (easy-menu-add-item
+         menu nil
+         [xref-find-references-and-replace
+          xref-find-references-and-replace
+          :label (format "Rename “%s”" (thing-at-point 'symbol))
+          :visible (let ((thing (thing-at-point 'symbol)))
+                     (and thing
+                          (not (string-match-p "^[-+]?[[:digit:]]*\\.?[[:digit:]]+$" thing))
+                          (not (member (substring-no-properties thing) '("lambda" "nil")))))
+          :help "Rename xref symbol"])
+
+        (easy-menu-add-item
+         menu nil
+         [anju-ert-run-test-at-point
+          anju-ert-run-test-at-point
+          :label (format "Test “%s”" (anju-form-name-at-point))
+          :visible (anju-point-in-ertdeftest-p)
+          :help "ERT"])
+
+        (easy-menu-add-item
+         menu nil
+         [anju-extract-lambda-to-defun
+          anju-extract-lambda-to-defun
+          :label "Extract 𝜆…"
+          :visible (anju-point-on-lambda-p)
+          :help "Convert lambda expression into a function"])
+
+        (easy-menu-add-item
+         menu nil
+         [eval-expression
+          eval-expression
+          :label "Eval Expression…"
+          :help "Evaluate expression and print result in mini-buffer"]))))
+  menu)
+
+
+(defun anju-context-menu-edebug-eval (menu click)
+  "Context menu hook function for Edebug eval mode.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (derived-mode-p 'edebug-eval-mode)
+
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu edebug-eval-separator)
+
+      (easy-menu-add-item
+       menu nil
+       [edebug-update-eval-list
+        edebug-update-eval-list
+        :label "Add symbol"
+        :help "In the watchlist, type in symbol or sexp to add"])
+
+      (easy-menu-add-item
+       menu nil
+       [edebug-delete-eval-item
+        edebug-delete-eval-item
+        :label "Delete symbol"
+        :help "Place point on symbol or sexp to delete"])
+
+      (easy-menu-add-item
+       menu nil
+       [edebug-eval-last-sexp
+        edebug-eval-last-sexp
+        :label "Eval last sexp"
+        :help "Eval last sexp"])
+
+      (easy-menu-add-item
+       menu nil
+       [edebug-eval-print-last-sexp
+        edebug-eval-print-last-sexp
+        :label "Insert last sexp"
+        :help "Insert (print) eval of last sexp into watchlist"])
+
+      (easy-menu-add-item
+       menu nil
+       [edebug-where
+        edebug-where
+        :label "Resume"
+        :help "Resume code stepping"])))
+menu)
+
+(defun anju-point-on-lambda-p ()
+  "Predicate if point is on a lambda symbol."
+  (let* ((thing (thing-at-point 'symbol))
+         (thing (if thing (substring-no-properties thing) nil)))
+    (and thing (string-equal "lambda" thing))))
+
+(defun anju-extract-lambda-to-defun (arg)
+  "Extract lambda expression at point to defun named ARG.
+
+When the point is on a lambda symbol, this command will prompt for a
+function name ARG and will convert the lambda expression into a defun.
+The new defun is not evaluated.
+
+This converted function is put into a temporary buffer ‘*ARG*’ for
+subsequent editing while the original lambda expression is replaced with
+a reference to the new defun ARG."
+
+  (interactive "sExtract lambda as: ")
+
+  (if (anju-point-on-lambda-p)
+      (progn
+        (save-excursion
+          (let* ((lfn (list-at-point))
+                 (lfn-body (seq-subseq lfn 1))
+                 (newfn ())
+                 (newfn (push (intern arg) newfn))
+                 (newfn (push 'defun newfn))
+                 (newfn (append newfn lfn-body))
+                 (lexp (prin1-to-string newfn))
+                 (bufname (format "*%s*" arg))
+                 (buf (get-buffer-create bufname)))
+
+            (with-current-buffer (current-buffer)
+              (switch-to-buffer-other-window buf)
+              (emacs-lisp-mode)
+              (insert lexp)
+              (goto-char (point-min)))))
+
+        (let ((delete-pair-blink-delay 0))
+          (backward-up-list)
+          (kill-sexp)
+          (insert (format "#'%s" arg))
+          (backward-sexp)))
+    (message "not on lambda")))
 
 
 ;; -------------------------------------------------------------------
@@ -820,6 +1163,8 @@ function into `context-menu-functions' over `add-hook'."
                 (add-hook 'context-menu-functions fn)))
           (reverse '(anju-context-menu-dired
                      anju-context-menu-org-mode
+                     anju-context-menu-elisp
+                     anju-context-menu-edebug-eval
                      anju-context-menu-scratch
                      anju-context-menu-buffers
                      anju-context-menu-region
@@ -848,6 +1193,8 @@ function into `context-menu-functions' over `add-hook'."
           (anju-context-menu--remove-from-context-menu-functions fn))
         (reverse '(anju-context-menu-dired
                    anju-context-menu-org-mode
+                   anju-context-menu-elisp
+                   anju-context-menu-edebug-eval
                    anju-context-menu-scratch
                    anju-context-menu-buffers
                    anju-context-menu-narrow
