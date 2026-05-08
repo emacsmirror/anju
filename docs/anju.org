@@ -5,7 +5,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.2.2
+#+MACRO: version 1.2.3-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -259,13 +259,79 @@ Anju adds more “Paste” commands that will display given the right context.
 
 Anju has context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
 
-[[file:images/anju-dired-copy-to.png]]
+[[file:images/anju-context-menu-dired-copy-to.png]]
 
 If the mouse point is over a directory, the option to insert a view (aka subdir) for it in the buffer is provided.
 
-[[file:images/anju-dired-insert-subdir.png]]
+[[file:images/anju-context-menu-dired-insert-subdir.png]]
 
 Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
+
+*** Emacs Lisp Context Menu
+#+CINDEX: Emacs Lisp Context Menu
+
+Anju enhances the context menu for Emacs Lisp (Elisp) development with support for Edebug and ERT. 
+
+
+**** Basic Elisp Context Menu
+#+CINDEX: Basic Elisp Context Menu
+
+Anju enhances the default Elisp context menu by providing commands for evaluating, debugging, and refactoring Elisp. Many of these commands are context-sensitive to point location. If a command does not apply at point, it will not be shown in the context menu.
+
+If hideshow ([[info:emacs#Hideshow][emacs#Hideshow]]) support is enabled, then a sub-menu “Hide/Show” is provided.
+
+The screenshot below shows the context menu raised when the point is on the function ~foo~. Selecting the menu item “Edebug “foo”” will instrument ~foo~ for debugging. On the next invocation of ~foo~, the Edebug debugger will be run. Anju enhances the [[#edebug-mode-context-menu][context menu for Edebug]] as well.
+
+[[file:images/anju-context-menu-elisp.png]]
+
+Note that the Emacs default context menu for Elisp supports Xref ([[info:emacs#Xref][emacs#Xref]]) navigation as well as help (~describe-function~) and Info lookup as shown below.
+
+[[file:images/anju-context-menu-elisp-built-in.png]]
+
+
+**** Edebug Mode Context Menu
+:PROPERTIES:
+:CUSTOM_ID: edebug-mode-context-menu
+:END:
+#+CINDEX: Edebug Mode Context Menu
+
+When debugging Elisp using Edebug, the following context menu offering its many commands is shown.
+
+[[file:images/anju-context-menu-edebug.png]]
+
+For users new to Edebug, it is helpful to understand that code execution is sexp-based as opposed to line/function-based in other IDEs. 
+
+To better understand Edebug's command set, a close reading of its manual is recommended ([[info:elisp#Edebug][elisp#Edebug]]). 
+
+
+**** ERT Support
+#+CINDEX: ERT Support
+
+
+ERT is a built-in package for Emacs that supports automated testing of Elisp ([[info:ert#Top][ert#Top]]). Anju provides a convenience command to run an ~ert-deftest~ if the point is within its declaration. The screenshot below shows and example of running the ERT test ~test-foo~.
+
+[[file:images/anju-context-menu-ert.png]]
+
+The result of running ~test-foo~ is shown below.
+
+[[file:images/anju-context-menu-ert-result.png]]
+
+**** Extract Lambda (𝜆) Expression
+#+CINDEX: Extract Lambda (𝜆) Expression
+
+Anju provides support for extracting a lambda (𝜆) expression into a function declaration with the menu item “Extract 𝜆…”. This feature requires that the point be on the ~lambda~ symbol. The screenshots below shows this command in operation.
+
+[[file:images/anju-context-menu-extract-lambda-1.png]]
+
+The user will be prompted in the mini-buffer for a name of the new function. The example below shows ~add-two~.
+
+[[file:images/anju-context-menu-extract-lambda-2.png]]
+
+The result is that a temporary buffer named ~*add-two*~ (the input name is used) holding the new function is created and a reference to the new function (~#'add-two~) is substituted in-place at the original location of the lambda expression.
+
+[[file:images/anju-context-menu-extract-lambda-3.png]]
+
+The ~*add-two*~ buffer can be edited as needed and its contents placed into a desired Elisp file.
 
 *** Magit Support
 #+CINDEX: Magit Support
@@ -645,6 +711,8 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 #+VINDEX: anju-context-menu-wordcount
 #+VINDEX: anju-context-menu-window
 #+VINDEX: anju-context-menu-dictionary
+#+VINDEX: anju-context-menu-elisp
+#+VINDEX: anju-context-menu-edebug-eval
 
 Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
 
@@ -674,6 +742,11 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-wordcount~ :: Word count command.
 
 - ~anju-context-menu-window~ :: Window management commands.
+
+- ~anju-context-menu-elisp~ :: Emacs Lisp commands.
+
+- ~anju-context-menu-edebug-eval~ :: Edebug commands.
+
 
 ** Mode Line Buffer List Menu Customization
 :PROPERTIES:
