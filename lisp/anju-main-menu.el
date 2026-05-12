@@ -236,6 +236,12 @@ for REGEXP."
                        :visible (not buffer-read-only)]
                       'fill)
 
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      anju-rectangle-menu 'Transpose\ ⇄)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      "--" 'Transpose\ ⇄)
+
   (when (eq window-system 'ns)
     (easy-menu-add-item global-map '(menu-bar edit)
                         [ns-popup-color-panel ns-popup-color-panel

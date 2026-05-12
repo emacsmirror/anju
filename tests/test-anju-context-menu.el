@@ -1266,6 +1266,31 @@ temporarily visible (Visible mode)"
                                    #'windmove-swap-states-right
                                    "Swap window right")))))))))
 
+
+;; -------------------------------------------------------------------
+;; Context Menu: Rectangle Commands
+
+(ert-deftest test-anju-context-menu-rectangle ()
+  "Test for `anju-context-menu-rectangle'."
+
+  (anju-test-context-menu-function-with-filetype
+   ".txt"
+   #'anju-context-menu-rectangle
+   2
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+       (let ((kmap (seq-elt (seq-elt items (cl-incf i)) 3)))
+             (test--anju-rectangle-menu kmap))))
+
+   (lambda (filename description)
+     (insert "hey they\nclittiak\nwhat is goin on?\n")
+     (save-buffer)
+     (transient-mark-mode)
+     (goto-char (point-min))
+     (rectangle-mark-mode)
+     (goto-char (point-max))
+     (activate-mark))))
 
 ;; (ert-deftest test-anju-context-menu--insert-into-context-menu-functions ()
 ;;   "Test for `anju-context-menu--insert-into-context-menu-functions'."

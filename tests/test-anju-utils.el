@@ -198,6 +198,13 @@ allowing varying indentation within each")))))
   (test--anju-fill-text-menu anju-fill-text-menu))
 
 
+
+(ert-deftest test-anju-rectangle-menu ()
+  "Test for `anju-rectangle-menu'."
+  (test--anju-rectangle-menu anju-rectangle-menu))
+
+
+
 ;; (ert-deftest test-anju--scrub-frame-register-list ()
 ;;   "Test for `anju--scrub-frame-register-list'."
 ;;   (should (unless anju-test-fail-uncovered-tests "Untested")))
