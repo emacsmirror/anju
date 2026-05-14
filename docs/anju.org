@@ -378,7 +378,7 @@ Anju makes the following modifications to the main menu bar *Edit* menu:
 
 - Adds “Search in Files…” to the *Search* sub-menu.
 
-- Add the “Rectangle” sub-menu of commands ([[info:emacs#Rectangles]]).
+- Adds the “Rectangle” sub-menu of commands ([[info:emacs#Rectangles]]).
 
 - Adds the “Transpose  ⇄” sub-menu of commands to transpose different text quantities.
 
@@ -390,6 +390,8 @@ Anju makes the following modifications to the main menu bar *Edit* menu:
 
 - Adds the menu item “Keep Lines…”.
 
+- Adds the menu item “Align Regexp…”.
+
 - Adds the menu item “Duplicate”.
 
 On the macOS NS variant of Emacs, the following menu items are added.
@@ -397,7 +399,6 @@ On the macOS NS variant of Emacs, the following menu items are added.
 - “Colors” - display the macOS system color picker dialog.
 
 - “Emoji & Symbols” - display the macOS system Emoji & Symbols dialog.
-
 
 The commands provided by the above additions to the *Edit* menu are shown below.
 
@@ -447,6 +448,8 @@ The commands provided by the above additions to the *Edit* menu are shown below.
 - Flush Lines… (~flush-lines~)
 
 - Keep Lines… (~keep-lines~)
+  
+- Align Regexp… (~align-regexp~)
 
 - Duplicate (~duplicate-dwim~)
 

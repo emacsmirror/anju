@@ -624,7 +624,7 @@ Anju makes the following modifications to the main menu bar @strong{Edit} menu:
 Adds “Search in Files…” to the @strong{Search} sub-menu.
 
 @item
-Add the “Rectangle” sub-menu of commands (@ref{Rectangles,,,emacs,}).
+Adds the “Rectangle” sub-menu of commands (@ref{Rectangles,,,emacs,}).
 
 @item
 Adds the “Transpose  ⇄” sub-menu of commands to transpose different text quantities.
@@ -640,6 +640,9 @@ Adds the menu item “Flush Lines…”.
 
 @item
 Adds the menu item “Keep Lines…”.
+
+@item
+Adds the menu item “Align Regexp…”.
 
 @item
 Adds the menu item “Duplicate”.
@@ -755,6 +758,9 @@ Flush Lines… (@code{flush-lines})
 
 @item
 Keep Lines… (@code{keep-lines})
+
+@item
+Align Regexp… (@code{align-regexp})
 
 @item
 Duplicate (@code{duplicate-dwim})
