@@ -146,7 +146,7 @@ From here, one can:
 - Split the window vertically (↓)
 - If multiple windows are shown, swap the current window.
 
-Note: usage of "window" refers to the Emacs definition of it. Refer to [[info:emacs#Frames][emacs#Frames]] for more detail on this.
+Note: usage of "window" refers to the Emacs definition of it. Refer to [[info:emacs#Frames]] for more detail on this.
 
 #+TEXINFO: @subheading Toggle Maximize Window
 #+CINDEX: Toggle Maximize Window
@@ -278,13 +278,13 @@ Anju enhances the context menu for Emacs Lisp (Elisp) development with support f
 
 Anju enhances the default Elisp context menu by providing commands for evaluating, debugging, and refactoring Elisp. Many of these commands are context-sensitive to point location. If a command does not apply at point, it will not be shown in the context menu.
 
-If hideshow ([[info:emacs#Hideshow][emacs#Hideshow]]) support is enabled, then a sub-menu “Hide/Show” is provided.
+If hideshow ([[info:emacs#Hideshow]]) support is enabled, then a sub-menu “Hide/Show” is provided.
 
 The screenshot below shows the context menu raised when the point is on the function ~foo~. Selecting the menu item “Edebug “foo”” will instrument ~foo~ for debugging. On the next invocation of ~foo~, the Edebug debugger will be run. Anju enhances the [[#edebug-mode-context-menu][context menu for Edebug]] as well.
 
 [[file:images/anju-context-menu-elisp.png]]
 
-Note that the Emacs default context menu for Elisp supports Xref ([[info:emacs#Xref][emacs#Xref]]) navigation as well as help (~describe-function~) and Info lookup as shown below.
+Note that the Emacs default context menu for Elisp supports Xref ([[info:emacs#Xref]]) navigation as well as help (~describe-function~) and Info lookup as shown below.
 
 [[file:images/anju-context-menu-elisp-built-in.png]]
 
@@ -301,14 +301,14 @@ When debugging Elisp using Edebug, the following context menu offering its many 
 
 For users new to Edebug, it is helpful to understand that code execution is sexp-based as opposed to line/function-based in other IDEs. 
 
-To better understand Edebug's command set, a close reading of its manual is recommended ([[info:elisp#Edebug][elisp#Edebug]]). 
+To better understand Edebug's command set, a close reading of its manual is recommended ([[info:elisp#Edebug]]). 
 
 
 **** ERT Support
 #+CINDEX: ERT Support
 
 
-ERT is a built-in package for Emacs that supports automated testing of Elisp ([[info:ert#Top][ert#Top]]). Anju provides a convenience command to run an ~ert-deftest~ if the point is within its declaration. The screenshot below shows and example of running the ERT test ~test-foo~.
+ERT is a built-in package for Emacs that supports automated testing of Elisp ([[info:ert#Top]]). Anju provides a convenience command to run an ~ert-deftest~ if the point is within its declaration. The screenshot below shows and example of running the ERT test ~test-foo~.
 
 [[file:images/anju-context-menu-ert.png]]
 
@@ -332,6 +332,16 @@ The result is that a temporary buffer named ~*add-two*~ (the input name is used)
 [[file:images/anju-context-menu-extract-lambda-3.png]]
 
 The ~*add-two*~ buffer can be edited as needed and its contents placed into a desired Elisp file.
+
+*** Rectangle Context Menu
+#+CINDEX: Rectangle Context Menu
+
+[[file:images/anju-context-menu-rectangle.png]]
+
+If a rectangle selection is made ({{{kbd(C-M-<mouse-1>)}}}) or has been killed, then the “Rectangle” sub-menu is presented in the context menu. Anju treats a rectangle selection with the highest priority; most Anju context menus will /not/ display if a rectangle selection is made.
+
+To learn more about rectangle commands, see [[info:emacs#Rectangles][info "(emacs) Rectangles"]].
+
 
 *** Magit Support
 #+CINDEX: Magit Support
@@ -368,6 +378,8 @@ Anju makes the following modifications to the main menu bar *Edit* menu:
 
 - Adds “Search in Files…” to the *Search* sub-menu.
 
+- Add the “Rectangle” sub-menu of commands ([[info:emacs#Rectangles]]).
+
 - Adds the “Transpose  ⇄” sub-menu of commands to transpose different text quantities.
 
 - Adds the “Move Text” sub-menu to move different text quantities.
@@ -389,9 +401,20 @@ On the macOS NS variant of Emacs, the following menu items are added.
 
 The commands provided by the above additions to the *Edit* menu are shown below.
 
-
 - Search
   - Search in Files… (~rgrep~)
+
+- Rectangle
+  - Cut (~kill-rectangle~)
+  - Copy (~copy-rectangle-as-kill~)
+  - Paste (~yank-rectangle~)
+  - Delete (~delete-rectangle~)
+  - Replace… (~string-rectangle~)
+  - Insert… (~string-insert-rectangle~)
+  - Number (~number-rectangle-lines~)
+  - Clear (~clear-rectangle~)
+  - Blank (~open-rectangle~)
+  - Delete leading spaces (~delete-whitespace-rectangle~)
 
 - Transpose ⇄
   - Characters (~transpose-chars~)
@@ -507,7 +530,7 @@ This modification is optional. For more detail, see [[#text-menu-customization][
 [[file:images/anju-main-menu-imenu.png]]
 
 
-For certain modes that support Imenu ([[info:emacs#Imenu][emacs#Imenu]]), Anju will add an *Index* menu to the main menu bar via the function  ~imenu-add-menubar-index~.
+For certain modes that support Imenu ([[info:emacs#Imenu]]), Anju will add an *Index* menu to the main menu bar via the function  ~imenu-add-menubar-index~.
 
 Modes supported this way by Anju are:
 
@@ -596,7 +619,7 @@ While not required, the following additions to your Emacs initialization file ca
 :END:
 #+CINDEX: Customization
 
-Anju provides a number of ways to customize mouse interactions in Emacs. In many cases, Anju leverages off existing Emacs customization options, particularly around defining and modifying menus. Users who wish to modify menus in Emacs should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps][elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu][elisp#Easy Menu]]) library.
+Anju provides a number of ways to customize mouse interactions in Emacs. In many cases, Anju leverages off existing Emacs customization options, particularly around defining and modifying menus. Users who wish to modify menus in Emacs should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu]]) library.
 
 Customization options for the different areas Anju covers are detailed below.
 
@@ -685,7 +708,7 @@ The /context/ is determined by a predicate which can take into account different
 
 In the example above, the context predicate tests if the major mode is derived from ~text-mode~ /and/ if point is not inside an Org table (~anju-at-org-table-p~).  Note that it is defined at a higher level to avoid instantiating menu items if the context does not apply.
 
-The context predicate can be embedded in the menu item definition itself. See more about this with the ~:visible~ and ~:active~ keywords for the macro ~easy-menu-define~ ([[info:elisp#Easy Menu][elisp#Easy Menu]]).
+The context predicate can be embedded in the menu item definition itself. See more about this with the ~:visible~ and ~:active~ keywords for the macro ~easy-menu-define~ ([[info:elisp#Easy Menu]]).
 
 It is up to the implementer to determine where to best define and apply the context predicate.
 
@@ -713,6 +736,7 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 #+VINDEX: anju-context-menu-dictionary
 #+VINDEX: anju-context-menu-elisp
 #+VINDEX: anju-context-menu-edebug-eval
+#+VINDEX: anju-context-menu-rectangle
 
 Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
 
@@ -746,6 +770,8 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-elisp~ :: Emacs Lisp commands.
 
 - ~anju-context-menu-edebug-eval~ :: Edebug commands.
+
+- ~anju-context-menu-rectangle~ :: Rectangle commands.
 
 
 ** Mode Line Buffer List Menu Customization
@@ -823,11 +849,11 @@ Anju uses the customizable hook variable ~anju-reconfigure-main-menu-hook~ to cu
 
 Detailed below are the different hook functions provided for by Anju.
 
-Users are free to implement their own hook functions to add to ~anju-reconfigure-main-menu-hook~. Users who wish to do this should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps][elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu][elisp#Easy Menu]]) library.
+Users are free to implement their own hook functions to add to ~anju-reconfigure-main-menu-hook~. Users who wish to do this should familiarize themselves with menu keymaps ([[info:elisp#Menu Keymaps]]) and the Easy Menu ([[info:elisp#Easy Menu]]) library.
 
 Note that Anju's implementation of hook functions to each affect a specific menu in the main menu bar is by convention.
 
-For more info on hook variables see [[info:emacs#Hooks][emacs#Hooks]].
+For more info on hook variables see [[info:emacs#Hooks]].
 
 *** File Menu Customization
 :PROPERTIES:
@@ -928,7 +954,7 @@ Anju's support for Imenu covers the following modes:
   - ~org-mode~
   - ~markdown-mode~
 
-For more info on Imenu see [[info:emacs#Imenu][emacs#Imenu]].
+For more info on Imenu see [[info:emacs#Imenu]].
 
 * Future Work
 #+CINDEX: Future Work
