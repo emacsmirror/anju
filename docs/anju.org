@@ -270,7 +270,7 @@ Note that the Dired context menu is intentionally restrained in its command offe
 *** Emacs Lisp Context Menu
 #+CINDEX: Emacs Lisp Context Menu
 
-Anju enhances the context menu for Emacs Lisp (Elisp) development with support for Edebug and ERT. 
+Anju enhances the context menu for Emacs Lisp (Elisp) development with support for Edebug and ERT.
 
 
 **** Basic Elisp Context Menu
@@ -299,9 +299,9 @@ When debugging Elisp using Edebug, the following context menu offering its many 
 
 [[file:images/anju-context-menu-edebug.png]]
 
-For users new to Edebug, it is helpful to understand that code execution is sexp-based as opposed to line/function-based in other IDEs. 
+For users new to Edebug, it is helpful to understand that code execution is sexp-based as opposed to line/function-based in other IDEs.
 
-To better understand Edebug's command set, a close reading of its manual is recommended ([[info:elisp#Edebug]]). 
+To better understand Edebug's command set, a close reading of its manual is recommended ([[info:elisp#Edebug]]).
 
 
 **** ERT Support
@@ -444,11 +444,11 @@ The commands provided by the above additions to the *Edit* menu are shown below.
   - Trailing Whitespace (~delete-trailing-whitespace~)
   - Zap up to… (~zap-up-to-char~)
   - Zap to… (~zap-to-char~)
-    
+
 - Flush Lines… (~flush-lines~)
 
 - Keep Lines… (~keep-lines~)
-  
+
 - Align Regexp… (~align-regexp~)
 
 - Duplicate (~duplicate-dwim~)
@@ -456,7 +456,7 @@ The commands provided by the above additions to the *Edit* menu are shown below.
 - Colors (~ns-popup-color-panel~) (only on  macOS NS)
 
 - Emoji & Symbols (~ns-do-show-character-palette~) (only on macOS NS)
-  
+
 
 Note that a menu command can be run again immediately after it has been issued using the ~repeat~ command (binding {{{kbd(C-x z)}}}). This is useful when using the move text commands.
 
@@ -785,6 +785,7 @@ Anju provides the following context menu functions for convenience. They can be 
 #+VINDEX: anju-buffer-list-filter-functions
 #+VINDEX: anju-mode-line-buffer-list-function
 #+VINDEX: anju-buffer-list-plain-filter
+#+VINDEX: anju-buffer-list-project-filter
 #+VINDEX: anju-buffer-list-compilation-filter
 #+VINDEX: anju-buffer-list-grep-filter
 #+VINDEX: anju-buffer-list-xref-filter
@@ -818,6 +819,7 @@ at the front of the list.
 
 Anju provides the following buffer filters:
 
+- ~anju-buffer-list-project-filter~ :: buffers within the same project whose name is not marked as special (a name wrapped in ‘*’).
 - ~anju-buffer-list-plain-filter~ :: buffers whose name is not marked as special (a name wrapped in ‘*’).
 - ~anju-buffer-list-compilation-filter~ :: buffers whose major mode is ~compilation-mode~.
 - ~anju-buffer-list-grep-filter~ :: buffers whose major mode is ~grep-mode~.
@@ -828,6 +830,17 @@ Anju provides the following buffer filters:
 - ~anju-buffer-list-help-filter~ :: buffers whose major mode is ~help-mode~.
 
 Users can customize ~anju-buffer-list-filter-functions~ to re-compose or add their own filters to define the resulting buffer list returned by ~anju-buffer-list-menu-items~. It is recommended that the ~customize-variable~ command be used to accomplish this.
+
+By default ~anju-buffer-list-filter-functions~ contains the following filters:
+
+- ~anju-buffer-list-project-filter~
+- ~anju-buffer-list-compilation-filter~
+- ~anju-buffer-list-grep-filter~
+- ~anju-buffer-list-xref-filter~
+- ~anju-buffer-list-eshell-filter~
+- ~anju-buffer-list-shell-filter~
+- ~anju-buffer-list-info-filter~
+- ~anju-buffer-list-help-filter~
 
 #+TEXINFO: @subheading anju-mode-line-buffer-list-function
 #+VINDEX: anju-mode-line-buffer-list-function

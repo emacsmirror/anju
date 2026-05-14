@@ -92,7 +92,7 @@ nil and restart Emacs."
   :group 'anju)
 
 (defcustom anju-buffer-list-filter-functions
-  '((anju-buffer-list-plain-filter . 7)
+  '((anju-buffer-list-project-filter . 7)
     (anju-buffer-list-compilation-filter . 3)
     (anju-buffer-list-grep-filter . 3)
     (anju-buffer-list-xref-filter . 3)
