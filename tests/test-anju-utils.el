@@ -60,7 +60,7 @@
   (should (eq 'cons
               (type-of anju-buffer-list-filter-functions)))
 
-  (let* ((tests '(anju-buffer-list-plain-filter
+  (let* ((tests '(anju-buffer-list-project-filter
                   anju-buffer-list-compilation-filter
                   anju-buffer-list-grep-filter
                   anju-buffer-list-xref-filter

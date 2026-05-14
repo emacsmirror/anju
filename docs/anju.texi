@@ -483,7 +483,7 @@ Note that the Dired context menu is intentionally restrained in its command offe
 
 @cindex Emacs Lisp Context Menu
 
-Anju enhances the context menu for Emacs Lisp (Elisp) development with support for Edebug and ERT@. 
+Anju enhances the context menu for Emacs Lisp (Elisp) development with support for Edebug and ERT@.
 
 @menu
 * Basic Elisp Context Menu::
@@ -518,7 +518,7 @@ When debugging Elisp using Edebug@comma{} the following context menu offering it
 
 @image{images/anju-context-menu-edebug,,,,png}
 
-For users new to Edebug@comma{} it is helpful to understand that code execution is sexp-based as opposed to line/function-based in other IDEs. 
+For users new to Edebug@comma{} it is helpful to understand that code execution is sexp-based as opposed to line/function-based in other IDEs.
 
 To better understand Edebug's command set@comma{} a close reading of its manual is recommended (@ref{Edebug,,,elisp,}).
 
@@ -657,7 +657,6 @@ On the macOS NS variant of Emacs@comma{} the following menu items are added.
 @item
 “Emoji & Symbols” - display the macOS system Emoji & Symbols dialog.
 @end itemize
-
 
 The commands provided by the above additions to the @strong{Edit} menu are shown below.
 
@@ -1228,6 +1227,7 @@ Rectangle commands.
 @vindex anju-buffer-list-filter-functions
 @vindex anju-mode-line-buffer-list-function
 @vindex anju-buffer-list-plain-filter
+@vindex anju-buffer-list-project-filter
 @vindex anju-buffer-list-compilation-filter
 @vindex anju-buffer-list-grep-filter
 @vindex anju-buffer-list-xref-filter
@@ -1270,6 +1270,8 @@ at the front of the list.
 Anju provides the following buffer filters:
 
 @table @asis
+@item @code{anju-buffer-list-project-filter}
+buffers within the same project whose name is not marked as special (a name wrapped in ‘*’).
 @item @code{anju-buffer-list-plain-filter}
 buffers whose name is not marked as special (a name wrapped in ‘*’).
 @item @code{anju-buffer-list-compilation-filter}
@@ -1289,6 +1291,27 @@ buffers whose major mode is @code{help-mode}.
 @end table
 
 Users can customize @code{anju-buffer-list-filter-functions} to re-compose or add their own filters to define the resulting buffer list returned by @code{anju-buffer-list-menu-items}. It is recommended that the @code{customize-variable} command be used to accomplish this.
+
+By default @code{anju-buffer-list-filter-functions} contains the following filters:
+
+@itemize
+@item
+@code{anju-buffer-list-project-filter}
+@item
+@code{anju-buffer-list-compilation-filter}
+@item
+@code{anju-buffer-list-grep-filter}
+@item
+@code{anju-buffer-list-xref-filter}
+@item
+@code{anju-buffer-list-eshell-filter}
+@item
+@code{anju-buffer-list-shell-filter}
+@item
+@code{anju-buffer-list-info-filter}
+@item
+@code{anju-buffer-list-help-filter}
+@end itemize
 
 @subheading anju-mode-line-buffer-list-function
 @vindex anju-mode-line-buffer-list-function
