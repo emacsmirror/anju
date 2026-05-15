@@ -60,7 +60,7 @@
   (should (eq 'cons
               (type-of anju-buffer-list-filter-functions)))
 
-  (let* ((tests '(anju-buffer-list-plain-filter
+  (let* ((tests '(anju-buffer-list-project-filter
                   anju-buffer-list-compilation-filter
                   anju-buffer-list-grep-filter
                   anju-buffer-list-xref-filter
@@ -196,6 +196,13 @@ allowing varying indentation within each")))))
 (ert-deftest test-anju-fill-text-menu ()
   "Test for `anju-fill-text-menu'."
   (test--anju-fill-text-menu anju-fill-text-menu))
+
+
+
+(ert-deftest test-anju-rectangle-menu ()
+  "Test for `anju-rectangle-menu'."
+  (test--anju-rectangle-menu anju-rectangle-menu))
+
 
 
 ;; (ert-deftest test-anju--scrub-frame-register-list ()

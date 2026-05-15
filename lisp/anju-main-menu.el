@@ -230,11 +230,26 @@ for REGEXP."
                       'fill)
 
   (easy-menu-add-item global-map '(menu-bar edit)
+                      [align-regexp align-regexp
+                       :label "Align Regexp…"
+                       :help "Align the current region using an ad-hoc rule \
+read from the minibuffer"
+                       :enable (use-region-p)
+                       :visible (not buffer-read-only)]
+                      'fill)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
                       [duplicate-dwim duplicate-dwim
                        :label "Duplicate"
                        :help "Duplicate the current line or region"
                        :visible (not buffer-read-only)]
                       'fill)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      anju-rectangle-menu 'Transpose\ ⇄)
+
+  (easy-menu-add-item global-map '(menu-bar edit)
+                      "--" 'Transpose\ ⇄)
 
   (when (eq window-system 'ns)
     (easy-menu-add-item global-map '(menu-bar edit)

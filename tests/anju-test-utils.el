@@ -37,22 +37,29 @@
 - COMMAND: item command
 - HSTR : item :help value"
 
-  (let ((item-type (seq-elt item 1))
-        (item-str (seq-elt item 2)))
-    (should (eq item-type 'menu-item))
-
-    (if (eq (length item) 3)
+  (let ((count (length item)))
+    (cond
+     ((= count 2) ; separator
+      (let ((item-str (seq-elt item 1)))
         (should (and (stringp item-str)
-                     (string-equal item-str istr)))
-      (let* ((item-cmd (seq-elt item 3))
-             (item-slots (seq-subseq item 4))
-             (item-help (map-elt item-slots :help)))
-        (should (eq item-cmd command))
-        (if (and (stringp item-str) (stringp istr))
-            (should (string-equal item-str istr))
-          (should (string-equal (eval item-str) (funcall istr))))
+                     (string-equal item-str istr)))))
+     (t
+      (let ((item-type (seq-elt item 1))
+            (item-str (seq-elt item 2)))
+        (should (eq item-type 'menu-item))
 
-        (should (string-equal item-help hstr))))))
+        (if (eq (length item) 3)
+            (should (and (stringp item-str)
+                         (string-equal item-str istr)))
+          (let* ((item-cmd (seq-elt item 3))
+                 (item-slots (seq-subseq item 4))
+                 (item-help (map-elt item-slots :help)))
+            (should (eq item-cmd command))
+            (if (and (stringp item-str) (stringp istr))
+                (should (string-equal item-str istr))
+              (should (string-equal (eval item-str) (funcall istr))))
+
+            (should (string-equal item-help hstr)))))))))
 
 (defun anju-test-keymap (kmap description count fn)
   "Test keymap.
@@ -120,6 +127,82 @@ This function."
         description
         count
         fn)))
+
+
+(defun test--anju-rectangle-menu (kmap)
+  "Test KMAP for `anju-rectangle-menu'."
+
+  (anju-test-keymap
+   kmap
+   "Rectangle"
+   12
+   (lambda (items)
+     (let* ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "Cut"
+        #'kill-rectangle
+        "Delete the region-rectangle and save it as the last killed one")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Copy"
+        #'copy-rectangle-as-kill
+        "Copy the region-rectangle and save it as the last killed one")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Paste"
+        #'yank-rectangle
+        "Yank the last killed rectangle with upper left corner at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Delete"
+        #'delete-rectangle
+        "Delete rectangle")
+
+       (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Replace…"
+        #'string-rectangle
+        "Replace rectangle contents with STRING on each line")
+
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert…"
+        #'string-insert-rectangle
+        "Insert STRING on each line of region-rectangle, shifting text right")
+
+
+       (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Number"
+        #'rectangle-number-lines
+        "Insert numbers in front of the region-rectangle")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Clear"
+        #'clear-rectangle
+        "Blank out the region-rectangle")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Blank"
+        #'open-rectangle
+        "Blank out the region-rectangle, shifting text right")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Delete leading spaces"
+        #'delete-whitespace-rectangle
+        "Delete all whitespace following a specified column in each line")))))
 
 
 (provide 'anju-test-utils)

@@ -26,6 +26,7 @@
 (require 'seq)
 (require 'map)
 (require 'mouse)
+(require 'rect)
 (require 'register)
 (require 'window)
 (require 'easymenu)
@@ -91,7 +92,7 @@ nil and restart Emacs."
   :group 'anju)
 
 (defcustom anju-buffer-list-filter-functions
-  '((anju-buffer-list-plain-filter . 7)
+  '((anju-buffer-list-project-filter . 7)
     (anju-buffer-list-compilation-filter . 3)
     (anju-buffer-list-grep-filter . 3)
     (anju-buffer-list-xref-filter . 3)
@@ -296,7 +297,7 @@ conform to extent <= (max/2) - 2"
      :help "Center each nonblank line in the paragraph at or after point"]))
 
 (easy-menu-define anju-fill-text-menu nil
-  "Keymap for centering text."
+  "Keymap for fill text."
   '("Fill"
     :enable (not buffer-read-only)
     ["Paragraph" fill-paragraph
@@ -318,6 +319,59 @@ conform to extent <= (max/2) - 2"
      :enable (use-region-p)
      :help "Fill paragraphs within the region, allowing varying indentation within each"]))
 
+(defun anju-rectangle-selected-p ()
+  "Predicate if rectangle is selected."
+  (and (bound-and-true-p rectangle-mark-mode) (use-region-p)))
+
+(easy-menu-define anju-rectangle-menu nil
+  "Keymap for rectangle commands."
+
+  '("Rectangle"
+    ["Cut" kill-rectangle
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Delete the region-rectangle and save it as the last killed one"]
+
+    ["Copy" copy-rectangle-as-kill
+     :enable (anju-rectangle-selected-p)
+     :help "Copy the region-rectangle and save it as the last killed one"]
+
+    ["Paste" yank-rectangle
+     :enable (and (not buffer-read-only)
+                  (boundp 'killed-rectangle)
+                  killed-rectangle)
+     :help "Yank the last killed rectangle with upper left corner at point"]
+
+    ["Delete" delete-rectangle
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Delete rectangle"]
+
+    "--"
+
+    ["Replace…" string-rectangle
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Replace rectangle contents with STRING on each line"]
+
+    ["Insert…" string-insert-rectangle
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Insert STRING on each line of region-rectangle, shifting text right"]
+
+    "--"
+
+    ["Number" rectangle-number-lines
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Insert numbers in front of the region-rectangle"]
+
+    ["Clear" clear-rectangle
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Blank out the region-rectangle"]
+
+    ["Blank" open-rectangle
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Blank out the region-rectangle, shifting text right"]
+
+    ["Delete leading spaces" delete-whitespace-rectangle
+     :enable (and (not buffer-read-only) (anju-rectangle-selected-p))
+     :help "Delete all whitespace following a specified column in each line"]))
 
 
 ;; -------------------------------------------------------------------

@@ -64,7 +64,7 @@
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (when (derived-mode-p 'dired-mode)
+  (when (and (derived-mode-p 'dired-mode) (not (anju-rectangle-selected-p)))
     (mouse-set-point click)
     (save-excursion
       (when (dired-file-name-at-point)
@@ -208,7 +208,8 @@ file names in the Dired buffer"])
 
 This function is intended to be hooked into `context-menu-functions'."
   (when (and (not (anju-at-org-table-p))
-             (not (use-region-p)))
+             (not (use-region-p))
+             (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu journal-separator)
@@ -224,7 +225,9 @@ This function is intended to be hooked into `context-menu-functions'."
 
 (defun anju-at-org-table-p ()
   "Predicate if point is in an Org table."
-  (or (org-at-table-p) (org-at-TBLFM-p)))
+  (if (derived-mode-p 'org-mode)
+      (or (org-at-table-p) (org-at-TBLFM-p))
+    nil))
 
 (defun anju-org-stored-links-p ()
   "Predicate if `org-stored-links' is populated.
@@ -267,7 +270,7 @@ This function is intended to be hooked into `context-menu-functions'."
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu org-separator)
-      (when (org-at-heading-p)
+      (when (and (org-at-heading-p) (not (anju-rectangle-selected-p)))
 
         (easy-menu-add-item menu nil
                             [org-clock-in
@@ -307,7 +310,7 @@ This function is intended to be hooked into `context-menu-functions'."
                              :label "Promote Subtree ←"
                              :help "Promote heading subtree"]))
 
-      (when (org-at-item-p)
+      (when (and (org-at-item-p) (not (anju-rectangle-selected-p)))
         (easy-menu-add-item menu nil
                             [org-indent-item
                              org-indent-item
@@ -508,7 +511,8 @@ This function is intended to be hooked into `context-menu-functions'."
 This function is intended to be hooked into `context-menu-functions'."
 
   (when (and (derived-mode-p 'emacs-lisp-mode)
-             (not (derived-mode-p 'edebug-eval-mode)))
+             (not (derived-mode-p 'edebug-eval-mode))
+             (not (anju-rectangle-selected-p)))
 
     (save-excursion
       (mouse-set-point click)
@@ -636,8 +640,8 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (when (derived-mode-p 'edebug-eval-mode)
-
+  (when (and (derived-mode-p 'edebug-eval-mode)
+             (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu edebug-eval-separator)
@@ -735,7 +739,8 @@ a reference to the new defun ARG."
 
 This function is intended to be hooked into `context-menu-functions'."
   (when (and (not (use-region-p))
-             (not (anju-at-org-table-p)))
+             (not (anju-at-org-table-p))
+             (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu buffer-navigation-separator)
@@ -767,7 +772,9 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (when (and (not (anju-at-org-table-p)) (not (derived-mode-p 'Info-mode)))
+  (when (and (not (anju-at-org-table-p))
+             (not (derived-mode-p 'Info-mode))
+             (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu narrow-separator)
@@ -823,7 +830,8 @@ This function is intended to be hooked into `context-menu-functions'."
   (when (and (not (use-region-p))
              (not (anju-at-org-table-p))
              (buffer-file-name)
-             (not (derived-mode-p 'dired-mode)))
+             (not (derived-mode-p 'dired-mode))
+             (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu open-in-separator)
@@ -845,8 +853,10 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
   (when (and (vc-responsible-backend default-directory t)
+             (not (derived-mode-p 'Info-mode))
              (not (use-region-p))
-             (not (anju-at-org-table-p)))
+             (not (anju-at-org-table-p))
+             (not (anju-rectangle-selected-p)))
 
     (save-excursion
       (mouse-set-point click)
@@ -896,7 +906,7 @@ This function is intended to be hooked into `context-menu-functions'."
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-  (when (use-region-p)
+  (when (and (use-region-p) (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu transform-text-separator)
@@ -962,7 +972,7 @@ and convert it to Org using the pandoc utility."
 (defun anju-context-menu-region-extension (menu click)
   "Region menu using MENU and CLICK."
 
-  (when (derived-mode-p 'org-mode)
+  (when (and (derived-mode-p 'org-mode) (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (easy-menu-add-item menu nil
@@ -1005,7 +1015,8 @@ and convert it to Org using the pandoc utility."
 
 This function is intended to be hooked into `context-menu-functions'."
   (when (and (not (use-region-p))
-             (member (derived-mode-p major-mode) '(org-mode markdown-mode)))
+             (member (derived-mode-p major-mode) '(org-mode markdown-mode))
+             (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (pcase (derived-mode-p major-mode)
@@ -1049,7 +1060,9 @@ temporarily visible (Visible mode)"]))
 - CLICK: event
 
 This function is intended to be hooked into `context-menu-functions'."
-  (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
+  (when (and (derived-mode-p 'text-mode)
+             (not (anju-at-org-table-p))
+             (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu count-words-separator)
@@ -1070,7 +1083,7 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
 
-  (when (use-region-p)
+  (when (and (use-region-p) (not (anju-rectangle-selected-p)))
     (save-excursion
       (mouse-set-point click)
       (easy-menu-add-item
@@ -1134,6 +1147,29 @@ This function is intended to be hooked into `context-menu-functions'."
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Rectangle Commands
+
+(defun anju-context-menu-rectangle (menu click)
+  "Context menu hook function for wordcount commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (or (and (anju-rectangle-selected-p)
+                 (not (anju-at-org-table-p)))
+            (and (not buffer-read-only)
+                 (boundp 'killed-rectangle)
+                 killed-rectangle))
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu context-rectangle--separator)
+      (easy-menu-add-item menu nil anju-rectangle-menu)))
+  menu)
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: Utility and Setup Functions
 
 (defun anju-context-menu--insert-into-context-menu-functions (source target)
@@ -1174,6 +1210,7 @@ function into `context-menu-functions' over `add-hook'."
                      anju-context-menu-vc
                      anju-context-menu-markup
                      anju-context-menu-wordcount
+                     anju-context-menu-rectangle
                      anju-context-menu-window))))
 
   (if (member #'context-menu-middle-separator context-menu-functions)
@@ -1201,6 +1238,7 @@ function into `context-menu-functions' over `add-hook'."
                    anju-context-menu-open-in
                    anju-context-menu-region-extension
                    anju-context-menu-vc
+                   anju-context-menu-rectangle
                    anju-context-menu-dictionary
                    anju-context-menu-region
                    anju-context-menu-markup

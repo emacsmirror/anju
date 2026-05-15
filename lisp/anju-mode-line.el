@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(require 'project)
 (require 'anju-utils)
 
 (defcustom anju-mode-line-buffer-list-function #'anju-buffer-list-menu-items
@@ -158,6 +159,30 @@ Derived from code found at URL
   (with-current-buffer buf
     (eq (derived-mode-p major-mode) 'xref--xref-buffer-mode)))
 
+(defun anju-filter-buffers-in-directory (buffers dir)
+  "Filter BUFFERS whose default directory is DIR."
+  (let ((dir (expand-file-name dir)))
+    (seq-filter (lambda (b)
+                  (let ((bdir (expand-file-name
+                               (buffer-local-value 'default-directory b))))
+                    (string-match dir bdir)))
+                buffers)))
+
+(defun anju-buffer-list-project-filter (buffers &optional count)
+  "Filter BUFFERS using `project-current', taking the first COUNT if defined.
+
+First filter BUFFERS through `anju-temporary-buffer-filter' and then
+filter remaining buffers using the root directory of `project-current'.
+If there is no project, then `default-directory' is used."
+  (let* ((buffers (seq-filter #'anju-temporary-buffer-filter buffers))
+         (curdir (if (project-current)
+                     (project-root (project-current))
+                   default-directory))
+         (buffers (anju-filter-buffers-in-directory buffers curdir)))
+    (if count
+        (seq-take buffers count)
+      buffers)))
+
 (defun anju-buffer-list-plain-filter (buffers &optional count)
   "Filter BUFFERS for plain names only, taking the first COUNT if defined."
   (anju-buffer-list--filter #'anju-temporary-buffer-filter buffers count))
@@ -215,8 +240,8 @@ This function called by indirection via the variable
 `anju-mode-line-buffer-list-function'."
 
   (let* ((open-buffers (buffer-list))
-         (all-buffers (anju-process-buffer-list-filter-functions open-buffers))
-         (all-buffers (remove (current-buffer) all-buffers))
+         (all-buffers (remove (current-buffer) open-buffers))
+         (all-buffers (anju-process-buffer-list-filter-functions all-buffers))
          (buffer-items (mapcar (lambda (buf)
                                  (vector (format "%s" (buffer-name buf))
                                          `(lambda () (interactive) (switch-to-buffer ,buf))
