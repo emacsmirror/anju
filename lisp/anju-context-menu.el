@@ -980,6 +980,105 @@ and convert it to Org using the pandoc utility."
       (kill-region (point-min) (point-max)))
     (yank)))
 
+
+(defun anju-org-copy-region-as (backend)
+  "Copy the BACKEND exported Org region to the system clipboard.
+
+Code derived from Marcin Borkowski post at
+URL `https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard'"
+  (interactive)
+  (if (use-region-p)
+      (let* ((region
+              (buffer-substring-no-properties
+               (region-beginning)
+               (region-end)))
+             (clipping
+              (org-export-string-as region backend t '(:with-toc nil))))
+        (gui-set-selection 'CLIPBOARD clipping))))
+
+(defun anju-org-copy-region-as-markdown ()
+  "Copy the Markdown exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'md)))
+
+(defun anju-org-copy-region-as-gfm ()
+  "Copy the GitHub Markdown exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'gfm)))
+
+(defun anju-org-copy-region-as-latex ()
+  "Copy the LaTeX exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'latex)))
+
+(defun anju-org-copy-region-as-ascii ()
+  "Copy the ASCII exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'ascii)))
+
+(defun anju-org-copy-region-as-html ()
+  "Copy the HTML exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'html)))
+
+(defun anju-org-copy-region-as-rtf ()
+  "Export region to RTF and copy it to the clipboard.
+
+Code from Daniel Martin
+URL `https://gist.github.com/danielmartin/3c5d3a3a8cd24a3556379c5251651748'."
+  (interactive)
+  (save-window-excursion
+    (let* ((buf (org-export-to-buffer 'html "*Formatted Copy*" nil nil t t))
+           (html (with-current-buffer buf (buffer-string))))
+      (ignore html)
+      (with-current-buffer buf
+        (shell-command-on-region
+         (point-min)
+         (point-max)
+         "textutil -stdin -format html -convert rtf -stdout | pbcopy"))
+      (kill-buffer buf))))
+
+(easy-menu-define anju-context-menu-org-copy-as-menu nil
+  "Key map for Org copy sub-menu."
+  '("Copy as…"
+    :visible (and (derived-mode-p 'org-mode) (use-region-p))
+
+    ["GFM"
+     anju-org-copy-region-as-gfm
+     :visible (package-installed-p 'ox-gfm)
+     :help "Copy region as GitHub Flavored Markdown to clipboard"]
+
+    ["Markdown"
+     anju-org-copy-region-as-markdown
+     :help "Copy region as Markdown to clipboard"]
+
+    ["LaTeX"
+     anju-org-copy-region-as-latex
+     :help "Copy region as LaTeX to clipboard"]
+
+    ["HTML"
+     anju-org-copy-region-as-html
+     :help "Copy region as HTML to clipboard"]
+
+    ["ASCII"
+     anju-org-copy-region-as-ascii
+     :help "Copy region as ASCII to clipboard"]
+
+    ["Slack"
+     org-slack-export-to-clipboard-as-slack
+     :visible (package-installed-p 'ox-slack)
+     :help "Copy as Slack to clipboard"]
+
+    ["RTF"
+     anju-org-copy-region-as-rtf
+     :visible (eq system-type 'darwin)
+     :help "Copy as RTF to clipboard"]))
+
 (defun anju-context-menu-region-extension (menu click)
   "Region menu using MENU and CLICK."
 
@@ -1010,7 +1109,11 @@ and convert it to Org using the pandoc utility."
                                          (display-graphic-p)
                                          (anju-yank-media-p))
                            :help "Paste (yank) media"]
-                          "Clear")))
+                          "Clear")
+
+      (easy-menu-add-item menu nil
+                          anju-context-menu-org-copy-as-menu
+                          "Paste")))
   menu)
 
 

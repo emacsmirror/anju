@@ -56,32 +56,91 @@
 ;; -------------------------------------------------------------------
 ;; Context Menu: Region Extension
 
+(defun test--anju-context-menu-org-copy-as-menu (kmap)
+  "Test KMAP for `anju-context-menu-org-copy-as-menu'."
+
+  (anju-test-keymap
+   kmap
+   "Copy as…"
+   7
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "GFM"
+        #'anju-org-copy-region-as-gfm
+        "Copy region as GitHub Flavored Markdown to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Markdown"
+        #'anju-org-copy-region-as-markdown
+        "Copy region as Markdown to clipboard")
+
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "LaTeX"
+        #'anju-org-copy-region-as-latex
+        "Copy region as LaTeX to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "HTML"
+        #'anju-org-copy-region-as-html
+        "Copy region as HTML to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "ASCII"
+        #'anju-org-copy-region-as-ascii
+        "Copy region as ASCII to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Slack"
+        #'org-slack-export-to-clipboard-as-slack
+        "Copy as Slack to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "RTF"
+        #'anju-org-copy-region-as-rtf
+        "Copy as RTF to clipboard")))))
+
+(ert-deftest test-anju-context-menu-org-copy-as-menu ()
+  "Test for `anju-context-menu-org-copy-as-menu'."
+  (test--anju-context-menu-org-copy-as-menu anju-context-menu-org-copy-as-menu))
+
+
 (ert-deftest test-anju-context-menu-region-extension ()
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-region-extension
-   3
+   4
    (lambda (items)
-     (let ((item0 (seq-elt items 0))
-           (item1 (seq-elt items 1))
-           (item2 (seq-elt items 2)))
+     (let ((i 0))
        (anju-test-menu-item
-        item0
+        (seq-elt items i)
         "Paste Last Org Link"
         #'org-insert-last-stored-link
         "Insert the last link stored in org-stored-links")
 
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         "Paste Markdown as Org"
         #'anju-yank-markdown-as-org
         "Convert clipboard (latest yank) of Markdown text to Org, then paste")
 
        (anju-test-menu-item
-        item2
+        (seq-elt items (cl-incf i))
         "Paste Media"
         #'yank-media
-        "Paste (yank) media")))))
+        "Paste (yank) media")
+
+       (let* ((copy-as-item (seq-elt items (cl-incf i)))
+              (copy-as-kmap (seq-elt copy-as-item 3)))
+         (test--anju-context-menu-org-copy-as-menu copy-as-kmap))))))
 
 (ert-deftest test-anju-filename-from-path ()
   "Test for `anju-filename-from-path'."
