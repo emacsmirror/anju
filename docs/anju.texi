@@ -105,6 +105,7 @@ Org Mode Context Menu
 * Org Item Context Menu::
 * Org Table Context Menu::
 * Org Paste Context Menu::
+* Org “Copy as…” Context Menu::
 
 Emacs Lisp Context Menu
 
@@ -383,6 +384,9 @@ Writes selected text to a user-specified file.
 
 @item Look Up
 If a word is selected@comma{} uses @code{dictionary} to look up its definition.
+
+@item Copy as…
+If the current buffer is using Org mode@comma{} then this sub-menu is displayed. Learn more about this in @ref{Org “Copy as…” Context Menu, , Org “Copy as…” Context Menu}.
 @end table
 
 @node Org Mode Context Menu
@@ -405,13 +409,14 @@ In addition if text is selected@comma{} then support for styling it is supported
 
 Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's @ref{Design Principles and Concerns, , Design Principles and Concerns}.
 
-It is recommended that the @code{org-mouse} package be loaded when using
+It is recommended that the @code{org-mouse} package be loaded when using Anju.
 
 @menu
 * Org Headline Context Menu::
 * Org Item Context Menu::
 * Org Table Context Menu::
 * Org Paste Context Menu::
+* Org “Copy as…” Context Menu::
 @end menu
 
 @node Org Headline Context Menu
@@ -468,6 +473,30 @@ If the clipboard (latest yank) is known by the user to be Markdown text@comma{} 
 @item Paste Media
 If an image as been copied into the clipboard@comma{} this menu item will ``paste'' it via the @code{yank-media} command.
 @end table
+
+@node Org “Copy as…” Context Menu
+@subsubsection Org “Copy as…” Context Menu
+
+@cindex Org Copy as Context Menu
+
+If text is selected@comma{} the “Copy as…” sub-menu will be presented. This sub-menu will provide different format options to export the selected text to the system clipboard for subsequent pasting. The following formats are supported.
+
+@itemize
+@item
+GFM  (GitHub Flavored Markdown@comma{} only available if the @code{ox-gfm} (@uref{https://melpa.org/#/ox-gfm, MELPA}) package is installed)
+@item
+Markdown
+@item
+@LaTeX{}
+@item
+HTML
+@item
+ASCII
+@item
+Slack (only available if the @code{ox-slack} (@uref{https://melpa.org/#/ox-slack, MELPA}) package is installed)
+@item
+RTF (only available on macOS)
+@end itemize
 
 @node Dired Mode Context Menu
 @subsection Dired Mode Context Menu

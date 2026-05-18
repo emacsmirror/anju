@@ -198,6 +198,10 @@ If a context menu is raised on selected text, the following menu items are displ
 
 - Look Up :: If a word is selected, uses ~dictionary~ to look up its definition.
 
+- Copy as… :: If the current buffer is using Org mode, then this sub-menu is displayed. Learn more about this in [[#org-copy-as-context-menu][Org “Copy as…” Context Menu]].
+
+
+
 
 *** Org Mode Context Menu
 #+CINDEX: Org Mode Context Menu
@@ -212,7 +216,7 @@ In addition if text is selected, then support for styling it is supported.
 
 Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
 
-It is recommended that the ~org-mouse~ package be loaded when using
+It is recommended that the ~org-mouse~ package be loaded when using Anju.
 
 **** Org Headline Context Menu
 #+CINDEX: Org Headline Context Menu
@@ -257,7 +261,26 @@ Anju adds more “Paste” commands that will display given the right context.
 
 - Paste Media :: If an image as been copied into the clipboard, this menu item will "paste" it via the ~yank-media~ command.
 
+  
+**** Org “Copy as…” Context Menu
+:PROPERTIES:
+:CUSTOM_ID: org-copy-as-context-menu
+:END:
+#+CINDEX: Org Copy as Context Menu
 
+[[file:images/anju-context-menu-org-copy-as.png]]
+
+If text is selected, the “Copy as…” sub-menu will be presented. This sub-menu will provide different format options to export the selected text to the system clipboard for subsequent pasting. The following formats are supported.
+
+- GFM  (GitHub Flavored Markdown, only available if the ~ox-gfm~ ([[https://melpa.org/#/ox-gfm][MELPA]]) package is installed)
+- Markdown
+- LaTeX
+- HTML
+- ASCII
+- Slack (only available if the ~ox-slack~ ([[https://melpa.org/#/ox-slack][MELPA]]) package is installed)
+- RTF (only available on macOS)
+  
+  
 *** Dired Mode Context Menu
 #+CINDEX: Dired Mode Context Menu
 
