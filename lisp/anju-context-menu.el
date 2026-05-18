@@ -913,6 +913,7 @@ This function is intended to be hooked into `context-menu-functions'."
       (easy-menu-add-item menu nil
                           [anju-occur-selected-region anju-occur-selected-region
                            :label (anju-menu-label "Occur")
+                           :visible (eq (count-lines (region-beginning) (region-end)) 1)
                            :help "Show all lines in the current buffer \
 containing a match for selected word"])
 
@@ -921,6 +922,16 @@ containing a match for selected word"])
           (easy-menu-add-item menu nil anju-style-menu))
 
       (easy-menu-add-item menu nil anju-transform-text-menu)
+
+      (easy-menu-add-item menu nil
+                          [query-replace query-replace
+                           :label "Query Replace…"
+                           :help "Replace some occurrences of FROM-STRING with TO-STRING"])
+
+      (easy-menu-add-item menu nil
+                          [query-replace-regexp query-replace-regexp
+                           :label "Query Replace Regexp…"
+                           :help "Replace some things after point matching REGEXP with TO-STRING"])
 
       (if (or (derived-mode-p 'prog-mode) (derived-mode-p 'org-mode))
           (easy-menu-add-item menu nil
