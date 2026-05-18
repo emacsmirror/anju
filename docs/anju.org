@@ -187,10 +187,14 @@ If a context menu is raised on selected text, the following menu items are displ
 
 - Transform Text :: Applies transforms (upper/lower case, capitalize) to the selected text.
 
+- Query Replace :: Run ~query-replace~ on selected text.
+
+- Query Replace Regexp… :: Run ~query-replace-regexp~ on selected text.
+
 - Toggle comment  :: Toggles selected text to be commented based on mode.
   - Available only on modes derived from ~prog-mode~ and ~org-mode~
 
-- Write Region :: Writes selected text to a user-specified file.
+- Write Region… :: Writes selected text to a user-specified file.
 
 - Look Up :: If a word is selected, uses ~dictionary~ to look up its definition.
 

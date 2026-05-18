@@ -1101,34 +1101,40 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-region
-   6
+   8
    (lambda (items)
-     (let* ((item0 (seq-elt items 0))
-            (item1 (seq-elt items 1))
-            (item2 (seq-elt items 2))
-            (item3 (seq-elt items 3))
-            (item4 (seq-elt items 4))
-            (item5 (seq-elt items 5)))
-
-       (anju-test-menu-item item0 "--")
+     (let* ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         (lambda () (anju-menu-label "Occur"))
         #'anju-occur-selected-region
         "Show all lines in the current buffer \
 containing a match for selected word")
 
-       (should (string-equal (seq-elt item2 2) "Style"))
-       (should (string-equal (seq-elt item3 2) "Transform Text"))
+       (should (string-equal (seq-elt (seq-elt items (cl-incf i)) 2) "Style"))
+       (should (string-equal (seq-elt (seq-elt items (cl-incf i)) 2) "Transform Text"))
 
        (anju-test-menu-item
-        item4
+        (seq-elt items (cl-incf i))
+        "Query Replace…"
+        #'query-replace
+        "Replace some occurrences of FROM-STRING with TO-STRING")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Query Replace Regexp…"
+        #'query-replace-regexp
+        "Replace some things after point matching REGEXP with TO-STRING")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
         "Toggle Comment"
         #'comment-dwim
         "Toggle comment on selected region")
 
        (anju-test-menu-item
-        item5
+        (seq-elt items (cl-incf i))
         "Write Region…"
         #'write-region
         "Write current region into specified file")))
