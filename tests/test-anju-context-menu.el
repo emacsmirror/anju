@@ -686,10 +686,17 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   7
+   8
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "TODO…"
+        #'org-todo
+        "Change the TODO state of an item")
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
         "Clock In"
@@ -731,6 +738,28 @@
      (save-buffer))))
 
 
+(ert-deftest test-anju-context-menu-org-link ()
+  "Test for `anju-context-menu-org-mode' when point is on selected word."
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-org-mode
+   2
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Link…"
+        #'org-insert-link
+        "Insert a link.  At the prompt, enter the link")))
+   (lambda (filename description)
+     (insert "* Hi There\nImma going fishing.\n")
+     (save-buffer)
+     (push-mark (point-min) t t)
+     (goto-char (point-max))
+     (activate-mark))))
+
+
 (ert-deftest test-anju-context-menu-org-mode-list-item ()
   "Test for `anju-context-menu-org-mode' when point is in list item."
   (anju-test-context-menu-function-with-filetype
@@ -740,6 +769,14 @@
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (if (org-at-item-checkbox-p)
+                  "Change to Item"
+                "Change to Checkbox"))
+        #'casual-org-toggle-list-to-checkbox
+        "Toggle Item/Checkbox")
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
         "Demote →"
@@ -762,15 +799,7 @@
         (seq-elt items (cl-incf i))
         "Promote Subtree ←"
         #'org-outdent-item-tree
-        "Promote item subtree")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        (lambda () (if (org-at-item-checkbox-p)
-                  "To Item"
-                "To Checkbox"))
-        #'casual-org-toggle-list-to-checkbox
-        "Toggle Item/Checkbox")))
+        "Promote item subtree")))
    (lambda (filename description)
      (insert "- item 1")
      (goto-char (point-min))
@@ -787,6 +816,20 @@
        (anju-test-menu-item (seq-elt items i) "--")
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
+        "In-Progress [-]"
+        #'casual-org-checkbox-in-progress
+        "Change checkbox state to in-progress [-]")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (if (org-at-item-checkbox-p)
+                  "Change to Item"
+                "Change to Checkbox"))
+        #'casual-org-toggle-list-to-checkbox
+        "Toggle Item/Checkbox")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
         "Demote →"
         #'org-indent-item
         "Demote")
@@ -807,21 +850,7 @@
         (seq-elt items (cl-incf i))
         "Promote Subtree ←"
         #'org-outdent-item-tree
-        "Promote item subtree")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        "In-Progress"
-        #'casual-org-checkbox-in-progress
-        "Change checkbox state to in-progress [-]")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        (lambda () (if (org-at-item-checkbox-p)
-                  "To Item"
-                "To Checkbox"))
-        #'casual-org-toggle-list-to-checkbox
-        "Toggle Item/Checkbox")))
+        "Promote item subtree")))
    (lambda (filename description)
      (insert "- [ ] item 1")
      (goto-char (point-min))

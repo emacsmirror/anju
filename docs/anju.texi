@@ -104,8 +104,9 @@ Org Mode Context Menu
 * Org Headline Context Menu::
 * Org Item Context Menu::
 * Org Table Context Menu::
-* Org Paste Context Menu::
+* Org Insert Link::
 * Org “Copy as…” Context Menu::
+* Org Paste Context Menu::
 
 Emacs Lisp Context Menu
 
@@ -405,9 +406,10 @@ Item
 Table
 @end itemize
 
-In addition if text is selected@comma{} then support for styling it is supported.
+In addition if text is selected@comma{} then support for styling@comma{} linking@comma{} and copying as are supported.
 
-Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's @ref{Design Principles and Concerns, , Design Principles and Concerns}.
+
+Note that the Org mode context menu is deliberately restrained in its command offering in accord with Anju's @ref{Design Principles and Concerns, , Design Principles and Concerns}.
 
 It is recommended that the @code{org-mouse} package be loaded when using Anju.
 
@@ -415,8 +417,9 @@ It is recommended that the @code{org-mouse} package be loaded when using Anju.
 * Org Headline Context Menu::
 * Org Item Context Menu::
 * Org Table Context Menu::
-* Org Paste Context Menu::
+* Org Insert Link::
 * Org “Copy as…” Context Menu::
+* Org Paste Context Menu::
 @end menu
 
 @node Org Headline Context Menu
@@ -424,7 +427,7 @@ It is recommended that the @code{org-mouse} package be loaded when using Anju.
 
 @cindex Org Headline Context Menu
 
-If the context menu is raised on a headline@comma{} then commands related to clocking and promotion are offered.
+If the context menu is raised on a headline@comma{} then commands related to TODO state@comma{} clocking@comma{} and promotion are offered.
 
 @image{images/anju-context-menu-org-headline,,,,png}
 
@@ -433,15 +436,15 @@ If the context menu is raised on a headline@comma{} then commands related to clo
 
 @cindex Org Item Context Menu
 
-If the context menu is raised on a list item@comma{} then commands related to promotion and conversion to a checkbox are provided.
+If the context menu is raised on a list item@comma{} then commands related to promotion and checkbox operations are provided.
 
-The menu item ``To Checkbox'' will convert an item to a checkbox@comma{} with the additional behavior that if the point is at the start of the whole list@comma{} the whole list will be turned into checkboxes.
+The menu item ``Change to Checkbox'' will convert an item to a checkbox@comma{} with the additional behavior that if the point is at the start of the whole list@comma{} the whole list will be converted.
 
 @image{images/anju-context-menu-org-item,,,,png}
 
-If @code{org-mouse} is loaded@comma{} then clicking on a checkbox will toggle its state between on ('[X]') or off ('[ ]'). However@comma{} changing to an intermediate state ('[-]') is supported by the menu item ``In-Progress''. The menu item ``To Item'' will convert the checkbox back to a plain list item.
+A checkbox can be converted back to a list item using “Change to Item” as shown below. If @code{org-mouse} is loaded then the checkbox state can be toggled between on ('[X]') or off ('[ ]'). Anju provides the “In-Progress [-]” menu item to put the checkbox in an intermediate state.
 
-@image{images/anju-context-menu-org-checkbox,,,,png}
+@image{images/anju-context-menu-org-item-inprogress,,,,png}
 
 Note that checkboxes in screenshots are prettified using @code{prettify-symbols-mode}.
 
@@ -453,6 +456,49 @@ Note that checkboxes in screenshots are prettified using @code{prettify-symbols-
 If the context menu is raised in a table@comma{} then table-specific commands are shown.
 
 @image{images/anju-context-menu-org-table,,,,png}
+
+The context menu shows the current Org table cell reference where the point is in (e.g. @code{@@3$2}). Clicking on this reference will copy it to the @code{kill-ring} for subsequent use in a table formula.
+
+If a selected region or rectangle is made whose extents are within the table@comma{} then the table region reference  is displayed.
+
+The “Org Table Region” sub-menu provides commands to cut@comma{} copy@comma{} and paste rectangular regions made in the table. Note that the binding @kbd{C-M-<mouse-1>} lets you make rectangle selections.
+
+@node Org Insert Link
+@subsubsection Org Insert Link
+
+@cindex Org Insert Link
+
+@image{images/anju-context-menu-org-link,,,,png}
+
+On selected text@comma{} the context menu will have the menu item “Link…” to run the command @code{org-insert-link}. From there you can enter a link@comma{} typically copied into the system clipboard.
+
+If an Org link has already been stored@comma{} then the menu item “Paste Last Org Link” will be displayed. See more at @ref{Org Paste Context Menu, , Org Paste Context Menu}.
+
+@node Org “Copy as…” Context Menu
+@subsubsection Org “Copy as…” Context Menu
+
+@cindex Org Copy as Context Menu
+
+@image{images/anju-context-menu-org-copy-as,,,,png}
+
+If text is selected@comma{} the “Copy as…” sub-menu will be presented. This sub-menu will provide different format options to export the selected text to the system clipboard for subsequent pasting. The following formats are supported.
+
+@itemize
+@item
+GFM  (GitHub Flavored Markdown@comma{} only available if the @code{ox-gfm} (@uref{https://melpa.org/#/ox-gfm, MELPA}) package is installed)
+@item
+Markdown
+@item
+@LaTeX{}
+@item
+HTML
+@item
+ASCII
+@item
+Slack (only available if the @code{ox-slack} (@uref{https://melpa.org/#/ox-slack, MELPA}) package is installed)
+@item
+RTF (only available on macOS)
+@end itemize
 
 @node Org Paste Context Menu
 @subsubsection Org Paste Context Menu
@@ -473,30 +519,6 @@ If the clipboard (latest yank) is known by the user to be Markdown text@comma{} 
 @item Paste Media
 If an image as been copied into the clipboard@comma{} this menu item will ``paste'' it via the @code{yank-media} command.
 @end table
-
-@node Org “Copy as…” Context Menu
-@subsubsection Org “Copy as…” Context Menu
-
-@cindex Org Copy as Context Menu
-
-If text is selected@comma{} the “Copy as…” sub-menu will be presented. This sub-menu will provide different format options to export the selected text to the system clipboard for subsequent pasting. The following formats are supported.
-
-@itemize
-@item
-GFM  (GitHub Flavored Markdown@comma{} only available if the @code{ox-gfm} (@uref{https://melpa.org/#/ox-gfm, MELPA}) package is installed)
-@item
-Markdown
-@item
-@LaTeX{}
-@item
-HTML
-@item
-ASCII
-@item
-Slack (only available if the @code{ox-slack} (@uref{https://melpa.org/#/ox-slack, MELPA}) package is installed)
-@item
-RTF (only available on macOS)
-@end itemize
 
 @node Dired Mode Context Menu
 @subsection Dired Mode Context Menu
