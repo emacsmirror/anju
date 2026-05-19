@@ -270,7 +270,14 @@ This function is intended to be hooked into `context-menu-functions'."
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu org-separator)
-      (when (and (org-at-heading-p) (not (anju-rectangle-selected-p)))
+
+      (cond
+       ((and (org-at-heading-p) (not (anju-rectangle-selected-p)))
+        (easy-menu-add-item menu nil
+                            [org-todo
+                             org-todo
+                             :label "TODO…"
+                             :help "Change the TODO state of an item"])
 
         (easy-menu-add-item menu nil
                             [org-clock-in
@@ -310,7 +317,24 @@ This function is intended to be hooked into `context-menu-functions'."
                              :label "Promote Subtree ←"
                              :help "Promote heading subtree"]))
 
-      (when (and (org-at-item-p) (not (anju-rectangle-selected-p)))
+
+       ((and (org-at-item-p) (not (anju-rectangle-selected-p)))
+
+        (if (org-at-item-checkbox-p)
+            (easy-menu-add-item menu nil
+                                [casual-org-checkbox-in-progress
+                                 casual-org-checkbox-in-progress
+                                 :label "In-Progress [-]"
+                                 :help "Change checkbox state to in-progress [-]"]))
+
+        (easy-menu-add-item menu nil
+                            [casual-org-toggle-list-to-checkbox
+                             casual-org-toggle-list-to-checkbox
+                             :label (if (org-at-item-checkbox-p)
+                                        "Change to Item"
+                                      "Change to Checkbox")
+                             :help "Toggle Item/Checkbox"])
+
         (easy-menu-add-item menu nil
                             [org-indent-item
                              org-indent-item
@@ -333,24 +357,9 @@ This function is intended to be hooked into `context-menu-functions'."
                             [org-outdent-item-tree
                              org-outdent-item-tree
                              :label "Promote Subtree ←"
-                             :help "Promote item subtree"])
+                             :help "Promote item subtree"]))
 
-        (if (org-at-item-checkbox-p)
-            (easy-menu-add-item menu nil
-                                [casual-org-checkbox-in-progress
-                                 casual-org-checkbox-in-progress
-                                 :label "In-Progress"
-                                 :help "Change checkbox state to in-progress [-]"]))
-
-        (easy-menu-add-item menu nil
-                            [casual-org-toggle-list-to-checkbox
-                             casual-org-toggle-list-to-checkbox
-                             :label (if (org-at-item-checkbox-p)
-                                        "To Item"
-                                      "To Checkbox")
-                             :help "Toggle Item/Checkbox"]))
-
-      (when (anju-at-org-table-p)
+       ((anju-at-org-table-p)
         (easy-menu-add-item menu nil
                             [casual-org-table-copy-reference-dwim
                              casual-org-table-copy-reference-dwim
@@ -383,7 +392,18 @@ This function is intended to be hooked into `context-menu-functions'."
         (easy-menu-add-item menu nil [org-plot/gnuplot
                                       org-plot/gnuplot
                                       :label "Run gnuplot"
-                                      :help "Plot table using gnuplot"]))))
+                                      :help "Plot table using gnuplot"]))
+
+       ;; so far nothing global
+       ;; (t)
+       )
+
+      (when (use-region-p)
+        (easy-menu-add-item menu nil
+                            [org-insert-link
+                             org-insert-link
+                             :label "Link…"
+                             :help "Insert a link.  At the prompt, enter the link"]))))
   menu)
 
 

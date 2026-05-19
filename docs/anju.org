@@ -1,4 +1,5 @@
 #+startup: overview nologdone
+#+startup: showeverything
 #+TITLE: Anju User Guide
 #+SUBTITLE: for version {{{version}}}
 #+AUTHOR: Charles Y. Choi
@@ -212,32 +213,31 @@ Anju provides context-sensitive support for Org mode by providing commands relev
 - Item
 - Table
 
-In addition if text is selected, then support for styling it is supported.
+In addition if text is selected, then support for styling, linking, and copying as a different format are supported.
 
-Note that the Org mode context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
+Note that the Org mode context menu is deliberately restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
 
 It is recommended that the ~org-mouse~ package be loaded when using Anju.
 
 **** Org Headline Context Menu
 #+CINDEX: Org Headline Context Menu
 
-If the context menu is raised on a headline, then commands related to clocking and promotion are offered.
+If the context menu is raised on a headline, then commands related to TODO state, clocking, and promotion are offered.
 
 [[file:images/anju-context-menu-org-headline.png]]
-
 
 **** Org Item Context Menu
 #+CINDEX: Org Item Context Menu
 
-If the context menu is raised on a list item, then commands related to promotion and conversion to a checkbox are provided.
+If the context menu is raised on a list item, then commands related to promotion and checkbox operations are provided.
 
-The menu item "To Checkbox" will convert an item to a checkbox, with the additional behavior that if the point is at the start of the whole list, the whole list will be turned into checkboxes.
+The menu item "Change to Checkbox" will convert an item to a checkbox, with the additional behavior that if the point is at the start of the whole list, the whole list will be converted.
 
 [[file:images/anju-context-menu-org-item.png]]
 
-If ~org-mouse~ is loaded, then clicking on a checkbox will toggle its state between on ('[X]') or off ('[ ]'). However, changing to an intermediate state ('[-]') is supported by the menu item "In-Progress". The menu item "To Item" will convert the checkbox back to a plain list item.
+A checkbox can be converted back to a list item using “Change to Item” as shown below. If ~org-mouse~ is loaded then the checkbox state can be toggled between on ('[X]') or off ('[ ]'). Anju provides the “In-Progress [-]” menu item to put the checkbox in an intermediate state.
 
-[[file:images/anju-context-menu-org-checkbox.png]]
+[[file:images/anju-context-menu-org-item-inprogress.png]]
 
 Note that checkboxes in screenshots are prettified using ~prettify-symbols-mode~.
 
@@ -248,20 +248,31 @@ If the context menu is raised in a table, then table-specific commands are shown
 
 [[file:images/anju-context-menu-org-table.png]]
 
-**** Org Paste Context Menu
-#+CINDEX: Org Paste Context Menu
+The context menu shows the current Org table cell reference where the point is in (e.g. ~@3$2~). Clicking on this reference will copy it to the ~kill-ring~ for subsequent use in a table formula.
 
-[[file:images/anju-context-menu-enhanced-paste.png]]
+If a selected region or rectangle is made whose extents are within the table, then the table region reference  is displayed.
 
-Anju adds more “Paste” commands that will display given the right context.
+The “Org Table Region” sub-menu provides commands to cut, copy, and paste rectangular regions made in the table. Note that the binding {{{kbd(C-M-<mouse-1>)}}} lets you make rectangle selections.
 
-- Paste Last Org Link :: If it exists, this command will insert the last stored Org link.
 
-- Paste Markdown as Org :: If the clipboard (latest yank) is known by the user to be Markdown text, this command will convert the clipboard text to Org via ~pandoc~, then paste (yank) it into the buffer.
+**** Org Insert Link
+#+CINDEX: Org Insert Link
 
-- Paste Media :: If an image as been copied into the clipboard, this menu item will "paste" it via the ~yank-media~ command.
+[[file:images/anju-context-menu-org-link.png]]
 
-  
+On selected text, the context menu will have the menu item “Link…” to run the command ~org-insert-link~. From there you can enter a link, typically copied into the system clipboard.
+
+If an Org link has already been stored, then the menu item “Paste Last Org Link” will be displayed. See more at [[#org-paste-context-menu][Org Paste Context Menu]].
+
+
+**** Org Toggle Images & Show Markup
+#+CINDEX Org Toggle Images & Show Markup
+
+The Org context menu supports the following menu items except for when the point is in a table:
+
+- Toggle Images :: toggles display of images when running in GUI.
+- Show Markup :: reveals or hides display of Org markup.
+
 **** Org “Copy as…” Context Menu
 :PROPERTIES:
 :CUSTOM_ID: org-copy-as-context-menu
@@ -280,6 +291,23 @@ If text is selected, the “Copy as…” sub-menu will be presented. This sub-m
 - Slack (only available if the ~ox-slack~ ([[https://melpa.org/#/ox-slack][MELPA]]) package is installed)
 - RTF (only available on macOS)
   
+  
+**** Org Paste Context Menu
+:PROPERTIES:
+:CUSTOM_ID: org-paste-context-menu
+:END:
+#+CINDEX: Org Paste Context Menu
+
+[[file:images/anju-context-menu-enhanced-paste.png]]
+
+Anju adds more “Paste” commands that will display given the right context.
+
+- Paste Last Org Link :: If it exists, this command will insert the last stored Org link.
+
+- Paste Markdown as Org :: If the clipboard (latest yank) is known by the user to be Markdown text, this command will convert the clipboard text to Org via ~pandoc~, then paste (yank) it into the buffer.
+
+- Paste Media :: If an image as been copied into the clipboard, this menu item will "paste" it via the ~yank-media~ command.
+
   
 *** Dired Mode Context Menu
 #+CINDEX: Dired Mode Context Menu
