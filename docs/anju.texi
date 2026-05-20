@@ -105,6 +105,7 @@ Org Mode Context Menu
 * Org Item Context Menu::
 * Org Table Context Menu::
 * Org Insert Link::
+* Org Toggle Images & Show Markup::
 * Org “Copy as…” Context Menu::
 * Org Paste Context Menu::
 
@@ -406,8 +407,7 @@ Item
 Table
 @end itemize
 
-In addition if text is selected@comma{} then support for styling@comma{} linking@comma{} and copying as are supported.
-
+In addition if text is selected@comma{} then support for styling@comma{} linking@comma{} and copying as a different format are supported.
 
 Note that the Org mode context menu is deliberately restrained in its command offering in accord with Anju's @ref{Design Principles and Concerns, , Design Principles and Concerns}.
 
@@ -418,6 +418,7 @@ It is recommended that the @code{org-mouse} package be loaded when using Anju.
 * Org Item Context Menu::
 * Org Table Context Menu::
 * Org Insert Link::
+* Org Toggle Images & Show Markup::
 * Org “Copy as…” Context Menu::
 * Org Paste Context Menu::
 @end menu
@@ -473,6 +474,20 @@ The “Org Table Region” sub-menu provides commands to cut@comma{} copy@comma{
 On selected text@comma{} the context menu will have the menu item “Link…” to run the command @code{org-insert-link}. From there you can enter a link@comma{} typically copied into the system clipboard.
 
 If an Org link has already been stored@comma{} then the menu item “Paste Last Org Link” will be displayed. See more at @ref{Org Paste Context Menu, , Org Paste Context Menu}.
+
+@node Org Toggle Images & Show Markup
+@subsubsection Org Toggle Images & Show Markup
+
+#+CINDEX Org Toggle Images & Show Markup
+
+The Org context menu supports the following menu items except for when the point is in a table:
+
+@table @asis
+@item Toggle Images
+toggles display of images when running in GUI@.
+@item Show Markup
+reveals or hides display of Org markup.
+@end table
 
 @node Org “Copy as…” Context Menu
 @subsubsection Org “Copy as…” Context Menu
@@ -797,6 +812,8 @@ Just One Space (@code{just-one-space})
 Horizontal Space (@code{delete-horizontal-space})
 @item
 Pair (@code{delete-pair})
+@item
+Duplicate Lines (@code{delete-duplicate-lines})
 @item
 Blank Lines (@code{delete-blank-lines})
 @item

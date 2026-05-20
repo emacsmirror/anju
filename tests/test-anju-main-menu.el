@@ -187,7 +187,7 @@ one sexp")))))
   (anju-test-keymap
    kmap
    "Delete"
-   9
+   10
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -215,6 +215,12 @@ one space")
         "Pair"
         #'delete-pair
         "Delete a pair of characters enclosing ARG sexps that follow point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Duplicate Lines"
+        #'delete-duplicate-lines
+        "Delete all but one copy of any identical lines in the region")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
