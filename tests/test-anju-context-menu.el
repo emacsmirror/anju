@@ -686,7 +686,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   8
+   9
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
@@ -696,6 +696,12 @@
         "TODO…"
         #'org-todo
         "Change the TODO state of an item")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Body"
+        #'org-toggle-heading
+        "Convert headings to normal text, or items or text to headings")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -743,10 +749,23 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   2
+   4
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Heading"
+        #'org-toggle-heading
+        "Convert headings to normal text, or items or text to headings")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Item"
+        #'org-toggle-item
+        "Convert headings or normal lines to items, items to normal lines")
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
         "Link…"
@@ -765,10 +784,17 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   6
+   7
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Cycle Bullet"
+        #'org-cycle-list-bullet
+        "Cycle through the different itemize/enumerate bullets")
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
         (lambda () (if (org-at-item-checkbox-p)
@@ -810,7 +836,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   7
+   8
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
@@ -819,6 +845,12 @@
         "In-Progress [-]"
         #'casual-org-checkbox-in-progress
         "Change checkbox state to in-progress [-]")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Cycle Bullet"
+        #'org-cycle-list-bullet
+        "Cycle through the different itemize/enumerate bullets")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
