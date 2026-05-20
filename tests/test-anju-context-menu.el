@@ -1125,6 +1125,73 @@
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Info Mode
+
+
+(ert-deftest test-anju-context-menu-info-mode ()
+  "Test for `anju-context-menu-info-mode'."
+
+  (info "(emacs)Top")
+  (anju-test-context-menu-function
+   #'anju-context-menu-info-mode
+   "hi there"
+   9
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Top"
+        #'Info-top-node
+        "Go to the Top node of this file")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Table of Contents"
+        #'Info-toc
+        "Go to a node with table of contents of the current Info file")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "↑ Node"
+        #'Info-up
+        "Go to the superior node of this node")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "← Node"
+        #'Info-backward-node
+        "Go backward one node, considering all nodes as forming one sequence")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "→ Node"
+        #'Info-forward-node
+        "Go forward one node, considering all nodes as forming one sequence")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Apropos…"
+        #'info-apropos
+        "Search indices of all known Info files on your system for STRING")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Copy node name"
+        #'Info-copy-current-node-name
+        "Put the name of the current Info node into the kill ring")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Open node in web"
+        #'anju-info-goto-node-web
+        "Open node in web browser"))))
+  (kill-buffer))
+
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: VC/Magit
 
 (ert-deftest test-anju-context-menu-vc-file ()

@@ -32,6 +32,7 @@
 (require 'elisp-mode)
 (require 'hideshow)
 (require 'edebug)
+(require 'info)
 (require 'yank-media)
 (require 'anju-utils)
 (require 'anju-style-text)
@@ -404,6 +405,75 @@ This function is intended to be hooked into `context-menu-functions'."
                              org-insert-link
                              :label "Link…"
                              :help "Insert a link.  At the prompt, enter the link"]))))
+  menu)
+
+
+;; -------------------------------------------------------------------
+;; Context Menu: Info Mode
+
+
+(defun anju-info-goto-node-web ()
+  "Open node in web browser."
+  (interactive)
+  (Info-goto-node-web (Info-copy-current-node-name)))
+
+(defun anju-context-menu-info-mode (menu click)
+  "Context menu hook function for Info mode commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+  (when (derived-mode-p 'Info-mode)
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu info-mode-separator)
+
+      (easy-menu-add-item menu nil [Info-top-node
+                                    Info-top-node
+                                    :label "Top"
+                                    :help "Go to the Top node of this file"])
+
+      (easy-menu-add-item menu nil [Info-toc
+                                    Info-toc
+                                    :label "Table of Contents"
+                                    :help "Go to a node with table of contents \
+of the current Info file"])
+
+      (easy-menu-add-item menu nil [Info-up
+                                    Info-up
+                                    :label "↑ Node"
+                                    :help "Go to the superior node of this \
+node"])
+
+      (easy-menu-add-item menu nil [Info-backward-node
+                                    Info-backward-node
+                                    :label "← Node"
+                                    :help "Go backward one node, considering \
+all nodes as forming one sequence"])
+
+      (easy-menu-add-item menu nil [Info-forward-node
+                                    Info-forward-node
+                                    :label "→ Node"
+                                    :help "Go forward one node, considering \
+all nodes as forming one sequence"])
+
+      (easy-menu-add-item menu nil [info-apropos
+                                    info-apropos
+                                    :label "Apropos…"
+                                    :help "Search indices of all known Info \
+files on your system for STRING"])
+
+      (easy-menu-add-item menu nil [Info-copy-current-node-name
+                                    Info-copy-current-node-name
+                                    :label "Copy node name"
+                                    :help "Put the name of the current Info \
+node into the kill ring"])
+
+      (easy-menu-add-item menu nil [anju-info-goto-node-web
+                                    anju-info-goto-node-web
+                                    :label "Open node in web"
+                                    :help "Open node in web browser"])))
   menu)
 
 
@@ -1336,6 +1406,7 @@ function into `context-menu-functions' over `add-hook'."
                 (add-hook 'context-menu-functions fn)))
           (reverse '(anju-context-menu-dired
                      anju-context-menu-org-mode
+                     anju-context-menu-info-mode
                      anju-context-menu-elisp
                      anju-context-menu-edebug-eval
                      anju-context-menu-scratch
@@ -1367,6 +1438,7 @@ function into `context-menu-functions' over `add-hook'."
           (anju-context-menu--remove-from-context-menu-functions fn))
         (reverse '(anju-context-menu-dired
                    anju-context-menu-org-mode
+                   anju-context-menu-info-mode
                    anju-context-menu-elisp
                    anju-context-menu-edebug-eval
                    anju-context-menu-scratch
