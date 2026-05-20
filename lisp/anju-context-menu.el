@@ -941,16 +941,19 @@ containing a match for selected word"])
               (derived-mode-p 'markdown-mode))
           (easy-menu-add-item menu nil anju-style-menu))
 
-      (easy-menu-add-item menu nil anju-transform-text-menu)
+      (if (not buffer-read-only)
+          (easy-menu-add-item menu nil anju-transform-text-menu))
 
       (easy-menu-add-item menu nil
                           [query-replace query-replace
                            :label "Query Replace…"
+                           :visible (not buffer-read-only)
                            :help "Replace some occurrences of FROM-STRING with TO-STRING"])
 
       (easy-menu-add-item menu nil
                           [query-replace-regexp query-replace-regexp
                            :label "Query Replace Regexp…"
+                           :visible (not buffer-read-only)
                            :help "Replace some things after point matching REGEXP with TO-STRING"])
 
       (if (or (derived-mode-p 'prog-mode) (derived-mode-p 'org-mode))
