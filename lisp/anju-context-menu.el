@@ -280,6 +280,12 @@ This function is intended to be hooked into `context-menu-functions'."
                              :help "Change the TODO state of an item"])
 
         (easy-menu-add-item menu nil
+                            [org-toggle-heading
+                             org-toggle-heading
+                             :label "Change to Body"
+                             :help "Convert headings to normal text, or items or text to headings"])
+
+        (easy-menu-add-item menu nil
                             [org-clock-in
                              org-clock-in
                              :label "Clock In"
@@ -326,6 +332,12 @@ This function is intended to be hooked into `context-menu-functions'."
                                  casual-org-checkbox-in-progress
                                  :label "In-Progress [-]"
                                  :help "Change checkbox state to in-progress [-]"]))
+
+        (easy-menu-add-item menu nil
+                            [org-cycle-list-bullet
+                             org-cycle-list-bullet
+                             :label "Cycle Bullet"
+                             :help "Cycle through the different itemize/enumerate bullets"])
 
         (easy-menu-add-item menu nil
                             [casual-org-toggle-list-to-checkbox
@@ -395,8 +407,18 @@ This function is intended to be hooked into `context-menu-functions'."
                                       :help "Plot table using gnuplot"]))
 
        ;; so far nothing global
-       ;; (t)
-       )
+       (t
+        (easy-menu-add-item menu nil [org-toggle-heading
+                                      org-toggle-heading
+                                      :label "Change to Heading"
+                                      :help "Convert headings to normal text, \
+or items or text to headings"])
+
+        (easy-menu-add-item menu nil [org-toggle-item
+                                      org-toggle-item
+                                      :label "Change to Item"
+                                      :help "Convert headings or normal lines \
+to items, items to normal lines"])))
 
       (when (use-region-p)
         (easy-menu-add-item menu nil
