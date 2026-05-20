@@ -176,6 +176,10 @@ one space"]
     ["Pair" delete-pair
      :help "Delete a pair of characters enclosing ARG sexps that follow point"]
 
+    ["Duplicate Lines" delete-duplicate-lines
+     :enable (use-region-p)
+     :help "Delete all but one copy of any identical lines in the region"]
+
     ["Blank Lines" delete-blank-lines
      :help "On blank line, delete all surrounding blank lines, \
 leaving just one"]
