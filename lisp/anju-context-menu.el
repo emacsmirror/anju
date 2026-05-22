@@ -39,6 +39,7 @@
 (require 'casual-dired)
 (require 'casual-org)
 (require 'casual-ediff)
+(require 'casual-compile)
 
 
 ;; -------------------------------------------------------------------
@@ -1234,6 +1235,52 @@ URL `https://gist.github.com/danielmartin/3c5d3a3a8cd24a3556379c5251651748'."
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Compilation Mode
+
+(defun anju-context-menu-compile (menu click)
+  "Context menu hook function for compile commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (derived-mode-p 'compilation-mode)
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu compile-separator)
+
+      (easy-menu-add-item menu nil
+                          [recompile
+                           recompile
+                           :label (casual-compile--select-mode-label
+                                   "Recompile"
+                                   "Refresh")
+                           :enable (not (casual-compile--compilation-running-p))
+                           :help "Re-compile the program including the \
+current buffer"])
+
+      (easy-menu-add-item menu nil
+                          [compile
+                           compile
+                           :label "Compile…"
+                           :visible (not (derived-mode-p 'grep-mode))
+                           :enable (not (casual-compile--compilation-running-p))
+                           :help "Compile the program including the current \
+buffer.  Default: run ‘make’"])
+
+      (easy-menu-add-item menu nil
+                          [kill-compilation
+                           kill-compilation
+                           :label (casual-compile-unicode-get :kill)
+                           :visible (casual-compile--compilation-running-p)
+                           :help "Kill the current compilation or grep process"])))
+  menu)
+
+
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: Show Markup/Toggle Images
 
 (defun anju-context-menu-markup (menu click)
@@ -1429,6 +1476,7 @@ function into `context-menu-functions' over `add-hook'."
           (reverse '(anju-context-menu-dired
                      anju-context-menu-org-mode
                      anju-context-menu-info-mode
+                     anju-context-menu-compile
                      anju-context-menu-elisp
                      anju-context-menu-edebug-eval
                      anju-context-menu-scratch
@@ -1461,6 +1509,7 @@ function into `context-menu-functions' over `add-hook'."
         (reverse '(anju-context-menu-dired
                    anju-context-menu-org-mode
                    anju-context-menu-info-mode
+                   anju-context-menu-compile
                    anju-context-menu-elisp
                    anju-context-menu-edebug-eval
                    anju-context-menu-scratch

@@ -1365,6 +1365,44 @@ temporarily visible (Visible mode)"
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Compilation Mode
+
+(ert-deftest test-anju-context-menu-compile ()
+  "Test for `anju-context-menu-compile'."
+
+  (with-temp-buffer
+    (compilation-mode)
+    (anju-test-context-menu-function
+     #'anju-context-menu-compile
+     "Hello there"
+     4
+     (lambda (items)
+       (let* ((i 0))
+         (anju-test-menu-item (seq-elt items i) "--")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          (lambda () (casual-compile--select-mode-label
+                                   "Recompile"
+                                   "Refresh"))
+          #'recompile
+          "Re-compile the program including the current buffer")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Compile…"
+          #'compile
+          "Compile the program including the current buffer.  Default: \
+run ‘make’")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          (lambda () (casual-compile-unicode-get :kill))
+          #'kill-compilation
+          "Kill the current compilation or grep process"))))))
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: Word Count
 
 (ert-deftest test-anju-context-menu-wordcount ()
