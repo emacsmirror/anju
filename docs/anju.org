@@ -782,6 +782,7 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 *** Anju Context Menu Functions
 #+VINDEX: anju-context-menu-dired
 #+VINDEX: anju-context-menu-org-mode
+#+VINDEX: anju-context-menu-compile
 #+VINDEX: anju-context-menu-scratch
 #+VINDEX: anju-context-menu-buffers
 #+VINDEX: anju-context-menu-region
@@ -802,6 +803,8 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-dired~ :: Dired commands.
 
 - ~anju-context-menu-org-mode~  :: Org mode commands.
+
+- ~anju-context-menu-compile~  :: Compilation (or Grep) mode commands.
 
 - ~anju-context-menu-scratch~  :: Open scratch buffer.
 
