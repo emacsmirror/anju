@@ -241,18 +241,21 @@ Return t if populated, nil otherwise."
 (easy-menu-define anju-org-table-region-menu nil
   "Key map for Org table region sub-menu."
   '("Org Table Region"
-    ["Cut"
+    [org-table-cut-region
      org-table-cut-region
+     :label "Cut"
      :enable (and (bound-and-true-p rectangle-mark-mode) (use-region-p))
      :help "Cut Org table region"]
 
-    ["Copy"
+    [org-table-copy-region
      org-table-copy-region
+     :label "Copy"
      :enable (and (bound-and-true-p rectangle-mark-mode) (use-region-p))
      :help "Copy Org table region"]
 
-    ["Paste"
+    [org-table-paste-rectangle
      org-table-paste-rectangle
+     :label "Paste"
      :help "Paste Org table region"]))
 
 (defun anju-org-table-recalculate ()
@@ -302,6 +305,13 @@ This function is intended to be hooked into `context-menu-functions'."
                              :help "Clock out"])
 
         (easy-menu-add-item menu nil
+                            [org-sort-entries
+                             org-sort-entries
+                             :label "Sort…"
+                             :help "Sort entries on a certain level of an \
+outline tree"])
+
+        (easy-menu-add-item menu nil
                             [org-do-demote
                              org-do-demote
                              :label "Demote →"
@@ -340,6 +350,12 @@ This function is intended to be hooked into `context-menu-functions'."
                              org-cycle-list-bullet
                              :label "Cycle Bullet"
                              :help "Cycle through the different itemize/enumerate bullets"])
+
+        (easy-menu-add-item menu nil
+                            [org-sort-list
+                             org-sort-list
+                             :label "Sort…"
+                             :help "Sort list items"])
 
         (easy-menu-add-item menu nil
                             [casual-org-toggle-list-to-checkbox
@@ -381,6 +397,12 @@ This function is intended to be hooked into `context-menu-functions'."
                              :help "Copy Org table reference (field or range) into kill ring via mouse"])
 
         (easy-menu-add-item menu nil anju-org-table-region-menu)
+
+        (easy-menu-add-item menu nil
+                            [org-table-sort-lines
+                             org-table-sort-lines
+                             :label "Sort…"
+                             :help "Sort table lines according to the column at point"])
 
         (easy-menu-add-item menu nil
                             [org-table-toggle-coordinate-overlays

@@ -670,11 +670,7 @@
          "Resume code stepping")))
 
    (lambda (filename description)
-     (edebug-eval-mode)))
-
-
-
-)
+     (edebug-eval-mode))))
 
 
 
@@ -686,7 +682,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   9
+   10
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
@@ -714,6 +710,12 @@
         "Clock Out"
         #'org-clock-out
         "Clock out")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-sort-entries
+        "Sort entries on a certain level of an outline tree")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -784,7 +786,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   7
+   8
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
@@ -794,6 +796,12 @@
         "Cycle Bullet"
         #'org-cycle-list-bullet
         "Cycle through the different itemize/enumerate bullets")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-sort-list
+        "Sort list items")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -836,7 +844,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   8
+   9
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
@@ -851,6 +859,12 @@
         "Cycle Bullet"
         #'org-cycle-list-bullet
         "Cycle through the different itemize/enumerate bullets")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-sort-list
+        "Sort list items")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -894,46 +908,48 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   7
+   8
    (lambda (items)
-     (let* ((item0 (seq-elt items 0))
-            (item1 (seq-elt items 1))
-            (item2 (seq-elt items 2))   ; anju-org-table-region-menu
-            (item3 (seq-elt items 3))
-            (item4 (seq-elt items 4))
-            (item5 (seq-elt items 5))
-            (item6 (seq-elt items 6)))
+     (let* ((i 0))
 
-       (anju-test-menu-item item0 "--")
+       (anju-test-menu-item (seq-elt items i) "--")
 
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         (lambda () (casual-org-table--reference-dwim))
         #'casual-org-table-copy-reference-dwim
         "Copy Org table reference (field or range) into kill ring via mouse")
 
-       ;;  bypass testing item2
+       (let* ((table-region-item (seq-elt items (cl-incf i)))
+              (kmap (seq-elt table-region-item 3)))
+         (test--anju-org-table-region-menu kmap))
 
        (anju-test-menu-item
-        item3
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-table-sort-lines
+        "Sort table lines according to the column at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
         "Show Coordinates"
         #'org-table-toggle-coordinate-overlays
         "Toggle the display of row/column numbers in tables")
 
        (anju-test-menu-item
-        item4
+        (seq-elt items (cl-incf i))
         "Recalculate"
         #'anju-org-table-recalculate
         "Recalculate table")
 
        (anju-test-menu-item
-        item5
+        (seq-elt items (cl-incf i))
         "Edit Table Formulas"
         #'org-table-edit-formulas
         "Edit the formulas of the current table in a separate buffer")
 
        (anju-test-menu-item
-        item6
+        (seq-elt items (cl-incf i))
         "Run gnuplot"
         #'org-plot/gnuplot
         "Plot table using gnuplot")))
@@ -943,11 +959,10 @@
      (goto-char 1)
      (save-buffer))))
 
-(ert-deftest test-anju-org-table-region-menu ()
-  "Test `anju-org-table-region-menu'."
-
+(defun test--anju-org-table-region-menu (kmap)
+  "Test KMAP for `anju-org-table-region-menu'."
   (anju-test-keymap
-   anju-org-table-region-menu
+   kmap
    "Org Table Region"
    3
    (lambda (items)
@@ -969,6 +984,10 @@
                             "Paste"
                             #'org-table-paste-rectangle
                             "Paste Org table region")))))
+
+(ert-deftest test-anju-org-table-region-menu ()
+  "Test `anju-org-table-region-menu'."
+  (test--anju-org-table-region-menu anju-org-table-region-menu))
 
 
 ;; -------------------------------------------------------------------
