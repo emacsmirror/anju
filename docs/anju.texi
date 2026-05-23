@@ -96,6 +96,7 @@ Context Menu Features
 * Org Mode Context Menu::
 * Dired Mode Context Menu::
 * Emacs Lisp Context Menu::
+* Makefile Context Menu::
 * Rectangle Context Menu::
 * Magit Support::
 
@@ -341,6 +342,7 @@ Learn more about the different areas Anju enhances context menus in the links be
 * Org Mode Context Menu::
 * Dired Mode Context Menu::
 * Emacs Lisp Context Menu::
+* Makefile Context Menu::
 * Rectangle Context Menu::
 * Magit Support::
 @end menu
@@ -626,6 +628,13 @@ The result is that a temporary buffer named @code{*add-two*} (the input name is 
 @image{images/anju-context-menu-extract-lambda-3,,,,png}
 
 The @code{*add-two*} buffer can be edited as needed and its contents placed into a desired Elisp file.
+
+@node Makefile Context Menu
+@subsection Makefile Context Menu
+
+@cindex Makefile Context Menu
+
+TBD
 
 @node Rectangle Context Menu
 @subsection Rectangle Context Menu
@@ -1226,6 +1235,8 @@ Top-down ordering of functions will similarly determine the order of menu items 
 
 @vindex anju-context-menu-dired
 @vindex anju-context-menu-org-mode
+@vindex anju-context-menu-make-mode
+@vindex anju-context-menu-compile
 @vindex anju-context-menu-scratch
 @vindex anju-context-menu-buffers
 @vindex anju-context-menu-region
@@ -1249,6 +1260,12 @@ Dired commands.
 
 @item @code{anju-context-menu-org-mode} 
 Org mode commands.
+
+@item @code{anju-context-menu-make-mode} 
+Makefile mode commands.
+
+@item @code{anju-context-menu-compile} 
+Compilation (or Grep) mode commands.
 
 @item @code{anju-context-menu-scratch} 
 Open scratch buffer.

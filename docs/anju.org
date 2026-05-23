@@ -201,9 +201,7 @@ If a context menu is raised on selected text, the following menu items are displ
 
 - Copy as… :: If the current buffer is using Org mode, then this sub-menu is displayed. Learn more about this in [[#org-copy-as-context-menu][Org “Copy as…” Context Menu]].
 
-
-
-
+  
 *** Org Mode Context Menu
 #+CINDEX: Org Mode Context Menu
 
@@ -387,6 +385,13 @@ The result is that a temporary buffer named ~*add-two*~ (the input name is used)
 [[file:images/anju-context-menu-extract-lambda-3.png]]
 
 The ~*add-two*~ buffer can be edited as needed and its contents placed into a desired Elisp file.
+
+*** Makefile Context Menu
+#+CINDEX: Makefile Context Menu
+
+# TODO: Write Makefile Context Menu
+
+TBD
 
 *** Rectangle Context Menu
 #+CINDEX: Rectangle Context Menu
@@ -782,6 +787,7 @@ It is recommended to use the ~customize-variable~ command to configure ~context-
 *** Anju Context Menu Functions
 #+VINDEX: anju-context-menu-dired
 #+VINDEX: anju-context-menu-org-mode
+#+VINDEX: anju-context-menu-make-mode
 #+VINDEX: anju-context-menu-compile
 #+VINDEX: anju-context-menu-scratch
 #+VINDEX: anju-context-menu-buffers
@@ -803,6 +809,8 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-dired~ :: Dired commands.
 
 - ~anju-context-menu-org-mode~  :: Org mode commands.
+
+- ~anju-context-menu-make-mode~  :: Makefile mode commands.
 
 - ~anju-context-menu-compile~  :: Compilation (or Grep) mode commands.
 
