@@ -125,6 +125,7 @@ Main Menu Features
 * Bookmarks Menu Features::
 * Text Menu Features::
 * Index Menu (imenu) Features::
+* Tools Menu Features::
 * Help Menu Features::
 
 Customization
@@ -147,6 +148,7 @@ Main Menu Customization
 * Bookmarks Menu Customization::
 * Help Menu Customization::
 * Imenu Menu Customization::
+* Tools Menu Customization::
 
 @end detailmenu
 @end menu
@@ -668,6 +670,7 @@ Anju enhances the main menu bar of Emacs by making opinionated changes to its ex
 * Bookmarks Menu Features::
 * Text Menu Features::
 * Index Menu (imenu) Features::
+* Tools Menu Features::
 * Help Menu Features::
 @end menu
 
@@ -990,6 +993,18 @@ Modes supported this way by Anju are:
 @end itemize
 
 This modification is optional. For more detail@comma{} see @ref{Imenu Menu Customization, , Imenu Menu Customization}.
+
+@node Tools Menu Features
+@subsection Tools Menu Features
+
+@cindex Tools Menu Features
+
+Anju makes the following modifications to the main menu bar @strong{Tools} menu:
+
+@table @asis
+@item Adds the “Macro Recorder” sub-menu
+A menu of commands pertaining to keyboard macros (@ref{Keyboard Macros,,,emacs,}).
+@end table
 
 @node Help Menu Features
 @subsection Help Menu Features
@@ -1440,6 +1455,7 @@ For more info on hook variables see @ref{Hooks,,,emacs,}.
 * Bookmarks Menu Customization::
 * Help Menu Customization::
 * Imenu Menu Customization::
+* Tools Menu Customization::
 @end menu
 
 @node File Menu Customization
@@ -1534,7 +1550,7 @@ if non-nil@comma{} then remove the Emacs tutorial menu items. (default @code{t})
 
 The hook function @code{anju-main-menu--reconfigure-imenu} in @code{anju-reconfigure-main-menu-hook} adds the @strong{Index} menu to the main menu bar.
 
-Enabling @code{anju-main-menu--reconfigure-file} can be done using the checkbox interface provided by @code{customize-variable} in modifying @code{anju-reconfigure-main-menu-hook}.
+Enabling @code{anju-main-menu--reconfigure-imenu} can be done using the checkbox interface provided by @code{customize-variable} in modifying @code{anju-reconfigure-main-menu-hook}.
 
 Anju's support for Imenu covers the following modes:
 
@@ -1550,6 +1566,16 @@ Anju's support for Imenu covers the following modes:
 @end itemize
 
 For more info on Imenu see @ref{Imenu,,,emacs,}.
+
+@node Tools Menu Customization
+@subsection Tools Menu Customization
+
+@cindex Tools Menu Customization
+@vindex anju-main-menu--reconfigure-tools
+
+The hook function @code{anju-main-menu--reconfigure-tools} in @code{anju-reconfigure-main-menu-hook} modifies the @strong{Tools} menu in the main menu bar.
+
+Enabling @code{anju-main-menu--reconfigure-tools} can be done using the checkbox interface provided by @code{customize-variable} in modifying @code{anju-reconfigure-main-menu-hook}.
 
 @node Future Work
 @chapter Future Work

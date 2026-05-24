@@ -28,6 +28,7 @@
 (require 'bookmark)
 (require 'make-mode)
 (require 'org)
+(require 'org-agenda)
 (require 'whitespace)
 (require 'markdown-mode)
 (require 'anju-utils)
@@ -417,7 +418,6 @@ This function is intended to be used in
 ;; -------------------------------------------------------------------
 ;; Imenu Configuration
 
-
 (defun anju-imenu-add-menubar-index ()
   "Add imenu index to menubar."
   (condition-case err (imenu-add-menubar-index)
@@ -457,6 +457,116 @@ Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
 
     (if (<= org-imenu-depth 2)
         (setopt org-imenu-depth 7))))
+
+
+;; -------------------------------------------------------------------
+;; Tools Menu Customization
+
+(easy-menu-define anju-kmacro-menu nil
+  "Keymap for keyboard macro commands."
+
+  '("Macro Recorder"
+    [kmacro-start-macro
+     kmacro-start-macro
+     :label "Record"
+     :visible (not defining-kbd-macro)
+     :help "Record subsequent keyboard input, defining a keyboard macro"]
+
+    [kmacro-end-macro
+     kmacro-end-macro
+     :label "Stop"
+     :visible defining-kbd-macro
+     :help "Finish defining a keyboard macro"]
+
+    [kmacro-insert-counter
+     kmacro-insert-counter
+     :label "Insert counter"
+     :visible defining-kbd-macro
+     :help "Insert current value of ‘kmacro-counter’, then increment it by ARG"]
+
+    [kmacro-end-and-call-macro
+     kmacro-end-and-call-macro
+     :label "Run last"
+     :enable (and (not defining-kbd-macro) last-kbd-macro)
+     :help "Call last keyboard macro, ending it first if currently being defined"]
+
+    [kmacro-name-last-macro
+     kmacro-name-last-macro
+     :label "Name last…"
+     :enable (and (not defining-kbd-macro) last-kbd-macro)
+     :help "Assign a name to the last keyboard macro defined"]
+
+    [kmacro-bind-to-key
+     kmacro-bind-to-key
+     :label "Bind last…"
+     :enable (and (not defining-kbd-macro) last-kbd-macro)
+     :help "When not defining or executing a macro, offer to bind last macro to a key"]
+
+    [kmacro-edit-macro
+     kmacro-edit-macro
+     :label "Edit last"
+     :enable (and (not defining-kbd-macro) last-kbd-macro)
+     :help "As edit last keyboard macro, but without kmacro-repeat property"]
+
+    [kmacro-step-edit-macro
+     kmacro-step-edit-macro
+     :label "Step edit macro…"
+     :enable (and (not defining-kbd-macro) last-kbd-macro)
+     :help "Step edit and execute last keyboard macro"]
+
+    [edit-kbd-macro
+     edit-kbd-macro
+     :label "Edit with binding…"
+     :enable (not defining-kbd-macro)
+     :help "Edit a keyboard macro"]
+
+    [insert-kbd-macro
+     insert-kbd-macro
+     :label "Insert macro named…"
+     :enable (not defining-kbd-macro)
+     :help "Insert in buffer the definition of kbd macro MACRONAME, as Lisp code"]
+
+    [kmacro-menu
+     kmacro-menu
+     :label "List macros"
+     :enable (and (not defining-kbd-macro) last-kbd-macro)
+     :help "List run-time defined keyboard macros"]))
+
+;; TODO: make a context menu for `kmacro-menu-mode'.
+
+(defun anju-main-menu--reconfigure-tools ()
+  "Reconfigure Tools menu."
+  (easy-menu-add-item global-map '(menu-bar tools)
+                      anju-kmacro-menu
+                      'grep)
+
+  (keymap-set-after (lookup-key global-map [menu-bar tools])
+    "<separator-tools-kmacro>"
+    '(menu-item "--")
+    'Macro\ Recorder)
+
+  ;; TODO: Consider having a variable to control this.
+
+  ;; (easy-menu-add-item global-map '(menu-bar tools)
+  ;;                       [org-capture
+  ;;                        org-capture
+  ;;                        :label "Org Capture…"
+  ;;                        :help "Capture something"]
+  ;;                       'grep)
+
+  ;;   (easy-menu-add-item global-map '(menu-bar tools)
+  ;;                       [org-agenda
+  ;;                        org-agenda
+  ;;                        :label "Org Agenda…"
+  ;;                        :help "Dispatch agenda commands to collect entries to \
+  ;; the agenda buffer"]
+  ;;                       'grep)
+
+  ;;   (keymap-set-after (lookup-key global-map [menu-bar tools])
+  ;;     "<separator-tools-org>"
+  ;;     '(menu-item "--")
+  ;;     #'org-agenda)
+  )
 
 (provide 'anju-main-menu)
 ;;; anju-main-menu.el ends here
