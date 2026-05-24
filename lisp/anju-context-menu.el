@@ -33,6 +33,7 @@
 (require 'hideshow)
 (require 'edebug)
 (require 'info)
+(require 'make-mode)
 (require 'yank-media)
 (require 'anju-utils)
 (require 'anju-style-text)
@@ -40,6 +41,7 @@
 (require 'casual-org)
 (require 'casual-ediff)
 (require 'casual-compile)
+(require 'casual-make)
 
 
 ;; -------------------------------------------------------------------
@@ -1468,6 +1470,151 @@ This function is intended to be hooked into `context-menu-functions'."
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Makefile Mode
+
+(easy-menu-define anju-makefile-modes-menu nil
+  "Keymap for mouse window management menu."
+  '("Makefile Type"
+    :label (format
+            "Makefile Type (%s)"
+                   (casual-make-mode-label major-mode))
+    [makefile-automake-mode
+     makefile-automake-mode
+     :label "automake"
+     :style radio
+     :selected (derived-mode-p 'makefile-automake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about automake"]
+
+    [makefile-bsdmake-mode
+     makefile-bsdmake-mode
+     :label "BSD"
+     :style radio
+     :selected (derived-mode-p 'makefile-bsdmake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about BSD make"]
+
+    [makefile-gmake-mode
+     makefile-gmake-mode
+     :label "GNU"
+     :style radio
+     :selected (derived-mode-p 'makefile-gmake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about gmake"]
+
+    [makefile-imake-mode
+     makefile-imake-mode
+     :label "imake"
+     :style radio
+     :selected (derived-mode-p 'makefile-imake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about imake"]
+
+    [makefile-mode
+     makefile-mode
+     :label "make"
+     :style radio
+     :selected (and (derived-mode-p 'makefile-mode)
+                    (not (or (derived-mode-p 'makefile-automake-mode)
+                             (derived-mode-p 'makefile-bsdmake-mode)
+                             (derived-mode-p 'makefile-gmake-mode)
+                             (derived-mode-p 'makefile-imake-mode)
+                             (derived-mode-p 'makefile-makepp-mode))))
+     :help "Major mode for editing standard Makefiles"]
+
+    [makefile-makepp-mode
+     makefile-makepp-mode
+     :label "makepp"
+     :style radio
+     :selected (derived-mode-p 'makefile-makepp-mode)
+     :help "An adapted ‘makefile-mode’ that knows about makepp"]))
+
+
+(defun anju-context-menu-make-mode (menu click)
+  "Context menu hook function for `makefile-mode' commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (derived-mode-p 'makefile-mode)
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu context-makefile--separator1)
+
+      (easy-menu-add-item menu nil
+                          [compile
+                           compile
+                           :label "Compile…"
+                           :help "Compile the program including the \
+current buffer.  Default: run ‘make’"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-insert-target-ref
+                           makefile-insert-target-ref
+                           :label "Insert target…"
+                           :enable (not buffer-read-only)
+                           :help "Complete on a list of known targets, \
+then insert TARGET-NAME at point"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-insert-macro-ref
+                           makefile-insert-macro-ref
+                           :label "Insert macro…"
+                           :enable (not buffer-read-only)
+                           :help "Complete on a list of known macros, \
+then insert complete ref at point"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-backslash-region
+                           makefile-backslash-region
+                           :label "\\ Region"
+                           :visible (use-region-p)
+                           :enable (not buffer-read-only)
+                           :help "Insert, align, or delete end-of-line \
+backslashes on the lines in the region"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-insert-gmake-function
+                           makefile-insert-gmake-function
+                           :label "Insert GNU make function…"
+                           :visible (derived-mode-p 'makefile-gmake-mode)
+                           :enable (not buffer-read-only)
+                           :help "Insert a GNU make function call"])
+
+      (easy-menu-add-item menu nil
+                          [casual-make-identify-autovar-region
+                           casual-make-identify-autovar-region
+                           :label "Identify Auto Var"
+                           :visible (use-region-p)
+                           :help "Identify GNU Make automatic variable in \
+region from START to END"])
+
+      (anju-context-menu-item-separator menu context-makefile--separator2)
+
+      (easy-menu-add-item menu nil
+                          [makefile-pickup-everything
+                           makefile-pickup-everything
+                           :label "Refresh targets and macros"
+                           :help "Notice names of all macros and \
+targets in Makefile"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-pickup-filenames-as-targets
+                           makefile-pickup-filenames-as-targets
+                           :label "Include file names as targets"
+                           :help "Scan the current directory for \
+filenames to use as targets"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-create-up-to-date-overview
+                           makefile-create-up-to-date-overview
+                           :label "Overview"
+                           :help "Create a buffer containing an overview of \
+the state of all known targets"])
+
+      (easy-menu-add-item menu nil anju-makefile-modes-menu)))
+  menu)
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: Utility and Setup Functions
 
 (defun anju-context-menu--insert-into-context-menu-functions (source target)
@@ -1498,6 +1645,7 @@ function into `context-menu-functions' over `add-hook'."
           (reverse '(anju-context-menu-dired
                      anju-context-menu-org-mode
                      anju-context-menu-info-mode
+                     anju-context-menu-make-mode
                      anju-context-menu-compile
                      anju-context-menu-elisp
                      anju-context-menu-edebug-eval
@@ -1531,6 +1679,7 @@ function into `context-menu-functions' over `add-hook'."
         (reverse '(anju-context-menu-dired
                    anju-context-menu-org-mode
                    anju-context-menu-info-mode
+                   anju-context-menu-make-mode
                    anju-context-menu-compile
                    anju-context-menu-elisp
                    anju-context-menu-edebug-eval

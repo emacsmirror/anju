@@ -1029,6 +1029,141 @@
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Makefile Mode
+
+(defun test--anju-makefile-modes-menu (kmap)
+  "Test KMAP for `anju-makefile-modes-menu'."
+
+  (anju-test-keymap
+   kmap
+   "Makefile Type"
+   6
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "automake"
+        #'makefile-automake-mode
+        "An adapted ‘makefile-mode’ that knows about automake")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "BSD"
+        #'makefile-bsdmake-mode
+        "An adapted ‘makefile-mode’ that knows about BSD make")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "GNU"
+        #'makefile-gmake-mode
+        "An adapted ‘makefile-mode’ that knows about gmake")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "imake"
+        #'makefile-imake-mode
+        "An adapted ‘makefile-mode’ that knows about imake")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "make"
+        #'makefile-mode
+        "Major mode for editing standard Makefiles")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "makepp"
+        #'makefile-makepp-mode
+        "An adapted ‘makefile-mode’ that knows about makepp")))))
+
+(ert-deftest test-anju-makefile-modes-menu ()
+  "Test for `anju-makefile-modes-menu'."
+  (test--anju-makefile-modes-menu anju-makefile-modes-menu))
+
+(ert-deftest test-anju-context-menu-make-mode ()
+  "Test for `anju-context-menu-make-mode'."
+  (anju-test-context-menu-function-with-filetype
+   ".mk"
+   #'anju-context-menu-make-mode
+   12
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Compile…"
+        #'compile
+        "Compile the program including the current buffer.  Default: run ‘make’")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert target…"
+        #'makefile-insert-target-ref
+        "Complete on a list of known targets, then insert TARGET-NAME at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert macro…"
+        #'makefile-insert-macro-ref
+        "Complete on a list of known macros, then insert complete ref at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "\\ Region"
+        #'makefile-backslash-region
+        "Insert, align, or delete end-of-line backslashes on the lines in the region")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert GNU make function…"
+        #'makefile-insert-gmake-function
+        "Insert a GNU make function call")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Identify Auto Var"
+        #'casual-make-identify-autovar-region
+        "Identify GNU Make automatic variable in region from START to END")
+
+       (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Refresh targets and macros"
+        #'makefile-pickup-everything
+        "Notice names of all macros and targets in Makefile")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Include file names as targets"
+        #'makefile-pickup-filenames-as-targets
+        "Scan the current directory for filenames to use as targets")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Overview"
+        #'makefile-create-up-to-date-overview
+        "Create a buffer containing an overview of the state of all known targets")
+
+       (let* ((makefile-modes-item (seq-elt items (cl-incf i)))
+              (kmap (seq-elt makefile-modes-item 3)))
+         (test--anju-makefile-modes-menu kmap))))
+
+   (lambda (filename description)
+     (makefile-gmake-mode)
+     (insert "# Hello
+.PHONY: tests
+tests:
+\t$(MAKE) -C $(SRC_DIR) $@\n")
+     (save-buffer)
+     (push-mark (point-min) t t)
+     (goto-char (point-max))
+     (activate-mark))))
+
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: Narrow/Widen
 
 (ert-deftest test-anju-context-menu-narrow-region ()
