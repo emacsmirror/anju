@@ -545,28 +545,25 @@ Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
     '(menu-item "--")
     'Macro\ Recorder)
 
-  ;; TODO: Consider having a variable to control this.
+  (easy-menu-add-item global-map '(menu-bar tools)
+                      [org-capture
+                       org-capture
+                       :label "Org Capture…"
+                       :help "Capture something"]
+                      'grep)
 
-  ;; (easy-menu-add-item global-map '(menu-bar tools)
-  ;;                       [org-capture
-  ;;                        org-capture
-  ;;                        :label "Org Capture…"
-  ;;                        :help "Capture something"]
-  ;;                       'grep)
+  (easy-menu-add-item global-map '(menu-bar tools)
+                      [org-agenda
+                       org-agenda
+                       :label "Org Agenda…"
+                       :help "Dispatch agenda commands to collect entries to \
+  the agenda buffer"]
+                      'grep)
 
-  ;;   (easy-menu-add-item global-map '(menu-bar tools)
-  ;;                       [org-agenda
-  ;;                        org-agenda
-  ;;                        :label "Org Agenda…"
-  ;;                        :help "Dispatch agenda commands to collect entries to \
-  ;; the agenda buffer"]
-  ;;                       'grep)
-
-  ;;   (keymap-set-after (lookup-key global-map [menu-bar tools])
-  ;;     "<separator-tools-org>"
-  ;;     '(menu-item "--")
-  ;;     #'org-agenda)
-  )
+  (keymap-set-after (lookup-key global-map [menu-bar tools])
+    "<separator-tools-org>"
+    '(menu-item "--")
+    #'org-agenda))
 
 (provide 'anju-main-menu)
 ;;; anju-main-menu.el ends here
