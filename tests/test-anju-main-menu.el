@@ -630,8 +630,18 @@ leaving just one")
 (ert-deftest test-anju-main-menu--reconfigure-tools ()
   (anju-main-menu--reconfigure-tools)
 
-  (let ((macro-menu (easy-menu-get-map global-map '(menu-bar tools Macro\ Recorder))))
-    (test--anju-kmacro-menu macro-menu)))
+  (let* ((tools (easy-menu-get-map global-map '(menu-bar tools)))
+         (macro-menu (easy-menu-get-map tools '(Macro\ Recorder)))
+         (macro-sep (easy-menu-get-map tools '(separator-tools-kmacro)))
+         (org-capture-item (easy-menu-get-map tools '(org-capture)))
+         (org-agenda-item (easy-menu-get-map tools '(org-agenda)))
+         (org-sep (easy-menu-get-map tools '(separator-tools-org))))
+
+    (test--anju-kmacro-menu macro-menu)
+    (should macro-sep)
+    (should org-capture-item)
+    (should org-agenda-item)
+    (should org-sep)))
 
 
 (provide 'test-anju-main-menu)
