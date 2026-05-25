@@ -605,6 +605,16 @@ Modes supported this way by Anju are:
 
 This modification is optional. For more detail, see [[#imenu-menu-customization][Imenu Menu Customization]].
 
+*** Tools Menu Features
+#+CINDEX: Tools Menu Features
+
+# TODO: Rewrite Tools Menu Features
+
+Anju makes the following modifications to the main menu bar *Tools* menu:
+
+- Adds the “Macro Recorder” sub-menu :: A menu of commands pertaining to keyboard macros ([[info:emacs#Keyboard Macros]]).
+
+
 ***  Help Menu Features
 #+CINDEX: Help Menu Features
 
@@ -1028,7 +1038,7 @@ Enabling ~anju-main-menu--reconfigure-help~ can be done using the checkbox inter
 
 The hook function ~anju-main-menu--reconfigure-imenu~ in ~anju-reconfigure-main-menu-hook~ adds the *Index* menu to the main menu bar.
 
-Enabling ~anju-main-menu--reconfigure-file~ can be done using the checkbox interface provided by ~customize-variable~ in modifying ~anju-reconfigure-main-menu-hook~.
+Enabling ~anju-main-menu--reconfigure-imenu~ can be done using the checkbox interface provided by ~customize-variable~ in modifying ~anju-reconfigure-main-menu-hook~.
 
 Anju's support for Imenu covers the following modes:
 
@@ -1038,6 +1048,20 @@ Anju's support for Imenu covers the following modes:
   - ~markdown-mode~
 
 For more info on Imenu see [[info:emacs#Imenu]].
+
+*** Tools Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: tools-menu-customization
+:END:
+#+CINDEX: Tools Menu Customization
+#+VINDEX: anju-main-menu--reconfigure-tools
+
+# TODO: Rewrite Tools Menu Customization
+
+The hook function ~anju-main-menu--reconfigure-tools~ in ~anju-reconfigure-main-menu-hook~ modifies the *Tools* menu in the main menu bar.
+
+Enabling ~anju-main-menu--reconfigure-tools~ can be done using the checkbox interface provided by ~customize-variable~ in modifying ~anju-reconfigure-main-menu-hook~.
+
 
 * Future Work
 #+CINDEX: Future Work
