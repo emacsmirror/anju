@@ -546,11 +546,20 @@ Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
     'Macro\ Recorder)
 
   (easy-menu-add-item global-map '(menu-bar tools)
+                      [org-store-link
+                       org-store-link
+                       :label "Org Store Link"
+                       :help "Store a link to the current location"]
+                      'grep)
+
+  (easy-menu-add-item global-map '(menu-bar tools)
                       [org-capture
                        org-capture
                        :label "Org Capture…"
                        :help "Capture something"]
                       'grep)
+
+
 
   (easy-menu-add-item global-map '(menu-bar tools)
                       [org-agenda

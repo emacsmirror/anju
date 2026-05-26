@@ -446,7 +446,8 @@ or items or text to headings"])
                                       :help "Convert headings or normal lines \
 to items, items to normal lines"])))
 
-      (when (use-region-p)
+      (when (or (use-region-p)
+                (eq (org-element-type (org-element-context)) 'link))
         (easy-menu-add-item menu nil
                             [org-insert-link
                              org-insert-link
