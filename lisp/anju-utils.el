@@ -168,6 +168,7 @@ initialized with the following functions:
 - `anju-main-menu--reconfigure-options'
 - `anju-main-menu--reconfigure-bookmarks'
 - `anju-main-menu--reconfigure-text-mode'
+- `anju-main-menu--reconfigure-tools'
 - `anju-main-menu--reconfigure-help'
 - `anju-main-menu--reconfigure-imenu'"
   :type 'hook
