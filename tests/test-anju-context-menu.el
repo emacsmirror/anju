@@ -56,32 +56,91 @@
 ;; -------------------------------------------------------------------
 ;; Context Menu: Region Extension
 
+(defun test--anju-context-menu-org-copy-as-menu (kmap)
+  "Test KMAP for `anju-context-menu-org-copy-as-menu'."
+
+  (anju-test-keymap
+   kmap
+   "Copy as…"
+   7
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "GFM"
+        #'anju-org-copy-region-as-gfm
+        "Copy region as GitHub Flavored Markdown to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Markdown"
+        #'anju-org-copy-region-as-markdown
+        "Copy region as Markdown to clipboard")
+
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "LaTeX"
+        #'anju-org-copy-region-as-latex
+        "Copy region as LaTeX to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "HTML"
+        #'anju-org-copy-region-as-html
+        "Copy region as HTML to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "ASCII"
+        #'anju-org-copy-region-as-ascii
+        "Copy region as ASCII to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Slack"
+        #'org-slack-export-to-clipboard-as-slack
+        "Copy as Slack to clipboard")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "RTF"
+        #'anju-org-copy-region-as-rtf
+        "Copy as RTF to clipboard")))))
+
+(ert-deftest test-anju-context-menu-org-copy-as-menu ()
+  "Test for `anju-context-menu-org-copy-as-menu'."
+  (test--anju-context-menu-org-copy-as-menu anju-context-menu-org-copy-as-menu))
+
+
 (ert-deftest test-anju-context-menu-region-extension ()
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-region-extension
-   3
+   4
    (lambda (items)
-     (let ((item0 (seq-elt items 0))
-           (item1 (seq-elt items 1))
-           (item2 (seq-elt items 2)))
+     (let ((i 0))
        (anju-test-menu-item
-        item0
+        (seq-elt items i)
         "Paste Last Org Link"
         #'org-insert-last-stored-link
         "Insert the last link stored in org-stored-links")
 
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         "Paste Markdown as Org"
         #'anju-yank-markdown-as-org
         "Convert clipboard (latest yank) of Markdown text to Org, then paste")
 
        (anju-test-menu-item
-        item2
+        (seq-elt items (cl-incf i))
         "Paste Media"
         #'yank-media
-        "Paste (yank) media")))))
+        "Paste (yank) media")
+
+       (let* ((copy-as-item (seq-elt items (cl-incf i)))
+              (copy-as-kmap (seq-elt copy-as-item 3)))
+         (test--anju-context-menu-org-copy-as-menu copy-as-kmap))))))
 
 (ert-deftest test-anju-filename-from-path ()
   "Test for `anju-filename-from-path'."
@@ -611,11 +670,7 @@
          "Resume code stepping")))
 
    (lambda (filename description)
-     (edebug-eval-mode)))
-
-
-
-)
+     (edebug-eval-mode))))
 
 
 
@@ -627,10 +682,23 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   7
+   10
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "TODO…"
+        #'org-todo
+        "Change the TODO state of an item")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Body"
+        #'org-toggle-heading
+        "Convert headings to normal text, or items or text to headings")
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
         "Clock In"
@@ -642,6 +710,12 @@
         "Clock Out"
         #'org-clock-out
         "Clock out")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-sort-entries
+        "Sort entries on a certain level of an outline tree")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -672,15 +746,71 @@
      (save-buffer))))
 
 
+(ert-deftest test-anju-context-menu-org-link ()
+  "Test for `anju-context-menu-org-mode' when point is on selected word."
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-org-mode
+   4
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Heading"
+        #'org-toggle-heading
+        "Convert headings to normal text, or items or text to headings")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Item"
+        #'org-toggle-item
+        "Convert headings or normal lines to items, items to normal lines")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Link…"
+        #'org-insert-link
+        "Insert a link.  At the prompt, enter the link")))
+   (lambda (filename description)
+     (insert "* Hi There\nImma going fishing.\n")
+     (save-buffer)
+     (push-mark (point-min) t t)
+     (goto-char (point-max))
+     (activate-mark))))
+
+
 (ert-deftest test-anju-context-menu-org-mode-list-item ()
   "Test for `anju-context-menu-org-mode' when point is in list item."
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   6
+   8
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Cycle Bullet"
+        #'org-cycle-list-bullet
+        "Cycle through the different itemize/enumerate bullets")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-sort-list
+        "Sort list items")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (if (org-at-item-checkbox-p)
+                  "Change to Item"
+                "Change to Checkbox"))
+        #'casual-org-toggle-list-to-checkbox
+        "Toggle Item/Checkbox")
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
         "Demote →"
@@ -703,15 +833,7 @@
         (seq-elt items (cl-incf i))
         "Promote Subtree ←"
         #'org-outdent-item-tree
-        "Promote item subtree")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        (lambda () (if (org-at-item-checkbox-p)
-                  "To Item"
-                "To Checkbox"))
-        #'casual-org-toggle-list-to-checkbox
-        "Toggle Item/Checkbox")))
+        "Promote item subtree")))
    (lambda (filename description)
      (insert "- item 1")
      (goto-char (point-min))
@@ -722,10 +844,36 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   7
+   9
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "In-Progress [-]"
+        #'casual-org-checkbox-in-progress
+        "Change checkbox state to in-progress [-]")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Cycle Bullet"
+        #'org-cycle-list-bullet
+        "Cycle through the different itemize/enumerate bullets")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-sort-list
+        "Sort list items")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (if (org-at-item-checkbox-p)
+                  "Change to Item"
+                "Change to Checkbox"))
+        #'casual-org-toggle-list-to-checkbox
+        "Toggle Item/Checkbox")
+
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
         "Demote →"
@@ -748,21 +896,7 @@
         (seq-elt items (cl-incf i))
         "Promote Subtree ←"
         #'org-outdent-item-tree
-        "Promote item subtree")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        "In-Progress"
-        #'casual-org-checkbox-in-progress
-        "Change checkbox state to in-progress [-]")
-
-       (anju-test-menu-item
-        (seq-elt items (cl-incf i))
-        (lambda () (if (org-at-item-checkbox-p)
-                  "To Item"
-                "To Checkbox"))
-        #'casual-org-toggle-list-to-checkbox
-        "Toggle Item/Checkbox")))
+        "Promote item subtree")))
    (lambda (filename description)
      (insert "- [ ] item 1")
      (goto-char (point-min))
@@ -774,46 +908,48 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   7
+   8
    (lambda (items)
-     (let* ((item0 (seq-elt items 0))
-            (item1 (seq-elt items 1))
-            (item2 (seq-elt items 2))   ; anju-org-table-region-menu
-            (item3 (seq-elt items 3))
-            (item4 (seq-elt items 4))
-            (item5 (seq-elt items 5))
-            (item6 (seq-elt items 6)))
+     (let* ((i 0))
 
-       (anju-test-menu-item item0 "--")
+       (anju-test-menu-item (seq-elt items i) "--")
 
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         (lambda () (casual-org-table--reference-dwim))
         #'casual-org-table-copy-reference-dwim
         "Copy Org table reference (field or range) into kill ring via mouse")
 
-       ;;  bypass testing item2
+       (let* ((table-region-item (seq-elt items (cl-incf i)))
+              (kmap (seq-elt table-region-item 3)))
+         (test--anju-org-table-region-menu kmap))
 
        (anju-test-menu-item
-        item3
+        (seq-elt items (cl-incf i))
+        "Sort…"
+        #'org-table-sort-lines
+        "Sort table lines according to the column at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
         "Show Coordinates"
         #'org-table-toggle-coordinate-overlays
         "Toggle the display of row/column numbers in tables")
 
        (anju-test-menu-item
-        item4
+        (seq-elt items (cl-incf i))
         "Recalculate"
         #'anju-org-table-recalculate
         "Recalculate table")
 
        (anju-test-menu-item
-        item5
+        (seq-elt items (cl-incf i))
         "Edit Table Formulas"
         #'org-table-edit-formulas
         "Edit the formulas of the current table in a separate buffer")
 
        (anju-test-menu-item
-        item6
+        (seq-elt items (cl-incf i))
         "Run gnuplot"
         #'org-plot/gnuplot
         "Plot table using gnuplot")))
@@ -823,11 +959,10 @@
      (goto-char 1)
      (save-buffer))))
 
-(ert-deftest test-anju-org-table-region-menu ()
-  "Test `anju-org-table-region-menu'."
-
+(defun test--anju-org-table-region-menu (kmap)
+  "Test KMAP for `anju-org-table-region-menu'."
   (anju-test-keymap
-   anju-org-table-region-menu
+   kmap
    "Org Table Region"
    3
    (lambda (items)
@@ -849,6 +984,10 @@
                             "Paste"
                             #'org-table-paste-rectangle
                             "Paste Org table region")))))
+
+(ert-deftest test-anju-org-table-region-menu ()
+  "Test `anju-org-table-region-menu'."
+  (test--anju-org-table-region-menu anju-org-table-region-menu))
 
 
 ;; -------------------------------------------------------------------
@@ -887,6 +1026,141 @@
         "≣ List All Buffers"
         #'ibuffer
         "List all buffers")))))
+
+
+;; -------------------------------------------------------------------
+;; Context Menu: Makefile Mode
+
+(defun test--anju-makefile-modes-menu (kmap)
+  "Test KMAP for `anju-makefile-modes-menu'."
+
+  (anju-test-keymap
+   kmap
+   "Makefile Type"
+   6
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "automake"
+        #'makefile-automake-mode
+        "An adapted ‘makefile-mode’ that knows about automake")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "BSD"
+        #'makefile-bsdmake-mode
+        "An adapted ‘makefile-mode’ that knows about BSD make")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "GNU"
+        #'makefile-gmake-mode
+        "An adapted ‘makefile-mode’ that knows about gmake")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "imake"
+        #'makefile-imake-mode
+        "An adapted ‘makefile-mode’ that knows about imake")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "make"
+        #'makefile-mode
+        "Major mode for editing standard Makefiles")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "makepp"
+        #'makefile-makepp-mode
+        "An adapted ‘makefile-mode’ that knows about makepp")))))
+
+(ert-deftest test-anju-makefile-modes-menu ()
+  "Test for `anju-makefile-modes-menu'."
+  (test--anju-makefile-modes-menu anju-makefile-modes-menu))
+
+(ert-deftest test-anju-context-menu-make-mode ()
+  "Test for `anju-context-menu-make-mode'."
+  (anju-test-context-menu-function-with-filetype
+   ".mk"
+   #'anju-context-menu-make-mode
+   12
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Compile…"
+        #'compile
+        "Compile the program including the current buffer.  Default: run ‘make’")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert target…"
+        #'makefile-insert-target-ref
+        "Complete on a list of known targets, then insert TARGET-NAME at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert macro…"
+        #'makefile-insert-macro-ref
+        "Complete on a list of known macros, then insert complete ref at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "\\ Region"
+        #'makefile-backslash-region
+        "Insert, align, or delete end-of-line backslashes on the lines in the region")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert GNU make function…"
+        #'makefile-insert-gmake-function
+        "Insert a GNU make function call")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Identify Auto Var"
+        #'casual-make-identify-autovar-region
+        "Identify GNU Make automatic variable in region from START to END")
+
+       (anju-test-menu-item (seq-elt items (cl-incf i)) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Refresh targets and macros"
+        #'makefile-pickup-everything
+        "Notice names of all macros and targets in Makefile")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Include file names as targets"
+        #'makefile-pickup-filenames-as-targets
+        "Scan the current directory for filenames to use as targets")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Overview"
+        #'makefile-create-up-to-date-overview
+        "Create a buffer containing an overview of the state of all known targets")
+
+       (let* ((makefile-modes-item (seq-elt items (cl-incf i)))
+              (kmap (seq-elt makefile-modes-item 3)))
+         (test--anju-makefile-modes-menu kmap))))
+
+   (lambda (filename description)
+     (makefile-gmake-mode)
+     (insert "# Hello
+.PHONY: tests
+tests:
+\t$(MAKE) -C $(SRC_DIR) $@\n")
+     (save-buffer)
+     (push-mark (point-min) t t)
+     (goto-char (point-max))
+     (activate-mark))))
+
 
 
 ;; -------------------------------------------------------------------
@@ -1037,6 +1311,73 @@
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Info Mode
+
+
+(ert-deftest test-anju-context-menu-info-mode ()
+  "Test for `anju-context-menu-info-mode'."
+
+  (info "(emacs)Top")
+  (anju-test-context-menu-function
+   #'anju-context-menu-info-mode
+   "hi there"
+   9
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Top"
+        #'Info-top-node
+        "Go to the Top node of this file")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Table of Contents"
+        #'Info-toc
+        "Go to a node with table of contents of the current Info file")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "↑ Node"
+        #'Info-up
+        "Go to the superior node of this node")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "← Node"
+        #'Info-backward-node
+        "Go backward one node, considering all nodes as forming one sequence")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "→ Node"
+        #'Info-forward-node
+        "Go forward one node, considering all nodes as forming one sequence")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Apropos…"
+        #'info-apropos
+        "Search indices of all known Info files on your system for STRING")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Copy node name"
+        #'Info-copy-current-node-name
+        "Put the name of the current Info node into the kill ring")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Open node in web"
+        #'anju-info-goto-node-web
+        "Open node in web browser"))))
+  (kill-buffer))
+
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: VC/Magit
 
 (ert-deftest test-anju-context-menu-vc-file ()
@@ -1101,34 +1442,40 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-region
-   6
+   8
    (lambda (items)
-     (let* ((item0 (seq-elt items 0))
-            (item1 (seq-elt items 1))
-            (item2 (seq-elt items 2))
-            (item3 (seq-elt items 3))
-            (item4 (seq-elt items 4))
-            (item5 (seq-elt items 5)))
-
-       (anju-test-menu-item item0 "--")
+     (let* ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         (lambda () (anju-menu-label "Occur"))
         #'anju-occur-selected-region
         "Show all lines in the current buffer \
 containing a match for selected word")
 
-       (should (string-equal (seq-elt item2 2) "Style"))
-       (should (string-equal (seq-elt item3 2) "Transform Text"))
+       (should (string-equal (seq-elt (seq-elt items (cl-incf i)) 2) "Style"))
+       (should (string-equal (seq-elt (seq-elt items (cl-incf i)) 2) "Transform Text"))
 
        (anju-test-menu-item
-        item4
+        (seq-elt items (cl-incf i))
+        "Query Replace…"
+        #'query-replace
+        "Replace some occurrences of FROM-STRING with TO-STRING")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Query Replace Regexp…"
+        #'query-replace-regexp
+        "Replace some things after point matching REGEXP with TO-STRING")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
         "Toggle Comment"
         #'comment-dwim
         "Toggle comment on selected region")
 
        (anju-test-menu-item
-        item5
+        (seq-elt items (cl-incf i))
         "Write Region…"
         #'write-region
         "Write current region into specified file")))
@@ -1169,6 +1516,44 @@ containing a match for selected word")
         "Toggle making all invisible text \
 temporarily visible (Visible mode)"
         )))))
+
+
+;; -------------------------------------------------------------------
+;; Context Menu: Compilation Mode
+
+(ert-deftest test-anju-context-menu-compile ()
+  "Test for `anju-context-menu-compile'."
+
+  (with-temp-buffer
+    (compilation-mode)
+    (anju-test-context-menu-function
+     #'anju-context-menu-compile
+     "Hello there"
+     4
+     (lambda (items)
+       (let* ((i 0))
+         (anju-test-menu-item (seq-elt items i) "--")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          (lambda () (casual-compile--select-mode-label
+                                   "Recompile"
+                                   "Refresh"))
+          #'recompile
+          "Re-compile the program including the current buffer")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Compile…"
+          #'compile
+          "Compile the program including the current buffer.  Default: \
+run ‘make’")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          (lambda () (casual-compile-unicode-get :kill))
+          #'kill-compilation
+          "Kill the current compilation or grep process"))))))
 
 
 ;; -------------------------------------------------------------------

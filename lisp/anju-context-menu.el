@@ -32,12 +32,16 @@
 (require 'elisp-mode)
 (require 'hideshow)
 (require 'edebug)
+(require 'info)
+(require 'make-mode)
 (require 'yank-media)
 (require 'anju-utils)
 (require 'anju-style-text)
 (require 'casual-dired)
 (require 'casual-org)
 (require 'casual-ediff)
+(require 'casual-compile)
+(require 'casual-make)
 
 
 ;; -------------------------------------------------------------------
@@ -239,18 +243,21 @@ Return t if populated, nil otherwise."
 (easy-menu-define anju-org-table-region-menu nil
   "Key map for Org table region sub-menu."
   '("Org Table Region"
-    ["Cut"
+    [org-table-cut-region
      org-table-cut-region
+     :label "Cut"
      :enable (and (bound-and-true-p rectangle-mark-mode) (use-region-p))
      :help "Cut Org table region"]
 
-    ["Copy"
+    [org-table-copy-region
      org-table-copy-region
+     :label "Copy"
      :enable (and (bound-and-true-p rectangle-mark-mode) (use-region-p))
      :help "Copy Org table region"]
 
-    ["Paste"
+    [org-table-paste-rectangle
      org-table-paste-rectangle
+     :label "Paste"
      :help "Paste Org table region"]))
 
 (defun anju-org-table-recalculate ()
@@ -270,7 +277,20 @@ This function is intended to be hooked into `context-menu-functions'."
     (save-excursion
       (mouse-set-point click)
       (anju-context-menu-item-separator menu org-separator)
-      (when (and (org-at-heading-p) (not (anju-rectangle-selected-p)))
+
+      (cond
+       ((and (org-at-heading-p) (not (anju-rectangle-selected-p)))
+        (easy-menu-add-item menu nil
+                            [org-todo
+                             org-todo
+                             :label "TODO…"
+                             :help "Change the TODO state of an item"])
+
+        (easy-menu-add-item menu nil
+                            [org-toggle-heading
+                             org-toggle-heading
+                             :label "Change to Body"
+                             :help "Convert headings to normal text, or items or text to headings"])
 
         (easy-menu-add-item menu nil
                             [org-clock-in
@@ -285,6 +305,13 @@ This function is intended to be hooked into `context-menu-functions'."
                              :label "Clock Out"
                              :visible (org-clocking-p)
                              :help "Clock out"])
+
+        (easy-menu-add-item menu nil
+                            [org-sort-entries
+                             org-sort-entries
+                             :label "Sort…"
+                             :help "Sort entries on a certain level of an \
+outline tree"])
 
         (easy-menu-add-item menu nil
                             [org-do-demote
@@ -310,7 +337,36 @@ This function is intended to be hooked into `context-menu-functions'."
                              :label "Promote Subtree ←"
                              :help "Promote heading subtree"]))
 
-      (when (and (org-at-item-p) (not (anju-rectangle-selected-p)))
+
+       ((and (org-at-item-p) (not (anju-rectangle-selected-p)))
+
+        (if (org-at-item-checkbox-p)
+            (easy-menu-add-item menu nil
+                                [casual-org-checkbox-in-progress
+                                 casual-org-checkbox-in-progress
+                                 :label "In-Progress [-]"
+                                 :help "Change checkbox state to in-progress [-]"]))
+
+        (easy-menu-add-item menu nil
+                            [org-cycle-list-bullet
+                             org-cycle-list-bullet
+                             :label "Cycle Bullet"
+                             :help "Cycle through the different itemize/enumerate bullets"])
+
+        (easy-menu-add-item menu nil
+                            [org-sort-list
+                             org-sort-list
+                             :label "Sort…"
+                             :help "Sort list items"])
+
+        (easy-menu-add-item menu nil
+                            [casual-org-toggle-list-to-checkbox
+                             casual-org-toggle-list-to-checkbox
+                             :label (if (org-at-item-checkbox-p)
+                                        "Change to Item"
+                                      "Change to Checkbox")
+                             :help "Toggle Item/Checkbox"])
+
         (easy-menu-add-item menu nil
                             [org-indent-item
                              org-indent-item
@@ -333,24 +389,9 @@ This function is intended to be hooked into `context-menu-functions'."
                             [org-outdent-item-tree
                              org-outdent-item-tree
                              :label "Promote Subtree ←"
-                             :help "Promote item subtree"])
+                             :help "Promote item subtree"]))
 
-        (if (org-at-item-checkbox-p)
-            (easy-menu-add-item menu nil
-                                [casual-org-checkbox-in-progress
-                                 casual-org-checkbox-in-progress
-                                 :label "In-Progress"
-                                 :help "Change checkbox state to in-progress [-]"]))
-
-        (easy-menu-add-item menu nil
-                            [casual-org-toggle-list-to-checkbox
-                             casual-org-toggle-list-to-checkbox
-                             :label (if (org-at-item-checkbox-p)
-                                        "To Item"
-                                      "To Checkbox")
-                             :help "Toggle Item/Checkbox"]))
-
-      (when (anju-at-org-table-p)
+       ((anju-at-org-table-p)
         (easy-menu-add-item menu nil
                             [casual-org-table-copy-reference-dwim
                              casual-org-table-copy-reference-dwim
@@ -358,6 +399,12 @@ This function is intended to be hooked into `context-menu-functions'."
                              :help "Copy Org table reference (field or range) into kill ring via mouse"])
 
         (easy-menu-add-item menu nil anju-org-table-region-menu)
+
+        (easy-menu-add-item menu nil
+                            [org-table-sort-lines
+                             org-table-sort-lines
+                             :label "Sort…"
+                             :help "Sort table lines according to the column at point"])
 
         (easy-menu-add-item menu nil
                             [org-table-toggle-coordinate-overlays
@@ -383,7 +430,98 @@ This function is intended to be hooked into `context-menu-functions'."
         (easy-menu-add-item menu nil [org-plot/gnuplot
                                       org-plot/gnuplot
                                       :label "Run gnuplot"
-                                      :help "Plot table using gnuplot"]))))
+                                      :help "Plot table using gnuplot"]))
+
+       ;; so far nothing global
+       (t
+        (easy-menu-add-item menu nil [org-toggle-heading
+                                      org-toggle-heading
+                                      :label "Change to Heading"
+                                      :help "Convert headings to normal text, \
+or items or text to headings"])
+
+        (easy-menu-add-item menu nil [org-toggle-item
+                                      org-toggle-item
+                                      :label "Change to Item"
+                                      :help "Convert headings or normal lines \
+to items, items to normal lines"])))
+
+      (when (or (use-region-p)
+                (eq (org-element-type (org-element-context)) 'link))
+        (easy-menu-add-item menu nil
+                            [org-insert-link
+                             org-insert-link
+                             :label "Link…"
+                             :help "Insert a link.  At the prompt, enter the link"]))))
+  menu)
+
+
+;; -------------------------------------------------------------------
+;; Context Menu: Info Mode
+
+
+(defun anju-info-goto-node-web ()
+  "Open node in web browser."
+  (interactive)
+  (Info-goto-node-web (Info-copy-current-node-name)))
+
+(defun anju-context-menu-info-mode (menu click)
+  "Context menu hook function for Info mode commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+  (when (derived-mode-p 'Info-mode)
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu info-mode-separator)
+
+      (easy-menu-add-item menu nil [Info-top-node
+                                    Info-top-node
+                                    :label "Top"
+                                    :help "Go to the Top node of this file"])
+
+      (easy-menu-add-item menu nil [Info-toc
+                                    Info-toc
+                                    :label "Table of Contents"
+                                    :help "Go to a node with table of contents \
+of the current Info file"])
+
+      (easy-menu-add-item menu nil [Info-up
+                                    Info-up
+                                    :label "↑ Node"
+                                    :help "Go to the superior node of this \
+node"])
+
+      (easy-menu-add-item menu nil [Info-backward-node
+                                    Info-backward-node
+                                    :label "← Node"
+                                    :help "Go backward one node, considering \
+all nodes as forming one sequence"])
+
+      (easy-menu-add-item menu nil [Info-forward-node
+                                    Info-forward-node
+                                    :label "→ Node"
+                                    :help "Go forward one node, considering \
+all nodes as forming one sequence"])
+
+      (easy-menu-add-item menu nil [info-apropos
+                                    info-apropos
+                                    :label "Apropos…"
+                                    :help "Search indices of all known Info \
+files on your system for STRING"])
+
+      (easy-menu-add-item menu nil [Info-copy-current-node-name
+                                    Info-copy-current-node-name
+                                    :label "Copy node name"
+                                    :help "Put the name of the current Info \
+node into the kill ring"])
+
+      (easy-menu-add-item menu nil [anju-info-goto-node-web
+                                    anju-info-goto-node-web
+                                    :label "Open node in web"
+                                    :help "Open node in web browser"])))
   menu)
 
 
@@ -913,6 +1051,7 @@ This function is intended to be hooked into `context-menu-functions'."
       (easy-menu-add-item menu nil
                           [anju-occur-selected-region anju-occur-selected-region
                            :label (anju-menu-label "Occur")
+                           :visible (eq (count-lines (region-beginning) (region-end)) 1)
                            :help "Show all lines in the current buffer \
 containing a match for selected word"])
 
@@ -920,7 +1059,20 @@ containing a match for selected word"])
               (derived-mode-p 'markdown-mode))
           (easy-menu-add-item menu nil anju-style-menu))
 
-      (easy-menu-add-item menu nil anju-transform-text-menu)
+      (if (not buffer-read-only)
+          (easy-menu-add-item menu nil anju-transform-text-menu))
+
+      (easy-menu-add-item menu nil
+                          [query-replace query-replace
+                           :label "Query Replace…"
+                           :visible (not buffer-read-only)
+                           :help "Replace some occurrences of FROM-STRING with TO-STRING"])
+
+      (easy-menu-add-item menu nil
+                          [query-replace-regexp query-replace-regexp
+                           :label "Query Replace Regexp…"
+                           :visible (not buffer-read-only)
+                           :help "Replace some things after point matching REGEXP with TO-STRING"])
 
       (if (or (derived-mode-p 'prog-mode) (derived-mode-p 'org-mode))
           (easy-menu-add-item menu nil
@@ -969,6 +1121,105 @@ and convert it to Org using the pandoc utility."
       (kill-region (point-min) (point-max)))
     (yank)))
 
+
+(defun anju-org-copy-region-as (backend)
+  "Copy the BACKEND exported Org region to the system clipboard.
+
+Code derived from Marcin Borkowski post at
+URL `https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard'"
+  (interactive)
+  (if (use-region-p)
+      (let* ((region
+              (buffer-substring-no-properties
+               (region-beginning)
+               (region-end)))
+             (clipping
+              (org-export-string-as region backend t '(:with-toc nil))))
+        (gui-set-selection 'CLIPBOARD clipping))))
+
+(defun anju-org-copy-region-as-markdown ()
+  "Copy the Markdown exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'md)))
+
+(defun anju-org-copy-region-as-gfm ()
+  "Copy the GitHub Markdown exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'gfm)))
+
+(defun anju-org-copy-region-as-latex ()
+  "Copy the LaTeX exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'latex)))
+
+(defun anju-org-copy-region-as-ascii ()
+  "Copy the ASCII exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'ascii)))
+
+(defun anju-org-copy-region-as-html ()
+  "Copy the HTML exported Org region to the system clipboard."
+  (interactive)
+  (if (use-region-p)
+      (anju-org-copy-region-as 'html)))
+
+(defun anju-org-copy-region-as-rtf ()
+  "Export region to RTF and copy it to the clipboard.
+
+Code from Daniel Martin
+URL `https://gist.github.com/danielmartin/3c5d3a3a8cd24a3556379c5251651748'."
+  (interactive)
+  (save-window-excursion
+    (let* ((buf (org-export-to-buffer 'html "*Formatted Copy*" nil nil t t))
+           (html (with-current-buffer buf (buffer-string))))
+      (ignore html)
+      (with-current-buffer buf
+        (shell-command-on-region
+         (point-min)
+         (point-max)
+         "textutil -stdin -format html -convert rtf -stdout | pbcopy"))
+      (kill-buffer buf))))
+
+(easy-menu-define anju-context-menu-org-copy-as-menu nil
+  "Key map for Org copy sub-menu."
+  '("Copy as…"
+    :visible (and (derived-mode-p 'org-mode) (use-region-p))
+
+    ["GFM"
+     anju-org-copy-region-as-gfm
+     :visible (package-installed-p 'ox-gfm)
+     :help "Copy region as GitHub Flavored Markdown to clipboard"]
+
+    ["Markdown"
+     anju-org-copy-region-as-markdown
+     :help "Copy region as Markdown to clipboard"]
+
+    ["LaTeX"
+     anju-org-copy-region-as-latex
+     :help "Copy region as LaTeX to clipboard"]
+
+    ["HTML"
+     anju-org-copy-region-as-html
+     :help "Copy region as HTML to clipboard"]
+
+    ["ASCII"
+     anju-org-copy-region-as-ascii
+     :help "Copy region as ASCII to clipboard"]
+
+    ["Slack"
+     org-slack-export-to-clipboard-as-slack
+     :visible (package-installed-p 'ox-slack)
+     :help "Copy as Slack to clipboard"]
+
+    ["RTF"
+     anju-org-copy-region-as-rtf
+     :visible (eq system-type 'darwin)
+     :help "Copy as RTF to clipboard"]))
+
 (defun anju-context-menu-region-extension (menu click)
   "Region menu using MENU and CLICK."
 
@@ -999,8 +1250,58 @@ and convert it to Org using the pandoc utility."
                                          (display-graphic-p)
                                          (anju-yank-media-p))
                            :help "Paste (yank) media"]
-                          "Clear")))
+                          "Clear")
+
+      (easy-menu-add-item menu nil
+                          anju-context-menu-org-copy-as-menu
+                          "Paste")))
   menu)
+
+
+
+;; -------------------------------------------------------------------
+;; Context Menu: Compilation Mode
+
+(defun anju-context-menu-compile (menu click)
+  "Context menu hook function for compile commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (derived-mode-p 'compilation-mode)
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu compile-separator)
+
+      (easy-menu-add-item menu nil
+                          [recompile
+                           recompile
+                           :label (casual-compile--select-mode-label
+                                   "Recompile"
+                                   "Refresh")
+                           :enable (not (casual-compile--compilation-running-p))
+                           :help "Re-compile the program including the \
+current buffer"])
+
+      (easy-menu-add-item menu nil
+                          [compile
+                           compile
+                           :label "Compile…"
+                           :visible (not (derived-mode-p 'grep-mode))
+                           :enable (not (casual-compile--compilation-running-p))
+                           :help "Compile the program including the current \
+buffer.  Default: run ‘make’"])
+
+      (easy-menu-add-item menu nil
+                          [kill-compilation
+                           kill-compilation
+                           :label (casual-compile-unicode-get :kill)
+                           :visible (casual-compile--compilation-running-p)
+                           :help "Kill the current compilation or grep process"])))
+  menu)
+
 
 
 
@@ -1170,6 +1471,151 @@ This function is intended to be hooked into `context-menu-functions'."
 
 
 ;; -------------------------------------------------------------------
+;; Context Menu: Makefile Mode
+
+(easy-menu-define anju-makefile-modes-menu nil
+  "Keymap for mouse window management menu."
+  '("Makefile Type"
+    :label (format
+            "Makefile Type (%s)"
+                   (casual-make-mode-label major-mode))
+    [makefile-automake-mode
+     makefile-automake-mode
+     :label "automake"
+     :style radio
+     :selected (derived-mode-p 'makefile-automake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about automake"]
+
+    [makefile-bsdmake-mode
+     makefile-bsdmake-mode
+     :label "BSD"
+     :style radio
+     :selected (derived-mode-p 'makefile-bsdmake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about BSD make"]
+
+    [makefile-gmake-mode
+     makefile-gmake-mode
+     :label "GNU"
+     :style radio
+     :selected (derived-mode-p 'makefile-gmake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about gmake"]
+
+    [makefile-imake-mode
+     makefile-imake-mode
+     :label "imake"
+     :style radio
+     :selected (derived-mode-p 'makefile-imake-mode)
+     :help "An adapted ‘makefile-mode’ that knows about imake"]
+
+    [makefile-mode
+     makefile-mode
+     :label "make"
+     :style radio
+     :selected (and (derived-mode-p 'makefile-mode)
+                    (not (or (derived-mode-p 'makefile-automake-mode)
+                             (derived-mode-p 'makefile-bsdmake-mode)
+                             (derived-mode-p 'makefile-gmake-mode)
+                             (derived-mode-p 'makefile-imake-mode)
+                             (derived-mode-p 'makefile-makepp-mode))))
+     :help "Major mode for editing standard Makefiles"]
+
+    [makefile-makepp-mode
+     makefile-makepp-mode
+     :label "makepp"
+     :style radio
+     :selected (derived-mode-p 'makefile-makepp-mode)
+     :help "An adapted ‘makefile-mode’ that knows about makepp"]))
+
+
+(defun anju-context-menu-make-mode (menu click)
+  "Context menu hook function for `makefile-mode' commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (derived-mode-p 'makefile-mode)
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu context-makefile--separator1)
+
+      (easy-menu-add-item menu nil
+                          [compile
+                           compile
+                           :label "Compile…"
+                           :help "Compile the program including the \
+current buffer.  Default: run ‘make’"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-insert-target-ref
+                           makefile-insert-target-ref
+                           :label "Insert target…"
+                           :enable (not buffer-read-only)
+                           :help "Complete on a list of known targets, \
+then insert TARGET-NAME at point"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-insert-macro-ref
+                           makefile-insert-macro-ref
+                           :label "Insert macro…"
+                           :enable (not buffer-read-only)
+                           :help "Complete on a list of known macros, \
+then insert complete ref at point"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-backslash-region
+                           makefile-backslash-region
+                           :label "\\ Region"
+                           :visible (use-region-p)
+                           :enable (not buffer-read-only)
+                           :help "Insert, align, or delete end-of-line \
+backslashes on the lines in the region"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-insert-gmake-function
+                           makefile-insert-gmake-function
+                           :label "Insert GNU make function…"
+                           :visible (derived-mode-p 'makefile-gmake-mode)
+                           :enable (not buffer-read-only)
+                           :help "Insert a GNU make function call"])
+
+      (easy-menu-add-item menu nil
+                          [casual-make-identify-autovar-region
+                           casual-make-identify-autovar-region
+                           :label "Identify Auto Var"
+                           :visible (use-region-p)
+                           :help "Identify GNU Make automatic variable in \
+region from START to END"])
+
+      (anju-context-menu-item-separator menu context-makefile--separator2)
+
+      (easy-menu-add-item menu nil
+                          [makefile-pickup-everything
+                           makefile-pickup-everything
+                           :label "Refresh targets and macros"
+                           :help "Notice names of all macros and \
+targets in Makefile"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-pickup-filenames-as-targets
+                           makefile-pickup-filenames-as-targets
+                           :label "Include file names as targets"
+                           :help "Scan the current directory for \
+filenames to use as targets"])
+
+      (easy-menu-add-item menu nil
+                          [makefile-create-up-to-date-overview
+                           makefile-create-up-to-date-overview
+                           :label "Overview"
+                           :help "Create a buffer containing an overview of \
+the state of all known targets"])
+
+      (easy-menu-add-item menu nil anju-makefile-modes-menu)))
+  menu)
+
+
+;; -------------------------------------------------------------------
 ;; Context Menu: Utility and Setup Functions
 
 (defun anju-context-menu--insert-into-context-menu-functions (source target)
@@ -1199,6 +1645,9 @@ function into `context-menu-functions' over `add-hook'."
                 (add-hook 'context-menu-functions fn)))
           (reverse '(anju-context-menu-dired
                      anju-context-menu-org-mode
+                     anju-context-menu-info-mode
+                     anju-context-menu-make-mode
+                     anju-context-menu-compile
                      anju-context-menu-elisp
                      anju-context-menu-edebug-eval
                      anju-context-menu-scratch
@@ -1230,6 +1679,9 @@ function into `context-menu-functions' over `add-hook'."
           (anju-context-menu--remove-from-context-menu-functions fn))
         (reverse '(anju-context-menu-dired
                    anju-context-menu-org-mode
+                   anju-context-menu-info-mode
+                   anju-context-menu-make-mode
+                   anju-context-menu-compile
                    anju-context-menu-elisp
                    anju-context-menu-edebug-eval
                    anju-context-menu-scratch

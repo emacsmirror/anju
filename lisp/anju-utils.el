@@ -121,6 +121,7 @@ at the front of the list.
 
 Anju provides the following buffer filters:
 
+- `anju-buffer-list-project-filter'
 - `anju-buffer-list-plain-filter'
 - `anju-buffer-list-compilation-filter'
 - `anju-buffer-list-grep-filter'
@@ -135,7 +136,8 @@ add their own filters to define the resulting buffer list returned by
 `anju-buffer-list-menu-items'."
 
   :type '(alist
-          :key-type (choice (function-item anju-buffer-list-plain-filter)
+          :key-type (choice (function-item anju-buffer-list-project-filter)
+                            (function-item anju-buffer-list-plain-filter)
                             (function-item anju-buffer-list-compilation-filter)
                             (function-item anju-buffer-list-grep-filter)
                             (function-item anju-buffer-list-xref-filter)
@@ -153,6 +155,7 @@ add their own filters to define the resulting buffer list returned by
     anju-main-menu--reconfigure-options
     anju-main-menu--reconfigure-bookmarks
     anju-main-menu--reconfigure-text-mode
+    anju-main-menu--reconfigure-tools
     anju-main-menu--reconfigure-help
     anju-main-menu--reconfigure-imenu)
   "Main menu mode hooks to run in `anju-init'.
@@ -165,6 +168,7 @@ initialized with the following functions:
 - `anju-main-menu--reconfigure-options'
 - `anju-main-menu--reconfigure-bookmarks'
 - `anju-main-menu--reconfigure-text-mode'
+- `anju-main-menu--reconfigure-tools'
 - `anju-main-menu--reconfigure-help'
 - `anju-main-menu--reconfigure-imenu'"
   :type 'hook
@@ -173,6 +177,7 @@ initialized with the following functions:
              anju-main-menu--reconfigure-options
              anju-main-menu--reconfigure-bookmarks
              anju-main-menu--reconfigure-text-mode
+             anju-main-menu--reconfigure-tools
              anju-main-menu--reconfigure-help
              anju-main-menu--reconfigure-imenu)
   :group 'anju)

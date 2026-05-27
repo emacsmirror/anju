@@ -187,7 +187,7 @@ one sexp")))))
   (anju-test-keymap
    kmap
    "Delete"
-   9
+   10
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -215,6 +215,12 @@ one space")
         "Pair"
         #'delete-pair
         "Delete a pair of characters enclosing ARG sexps that follow point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Duplicate Lines"
+        #'delete-duplicate-lines
+        "Delete all but one copy of any identical lines in the region")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -536,6 +542,109 @@ leaving just one")
           "Non-uniform paragraphs"
           #'fill-nonuniform-paragraphs
           "Fill paragraphs within the region, allowing varying indentation within each"))))))
+
+
+;; -------------------------------------------------------------------
+;; Tools Menu Tests
+
+(defun test--anju-kmacro-menu (kmap)
+  "Test KMAP for `anju-kmacro-menu'."
+
+  (anju-test-keymap
+   kmap
+   "Macro Recorder"
+   11
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "Record"
+        #'kmacro-start-macro
+        "Record subsequent keyboard input, defining a keyboard macro")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Stop"
+        #'kmacro-end-macro
+        "Finish defining a keyboard macro")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert counter"
+        #'kmacro-insert-counter
+        "Insert current value of ‘kmacro-counter’, then increment it by ARG")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Run last"
+        #'kmacro-end-and-call-macro
+        "Call last keyboard macro, ending it first if currently being defined")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Name last…"
+        #'kmacro-name-last-macro
+        "Assign a name to the last keyboard macro defined")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Bind last…"
+        #'kmacro-bind-to-key
+        "When not defining or executing a macro, offer to bind last macro to a key")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Edit last"
+        #'kmacro-edit-macro
+        "As edit last keyboard macro, but without kmacro-repeat property")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Step edit macro…"
+        #'kmacro-step-edit-macro
+        "Step edit and execute last keyboard macro")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Edit with binding…"
+        #'edit-kbd-macro
+        "Edit a keyboard macro")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert macro named…"
+        #'insert-kbd-macro
+        "Insert in buffer the definition of kbd macro MACRONAME, as Lisp code")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "List macros"
+        #'kmacro-menu
+        "List run-time defined keyboard macros")))))
+
+(ert-deftest test-anju-kmacro-menu ()
+  "Test for `anju-kmacro-menu'."
+  (test--anju-kmacro-menu anju-kmacro-menu))
+
+
+(ert-deftest test-anju-main-menu--reconfigure-tools ()
+  (anju-main-menu--reconfigure-tools)
+
+  (let* ((tools (easy-menu-get-map global-map '(menu-bar tools)))
+         (macro-menu (easy-menu-get-map tools '(Macro\ Recorder)))
+         (macro-sep (easy-menu-get-map tools '(separator-tools-kmacro)))
+         (org-store-link-item (easy-menu-get-map tools '(org-store-link)))
+         (org-capture-item (easy-menu-get-map tools '(org-capture)))
+         (org-agenda-item (easy-menu-get-map tools '(org-agenda)))
+         (org-sep (easy-menu-get-map tools '(separator-tools-org))))
+
+    (test--anju-kmacro-menu macro-menu)
+    (should macro-sep)
+    (should org-store-link-item)
+    (should org-capture-item)
+    (should org-agenda-item)
+    (should org-sep)))
+
 
 (provide 'test-anju-main-menu)
 ;;; test-anju-main-menu.el ends here
