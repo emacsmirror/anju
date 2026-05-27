@@ -47,7 +47,7 @@ De-emphasis of middle mouse button usage (binding @samp{<mouse-2>})
 @item
 Support direct manipulation when possible
 @item
-Re-organization of the main menu bar
+Re-organization of the menu bar
 @end itemize
 
 The features offered by Anju are opinionated@comma{} but avoids unconventional behavior. Anju aspires to bring a calmer mouse experience to Emacs.
@@ -95,10 +95,12 @@ Context Menu Features
 * Selected Text Commands::
 * Org Mode Context Menu::
 * Dired Mode Context Menu::
+* Info Context Menu::
 * Emacs Lisp Context Menu::
+* Compilation/Grep Context Menu::
 * Makefile Context Menu::
 * Rectangle Context Menu::
-* Magit Support::
+* Version-Controlled Source::
 
 Org Mode Context Menu
 
@@ -127,6 +129,10 @@ Main Menu Features
 * Index Menu (imenu) Features::
 * Tools Menu Features::
 * Help Menu Features::
+
+Tools Menu Features
+
+* Macro Recorder Menu::
 
 Customization
 
@@ -328,7 +334,19 @@ Mode-specific commands
 Org mode
 @item
 Dired
+@item
+Emacs Lisp
+@item
+Compilation/Grep
+@item
+Info
+@item
+Makefile
 @end itemize
+@item
+Rectangles
+@item
+Version-controlled source
 @item
 Window management
 @item
@@ -343,10 +361,12 @@ Learn more about the different areas Anju enhances context menus in the links be
 * Selected Text Commands::
 * Org Mode Context Menu::
 * Dired Mode Context Menu::
+* Info Context Menu::
 * Emacs Lisp Context Menu::
+* Compilation/Grep Context Menu::
 * Makefile Context Menu::
 * Rectangle Context Menu::
-* Magit Support::
+* Version-Controlled Source::
 @end menu
 
 @node Selected Text Commands
@@ -432,7 +452,7 @@ It is recommended that the @code{org-mouse} package be loaded when using Anju.
 
 @cindex Org Headline Context Menu
 
-If the context menu is raised on a headline@comma{} then commands related to TODO state@comma{} clocking@comma{} and promotion are offered.
+If the context menu is raised on a headline@comma{} then commands related to TODO state@comma{} change to body@comma{} clocking@comma{} sorting@comma{} and promotion are offered.
 
 @image{images/anju-context-menu-org-headline,,,,png}
 
@@ -441,7 +461,7 @@ If the context menu is raised on a headline@comma{} then commands related to TOD
 
 @cindex Org Item Context Menu
 
-If the context menu is raised on a list item@comma{} then commands related to promotion and checkbox operations are provided.
+If the context menu is raised on a list item@comma{} then commands related to sorting@comma{} bullet-style cycling@comma{} promotion and checkbox operations are provided.
 
 The menu item ``Change to Checkbox'' will convert an item to a checkbox@comma{} with the additional behavior that if the point is at the start of the whole list@comma{} the whole list will be converted.
 
@@ -475,22 +495,25 @@ The “Org Table Region” sub-menu provides commands to cut@comma{} copy@comma{
 
 @image{images/anju-context-menu-org-link,,,,png}
 
-On selected text@comma{} the context menu will have the menu item “Link…” to run the command @code{org-insert-link}. From there you can enter a link@comma{} typically copied into the system clipboard.
+If the point is on selected text or an existing Org link@comma{} the context menu will have the menu item “Link…” to run the command @code{org-insert-link}. From there you can add or edit a link.
 
 If an Org link has already been stored@comma{} then the menu item “Paste Last Org Link” will be displayed. See more at @ref{Org Paste Context Menu, , Org Paste Context Menu}.
 
 @node Org Toggle Images & Show Markup
 @subsubsection Org Toggle Images & Show Markup
 
-#+CINDEX Org Toggle Images & Show Markup
+@cindex Org Toggle Images & Show Markup
+
+@image{images/anju-context-menu-toggle-images-markup,,,,png}
 
 The Org context menu supports the following menu items except for when the point is in a table:
 
 @table @asis
 @item Toggle Images
-toggles display of images when running in GUI@.
+Toggle display of images when running in GUI@.
+
 @item Show Markup
-reveals or hides display of Org markup.
+Reveal or hide display of Org markup.
 @end table
 
 @node Org “Copy as…” Context Menu
@@ -519,6 +542,10 @@ Slack (only available if the @code{ox-slack} (@uref{https://melpa.org/#/ox-slack
 RTF (only available on macOS)
 @end itemize
 
+Users who frequently work with other text-based formats may find this menu useful.
+
+Markdown users may find the companion feature of “Paste Markdown as Org” also useful (@ref{Org Paste Context Menu, , Org Paste Context Menu}).
+
 @node Org Paste Context Menu
 @subsubsection Org Paste Context Menu
 
@@ -544,7 +571,7 @@ If an image as been copied into the clipboard@comma{} this menu item will ``past
 
 @cindex Dired Mode Context Menu
 
-Anju has context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
+Anju enhances the context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
 
 @image{images/anju-context-menu-dired-copy-to,,,,png}
 
@@ -553,6 +580,15 @@ If the mouse point is over a directory@comma{} the option to insert a view (aka 
 @image{images/anju-context-menu-dired-insert-subdir,,,,png}
 
 Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's @ref{Design Principles and Concerns, , Design Principles and Concerns}.
+
+@node Info Context Menu
+@subsection Info Context Menu
+
+@cindex Info Context Menu
+
+Anju enhances the context menu support for Info mode. Notable additions include copying the node name to the @code{kill-ring} and opening the node in a web browser.
+
+@image{images/anju-context-menu-info,,,,png}
 
 @node Emacs Lisp Context Menu
 @subsection Emacs Lisp Context Menu
@@ -631,12 +667,28 @@ The result is that a temporary buffer named @code{*add-two*} (the input name is 
 
 The @code{*add-two*} buffer can be edited as needed and its contents placed into a desired Elisp file.
 
+@node Compilation/Grep Context Menu
+@subsection Compilation/Grep Context Menu
+
+@cindex Compilation/Grep Context Menu
+
+
+@image{images/anju-context-menu-compilation,,,,png}
+
+
+If the buffer is the output of a compilation@comma{} then its context menu is populated with commands to either recompile or invoke a new compile command.
+
+If the buffer is the output of a Grep search@comma{} then its context menu is populated with the command to refresh the search.
+
 @node Makefile Context Menu
 @subsection Makefile Context Menu
 
 @cindex Makefile Context Menu
 
-TBD
+@image{images/anju-context-menu-makefile,,,,png}
+
+
+This context menu offers commands provided by Makefile mode.
 
 @node Rectangle Context Menu
 @subsection Rectangle Context Menu
@@ -649,19 +701,24 @@ If a rectangle selection is made (@kbd{C-M-<mouse-1>}) or has been killed@comma{
 
 To learn more about rectangle commands@comma{} see @ref{Rectangles,info ``(emacs) Rectangles'',,emacs,}.
 
-@node Magit Support
-@subsection Magit Support
+@node Version-Controlled Source
+@subsection Version-Controlled Source
 
-@cindex Magit Support
+@cindex Version-Controlled Source
+@cindex Magit
 
-If Magit 4.4+ is installed@comma{} then the context menu function @code{anju-context-menu-vc} will offer Magit commands depending on context. If the context menu is raised in a file buffer@comma{} then the menu item ``Magit Dispatch…'' (@code{magit-file-dispatch}) is shown@comma{} otherwise ``Magit Status'' (@code{magit-status}).
+@image{images/anju-context-menu-vc,,,,png}
+
+If a context menu is raised on a buffer containing a modified version controlled file@comma{} then support for viewing the difference between the modifications with its previous commit is provided by the menu item “Ediff revision…”.
+
+If Magit 4.4+ is installed@comma{} then different Magit commands depending on context are displayed. If the context menu is raised in a file buffer@comma{} then the menu item ``Magit Dispatch…'' (@code{magit-file-dispatch}) is shown@comma{} otherwise ``Magit Status'' (@code{magit-status}).
 
 @node Main Menu Features
 @section Main Menu Features
 
 @cindex Main Menu Features
 
-Anju enhances the main menu bar of Emacs by making opinionated changes to its existing menus as well as adding several new ones. These changes are configurable per menu in the main menu (e.g. ``File''@comma{} ``Edit''@comma{} ``Options''@comma{} etc.). For more detail@comma{} see @ref{Main Menu Customization, , Main Menu Customization}.
+Anju enhances the menu bar of Emacs by making opinionated changes to its existing menus as well as adding several new ones. These changes are configurable per menu in the main menu (e.g. ``File''@comma{} ``Edit''@comma{} ``Options''@comma{} etc.). For more detail@comma{} see @ref{Main Menu Customization, , Main Menu Customization}.
 
 @menu
 * File Menu Features::
@@ -679,7 +736,7 @@ Anju enhances the main menu bar of Emacs by making opinionated changes to its ex
 
 @cindex File Menu Features
 
-Anju makes the following modifications to the main menu bar @strong{File} menu:
+Anju makes the following modifications to the menu bar @strong{File} menu:
 
 @itemize
 @item
@@ -701,7 +758,7 @@ These modifications are optional. For more detail@comma{} see @ref{File Menu Cus
 
 @image{images/anju-main-menu-edit-search-in-files,,,,png}
 
-Anju makes the following modifications to the main menu bar @strong{Edit} menu:
+Anju makes the following modifications to the menu bar @strong{Edit} menu:
 
 @itemize
 @item
@@ -867,7 +924,7 @@ These modifications are optional. For more detail@comma{} see @ref{Edit Menu Cus
 
 @cindex Options Menu Features
 
-Anju makes the presumption that most Emacs users do not use the CUA mode configuration in the main menu bar @strong{Options} menu. As such@comma{} the “Cut/Paste with C-x/C-c/C-v (CUA Mode)” menu item is removed.
+Anju makes the presumption that most Emacs users do not use the CUA mode configuration in the menu bar @strong{Options} menu. As such@comma{} the “Cut/Paste with C-x/C-c/C-v (CUA Mode)” menu item is removed.
 
 This modification is optional. For more detail@comma{} see @ref{Options Menu Customization, , Options Menu Customization}.
 
@@ -900,7 +957,7 @@ Jump to Bookmark… (@code{bookmark-jump})
 
 @image{images/anju-main-menu-text,,,,png}
 
-If the major mode of the current buffer is derived from @code{text-mode}@comma{} then a @strong{Text} menu is displayed in the main menu bar.
+If the major mode of the current buffer is derived from @code{text-mode}@comma{} then a @strong{Text} menu is displayed in the menu bar.
 
 The menu hierarchy of the @strong{Text} menu is described below with the actual command shown in parenthesis next to its label.
 
@@ -977,7 +1034,7 @@ This modification is optional. For more detail@comma{} see @ref{Text Menu Custom
 @image{images/anju-main-menu-imenu,,,,png}
 
 
-For certain modes that support Imenu (@ref{Imenu,,,emacs,})@comma{} Anju will add an @strong{Index} menu to the main menu bar via the function  @code{imenu-add-menubar-index}.
+For certain modes that support Imenu (@ref{Imenu,,,emacs,})@comma{} Anju will add an @strong{Index} menu to the menu bar via the function  @code{imenu-add-menubar-index}.
 
 Modes supported this way by Anju are:
 
@@ -999,12 +1056,45 @@ This modification is optional. For more detail@comma{} see @ref{Imenu Menu Custo
 
 @cindex Tools Menu Features
 
-Anju makes the following modifications to the main menu bar @strong{Tools} menu:
+@image{images/anju-main-menu-tools,,,,png}
+
+
+Anju makes the following modifications to the menu bar @strong{Tools} menu:
 
 @table @asis
 @item Adds the “Macro Recorder” sub-menu
-A menu of commands pertaining to keyboard macros (@ref{Keyboard Macros,,,emacs,}).
+Commands to create@comma{} run@comma{} edit@comma{} and debug  @ref{Macro Recorder Menu, , keyboard macros}.
+
+@item Adds global Org commands
+Provide general access to these commands
+@itemize
+@item
+“Org Store Link” (@code{org-store-link})
+@item
+“Org Capture…” (@code{org-capture})
+@item
+“Org Agenda…” (@code{org-agenda})
+@end itemize
 @end table
+
+@menu
+* Macro Recorder Menu::
+@end menu
+
+@node Macro Recorder Menu
+@subsubsection Macro Recorder Menu
+
+@cindex Macro Recoder Menu
+
+Keyboard macros offer workflow automation in Emacs in a ``no-code'' fashion.  Anju showcases this capability by providing a menu of keyboard macro commands in the menu bar Tools menu.
+
+
+@image{images/anju-main-menu-tools-kmacro,,,,png}
+
+
+Note that both keystroke and mouse menu actions can be recorded by a keyboard macro.
+
+For more reading on keyboard macros@comma{} see @ref{Keyboard Macros,,,emacs,}.
 
 @node Help Menu Features
 @subsection Help Menu Features
@@ -1435,15 +1525,15 @@ Users who wish define their own menu should override this value with their own f
 
 @cindex Main Menu Customization
 
-Anju uses the customizable hook variable @code{anju-reconfigure-main-menu-hook} to customize the main menu bar.
+Anju uses the customizable hook variable @code{anju-reconfigure-main-menu-hook} to customize the menu bar.
 
-@code{anju-reconfigure-main-menu-hook} is a list of hook functions@comma{}  where each function is designed to modify a different menu of the main menu bar (e.g. ``File''@comma{} ``Edit''@comma{} ``Options''@comma{} etc.). This hook is run in the command @code{anju-init}.
+@code{anju-reconfigure-main-menu-hook} is a list of hook functions@comma{}  where each function is designed to modify a different menu of the menu bar (e.g. ``File''@comma{} ``Edit''@comma{} ``Options''@comma{} etc.). This hook is run in the command @code{anju-init}.
 
 Detailed below are the different hook functions provided for by Anju.
 
 Users are free to implement their own hook functions to add to @code{anju-reconfigure-main-menu-hook}. Users who wish to do this should familiarize themselves with menu keymaps (@ref{Menu Keymaps,,,elisp,}) and the Easy Menu (@ref{Easy Menu,,,elisp,}) library.
 
-Note that Anju's implementation of hook functions to each affect a specific menu in the main menu bar is by convention.
+Note that Anju's implementation of hook functions to each affect a specific menu in the menu bar is by convention.
 
 For more info on hook variables see @ref{Hooks,,,emacs,}.
 
@@ -1464,9 +1554,11 @@ For more info on hook variables see @ref{Hooks,,,emacs,}.
 @cindex File Menu Customization
 @vindex anju-main-menu--reconfigure-file
 
-The hook function @code{anju-main-menu--reconfigure-file} in @code{anju-reconfigure-main-menu-hook} modifies the @strong{File} menu in the main menu bar.
+Anju customizes the @strong{File} menu using the hook function @code{anju-main-menu--reconfigure-file}.
 
-Enabling @code{anju-main-menu--reconfigure-file} can be done using the checkbox interface provided by @code{customize-variable} when modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to enable customization of the @strong{File} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-file} is displayed.
 
 @code{anju-main-menu--reconfigure-file} supports the following customization variable:
 
@@ -1488,9 +1580,11 @@ If non-nil@comma{} the following menu items are replaced with more context-speci
 @cindex Edit Menu Customization
 @vindex anju-main-menu--reconfigure-edit
 
-The hook function @code{anju-main-menu--reconfigure-edit} in @code{anju-reconfigure-main-menu-hook} modifies the @strong{Edit} menu in the main menu bar.
+Anju customizes the @strong{Edit} menu using the hook function @code{anju-main-menu--reconfigure-edit}.
 
-Enabling @code{anju-main-menu--reconfigure-edit} can be done using the checkbox interface provided by @code{customize-variable} when modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to enable customization of the @strong{Edit} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-edit} is displayed.
 
 @node Options Menu Customization
 @subsection Options Menu Customization
@@ -1498,9 +1592,11 @@ Enabling @code{anju-main-menu--reconfigure-edit} can be done using the checkbox 
 @cindex Options Menu Customization
 @vindex anju-main-menu--reconfigure-options
 
-The hook function @code{anju-main-menu--reconfigure-options} in @code{anju-reconfigure-main-menu-hook} modifies the @strong{Options} menu in the main menu bar.
+Anju customizes the @strong{Options} menu using the hook function @code{anju-main-menu--reconfigure-options}.
 
-Enabling @code{anju-main-menu--reconfigure-options} can be done using the checkbox interface provided by @code{customize-variable} when modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to enable customization of the @strong{Options} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-options} is displayed.
 
 @node Text Menu Customization
 @subsection Text Menu Customization
@@ -1508,9 +1604,11 @@ Enabling @code{anju-main-menu--reconfigure-options} can be done using the checkb
 @cindex Text Menu Customization
 @vindex anju-main-menu--reconfigure-text-mode
 
-The hook function @code{anju-main-menu--reconfigure-text-mode} in @code{anju-reconfigure-main-menu-hook} modifies the @strong{Text} menu in the main menu bar.
+Anju customizes the @strong{Text} menu using the hook function @code{anju-main-menu--reconfigure-text-mode}.
 
-Enabling @code{anju-main-menu--reconfigure-text-mode} can be done using the checkbox interface provided by @code{customize-variable} when modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to enable customization of the @strong{Text} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-text-mode} is displayed.
 
 Note that the @strong{Text} menu is only displayed when the current major mode is derived from @code{text-mode}.
 
@@ -1520,9 +1618,11 @@ Note that the @strong{Text} menu is only displayed when the current major mode i
 @cindex Bookmarks Menu Customization
 @vindex anju-main-menu--reconfigure-bookmarks
 
-The hook function @code{anju-main-menu--reconfigure-bookmarks} in @code{anju-reconfigure-main-menu-hook} adds the @strong{Bookmarks} menu to the main menu bar.
+Anju adds the @strong{Bookmarks} menu to the menu bar using the hook function @code{anju-main-menu--reconfigure-bookmarks}.
 
-Enabling @code{anju-main-menu--reconfigure-bookmarks} can be done using the checkbox interface provided by @code{customize-variable} when modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to add the @strong{Bookmarks} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-bookmarks} is displayed.
 
 @node Help Menu Customization
 @subsection Help Menu Customization
@@ -1531,9 +1631,11 @@ Enabling @code{anju-main-menu--reconfigure-bookmarks} can be done using the chec
 @vindex anju-main-menu--reconfigure-help
 @vindex anju-help-menu-remove-emacs-tutorial
 
-The hook function @code{anju-main-menu--reconfigure-help} in @code{anju-reconfigure-main-menu-hook} modifies the @strong{Help} menu in the main menu bar.
+Anju customizes the @strong{Help} menu using the hook function @code{anju-main-menu--reconfigure-help}.
 
-Enabling @code{anju-main-menu--reconfigure-help} can be done using the checkbox interface provided by @code{customize-variable} in modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to enable customization of the @strong{Help} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-help} is displayed.
 
 @code{anju-main-menu--reconfigure-help} supports the following customization variable:
 
@@ -1548,9 +1650,12 @@ if non-nil@comma{} then remove the Emacs tutorial menu items. (default @code{t})
 @cindex Imenu Menu Customization
 @vindex anju-main-menu--reconfigure-imenu
 
-The hook function @code{anju-main-menu--reconfigure-imenu} in @code{anju-reconfigure-main-menu-hook} adds the @strong{Index} menu to the main menu bar.
+Anju adds the @strong{Index} menu to the menu bar using the hook function @code{anju-main-menu--reconfigure-imenu}.
 
-Enabling @code{anju-main-menu--reconfigure-imenu} can be done using the checkbox interface provided by @code{customize-variable} in modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to add the @strong{Index} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-imenu} is displayed.
+
 
 Anju's support for Imenu covers the following modes:
 
@@ -1573,9 +1678,11 @@ For more info on Imenu see @ref{Imenu,,,emacs,}.
 @cindex Tools Menu Customization
 @vindex anju-main-menu--reconfigure-tools
 
-The hook function @code{anju-main-menu--reconfigure-tools} in @code{anju-reconfigure-main-menu-hook} modifies the @strong{Tools} menu in the main menu bar.
+Anju customizes the @strong{Tools} menu using the hook function @code{anju-main-menu--reconfigure-tools}.
 
-Enabling @code{anju-main-menu--reconfigure-tools} can be done using the checkbox interface provided by @code{customize-variable} in modifying @code{anju-reconfigure-main-menu-hook}.
+Add this hook function to @code{anju-reconfigure-main-menu-hook} to enable customization of the @strong{Tools} menu.
+
+If @code{customize-variable} is used to configure @code{anju-reconfigure-main-menu-hook}@comma{} then a checkbox interface to enable  @code{anju-main-menu--reconfigure-tools} is displayed.
 
 @node Future Work
 @chapter Future Work
