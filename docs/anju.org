@@ -713,21 +713,20 @@ Anju provides optional support for Magit 4.4+.
 #+VINDEX: context-menu-mode
 #+VINDEX: anju-init
 
-Basic installation of Anju composes of two parts:
+To install Anju, add the command ~anju-init~ to your Emacs initialization file.
 
-1. Turn on ~context-menu-mode~ to major modes of preference. This is done using the ~add-hook~ function as shown below.
-  #+begin_src elisp :lexical no
-    (add-hook 'prog-mode-hook #'context-menu-mode)
-    (add-hook 'text-mode-hook #'context-menu-mode)
-    (add-hook 'dired-mode-hook #'context-menu-mode)
-    (add-hook 'shell-mode-hook #'context-menu-mode)
-  #+end_src
+#+begin_src elisp :lexical no
+  (anju-init)
+#+end_src
 
-2. Call ~anju-init~ in your Emacs initialization file.
+This command will initialize ~context-menu-mode~ and reconfigure the following mouse menus and bindings:
 
-  #+begin_src elisp :lexical no
-    (anju-init)
-  #+end_src
+- Legacy mouse bindings
+- Mode line bindings
+- Main menu
+- Context menus for different modes
+
+The ~anju-init~ command can also be invoked via ~M-x~.
 
 Anju supports a high degree of customization. Users who wish this should make a deep read of the [[#customization][Customization]] section.
 
