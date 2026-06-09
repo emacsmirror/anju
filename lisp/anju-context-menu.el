@@ -44,8 +44,7 @@
 (require 'casual-make)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Dired
+;;; Context Menu: Dired
 
 (defun anju-dired-duplicate-file ()
   "Duplicate the current file in Dired."
@@ -201,8 +200,7 @@ file names in the Dired buffer"])
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Scratch Buffer
+;;; Context Menu: Scratch Buffer
 
 (defun anju-context-menu-scratch (menu click)
   "Context menu hook function for journal commands.
@@ -224,8 +222,7 @@ This function is intended to be hooked into `context-menu-functions'."
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Org Mode
+;;; Context Menu: Org Mode
 
 (defun anju-at-org-table-p ()
   "Predicate if point is in an Org table."
@@ -239,6 +236,13 @@ Return t if populated, nil otherwise."
   (if (> (length org-stored-links) 0)
       t
     nil))
+
+(defun anju-org-element-empty-p ()
+  "Predicate for Org body text to check it is not empty."
+  (let* ((element (org-element-at-point))
+         (c-beg (org-element-property :contents-begin element))
+         (c-end (org-element-property :contents-end element)))
+    (not (and c-beg c-end (> c-end c-beg)))))
 
 (easy-menu-define anju-org-table-region-menu nil
   "Key map for Org table region sub-menu."
@@ -437,12 +441,16 @@ outline tree"])
         (easy-menu-add-item menu nil [org-toggle-heading
                                       org-toggle-heading
                                       :label "Change to Heading"
+                                      :visible (and (not (use-region-p))
+                                                    (not (anju-org-element-empty-p)))
                                       :help "Convert headings to normal text, \
 or items or text to headings"])
 
         (easy-menu-add-item menu nil [org-toggle-item
                                       org-toggle-item
                                       :label "Change to Item"
+                                      :visible (and (not (use-region-p))
+                                                    (not (anju-org-element-empty-p)))
                                       :help "Convert headings or normal lines \
 to items, items to normal lines"])))
 
@@ -456,8 +464,7 @@ to items, items to normal lines"])))
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Info Mode
+;;; Context Menu: Info Mode
 
 
 (defun anju-info-goto-node-web ()
@@ -525,8 +532,7 @@ node into the kill ring"])
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Emacs Lisp Mode
+;;; Context Menu: Emacs Lisp Mode
 
 
 (defun anju-form-name-at-point ()
@@ -866,8 +872,7 @@ a reference to the new defun ARG."
     (message "not on lambda")))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Buffer Navigation/Management
+;;; Context Menu: Buffer Navigation/Management
 
 (defun anju-context-menu-buffers (menu click)
   "Context menu hook function for buffers commands.
@@ -899,8 +904,7 @@ This function is intended to be hooked into `context-menu-functions'."
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Narrow/Widen
+;;; Context Menu: Narrow/Widen
 
 (defun anju-context-menu-narrow (menu click)
   "Context menu hook function for narrow commands.
@@ -954,8 +958,7 @@ from current buffer"]))))
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Open in…
+;;; Context Menu: Open in…
 
 (defun anju-context-menu-open-in (menu click)
   "Context menu hook function for open-in commands.
@@ -980,8 +983,7 @@ This function is intended to be hooked into `context-menu-functions'."
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: VC/Magit
+;;; Context Menu: VC/Magit
 
 (defun anju-context-menu-vc (menu click)
   "Context menu hook function for version control commands.
@@ -1026,8 +1028,7 @@ This function is intended to be hooked into `context-menu-functions'."
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Region Operations
+;;; Context Menu: Region Operations
 
 (defun anju-occur-selected-region ()
   "Occur selected region."
@@ -1088,8 +1089,7 @@ containing a match for selected word"])
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Region Extension
+;;; Context Menu: Region Extension
 
 (defun anju-yank-media-p ()
   "Predicate if media (images, HTML and the like) is in the clipboard.
@@ -1259,8 +1259,7 @@ URL `https://gist.github.com/danielmartin/3c5d3a3a8cd24a3556379c5251651748'."
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Compilation Mode
+;;; Context Menu: Compilation Mode
 
 (defun anju-context-menu-compile (menu click)
   "Context menu hook function for compile commands.
@@ -1305,8 +1304,7 @@ buffer.  Default: run ‘make’"])
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Show Markup/Toggle Images
+;;; Context Menu: Show Markup/Toggle Images
 
 (defun anju-context-menu-markup (menu click)
   "Context menu hook function for markup commands.
@@ -1351,8 +1349,7 @@ temporarily visible (Visible mode)"]))
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Word Count
+;;; Context Menu: Word Count
 
 (defun anju-context-menu-wordcount (menu click)
   "Context menu hook function for wordcount commands.
@@ -1373,8 +1370,7 @@ This function is intended to be hooked into `context-menu-functions'."
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Dictionary
+;;; Context Menu: Dictionary
 
 (defun anju-context-menu-dictionary (menu click)
   "Context menu hook function for the dictionary command.
@@ -1397,8 +1393,7 @@ This function is intended to be hooked into `context-menu-functions'."
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Window Management
+;;; Context Menu: Window Management
 
 (easy-menu-define anju-context-window-management-menu nil
   "Keymap for mouse window management menu."
@@ -1447,8 +1442,7 @@ This function is intended to be hooked into `context-menu-functions'."
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Rectangle Commands
+;;; Context Menu: Rectangle Commands
 
 (defun anju-context-menu-rectangle (menu click)
   "Context menu hook function for wordcount commands.
@@ -1470,8 +1464,7 @@ This function is intended to be hooked into `context-menu-functions'."
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Makefile Mode
+;;; Context Menu: Makefile Mode
 
 (easy-menu-define anju-makefile-modes-menu nil
   "Keymap for mouse window management menu."
@@ -1615,8 +1608,7 @@ the state of all known targets"])
   menu)
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Utility and Setup Functions
+;;; Context Menu: Utility and Setup Functions
 
 (defun anju-context-menu--insert-into-context-menu-functions (source target)
   "Insert SOURCE before TARGET in `context-menu-functions'.

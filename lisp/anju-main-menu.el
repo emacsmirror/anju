@@ -37,8 +37,7 @@
 (require 'casual-editkit)
 
 
-;; -------------------------------------------------------------------
-;; File Menu Customization
+;;; File Menu Customization
 (easy-menu-define anju-window-swap-menu nil
   "Keymap for mouse window swap menu."
   '("Swap Window"
@@ -94,8 +93,7 @@ This function is intended to be used in
                         'delete-this-frame)))
 
 
-;; -------------------------------------------------------------------
-;; Options Menu Customization
+;;; Options Menu Customization
 (defun anju-main-menu--reconfigure-options ()
   "Hook function to reconfigure Options menu in main menu bar.
 
@@ -105,8 +103,7 @@ This function is intended to be used in
 
 
 
-;; -------------------------------------------------------------------
-;; Edit Menu Customization
+;;; Edit Menu Customization
 (easy-menu-define anju-transpose-menu nil
   "Keymap for Transpose menu."
   '("Transpose ⇄"
@@ -274,8 +271,7 @@ read from the minibuffer"
 
 
 
-;; -------------------------------------------------------------------
-;; Reconfigure Bookmarks Menu
+;;; Reconfigure Bookmarks Menu
 (defun anju-main-menu--reconfigure-bookmarks ()
   "Hook function to add Bookmarks menu to the main menu bar.
 
@@ -289,8 +285,7 @@ This function is intended to be used in
 
 
 
-;; -------------------------------------------------------------------
-;; Help Menu Customization
+;;; Help Menu Customization
 
 (defun anju-info-in-new-frame ()
   "Create new frame with `info' window."
@@ -398,8 +393,7 @@ This function is intended to be used in
 
 
 
-;; -------------------------------------------------------------------
-;; Text Mode Menu Customization
+;;; Text Mode Menu Customization
 
 (defun anju-main-menu--reconfigure-text-mode ()
   "Reconfigure Text mode menu."
@@ -415,8 +409,7 @@ This function is intended to be used in
   (easy-menu-add-item text-mode-menu nil anju-fill-text-menu "Auto Fill"))
 
 
-;; -------------------------------------------------------------------
-;; Imenu Configuration
+;;; Imenu Configuration
 
 (defun anju-imenu-add-menubar-index ()
   "Add imenu index to menubar."
@@ -459,8 +452,7 @@ Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
         (setopt org-imenu-depth 7))))
 
 
-;; -------------------------------------------------------------------
-;; Tools Menu Customization
+;;; Tools Menu Customization
 
 (easy-menu-define anju-kmacro-menu nil
   "Keymap for keyboard macro commands."

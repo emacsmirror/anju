@@ -44,8 +44,7 @@ function."
   :group 'anju)
 
 
-;; -------------------------------------------------------------------
-;; Mode Line Customization
+;;; Mode Line Customization
 
 (easy-menu-define anju-window-management-menu nil
   "Keymap for mouse window management menu."
@@ -103,8 +102,7 @@ Derived from code found at URL
   (popup-menu (funcall anju-mode-line-buffer-list-function) click))
 
 
-;; -------------------------------------------------------------------
-;; Buffer Filter Logic
+;;; Buffer Filter Logic
 
 (defun anju-buffer-list--filter (filter buffers &optional count)
   "Apply FILTER on BUFFERS, taking the first COUNT if defined."
