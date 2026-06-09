@@ -37,22 +37,39 @@
 
 ;; INSTALLATION
 
-;; Basic installation of Anju composes of two parts:
-
-;; 1. Turn on `context-menu-mode' to major modes of preference. This is done
-;;    using the `add-hook' function as shown below.
-
-;;     (add-hook 'prog-mode-hook #'context-menu-mode)
-;;     (add-hook 'text-mode-hook #'context-menu-mode)
-;;     (add-hook 'dired-mode-hook #'context-menu-mode)
-;;     (add-hook 'shell-mode-hook #'context-menu-mode)
-
-;; 2. Call `anju-init' in your Emacs initialization file.
+;; To install Anju, add the command `anju-init' to your Emacs initialization
+;; file.
 
 ;;     (anju-init)
 
-;; The `anju-init' command can be customized to preference. Read more on this in
-;; the Anju User Guide in Info.
+;; This command will initialize `context-menu-mode' and reconfigure the
+;; following mouse menus and bindings:
+
+;; - Legacy mouse bindings
+;; - Mode line bindings
+;; - Main menu
+;; - Context menus for different modes
+
+;; The `anju-init' command can be customized to preference. See Info node
+;; `(anju) Anju Initialization (anju-init)' for more detail.
+
+;; While not required, the following additions to your Emacs initialization
+;; file can further enhance your mouse experience:
+
+;; - Enable `org-mouse'
+
+;;     (require 'org-mouse)
+
+;; - Add Markdown export support to Org mode
+;;   - `M-x' `customize-variable' `org-export-backends', check `md' option.
+
+;; - Globally bind `C-x 1' to `anju-toggle-one-window'.
+
+;;     (keymap-global-set "C-x 1" #'anju-toggle-one-window)
+
+;; - Set `use-file-dialog' to `t' to support mouse-driven-only dialog
+;;   interactions, or `nil' to always get a mini-buffer prompt.
+
 
 ;;; Code:
 (require 'anju-mode-line)
@@ -73,12 +90,19 @@ of mouse menus and bindings:
 - Legacy mouse bindings (`anju-unset-legacy-mouse-bindings-enable')
 - Mode line bindings (`anju-mode-line-bindings-enable')
 - Main menu (`anju-reconfigure-main-menu-enable')
-- Context menu (`anju-reconfigure-context-menu-functions-enable')
+- Context menus (`anju-reconfigure-context-menu-functions-enable')
 
 Each area is controlled with a customizable variable and all are by
 default t. Changes to any of these variables will require a restart of
-Emacs."
+Emacs.
+
+The global minor mode `context-menu-mode' will be initialized if it
+already has not been done so."
   (interactive)
+
+  (unless context-menu-mode
+    (context-menu-mode 1))
+
   (if anju-unset-legacy-mouse-bindings-enable
       (anju-utils--unset-legacy-mouse-bindings))
 
