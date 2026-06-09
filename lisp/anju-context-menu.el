@@ -240,6 +240,13 @@ Return t if populated, nil otherwise."
       t
     nil))
 
+(defun anju-org-element-empty-p ()
+  "Predicate for Org body text to check it is not empty."
+  (let* ((element (org-element-at-point))
+         (c-beg (org-element-property :contents-begin element))
+         (c-end (org-element-property :contents-end element)))
+    (not (and c-beg c-end (> c-end c-beg)))))
+
 (easy-menu-define anju-org-table-region-menu nil
   "Key map for Org table region sub-menu."
   '("Org Table Region"
@@ -437,12 +444,16 @@ outline tree"])
         (easy-menu-add-item menu nil [org-toggle-heading
                                       org-toggle-heading
                                       :label "Change to Heading"
+                                      :visible (and (not (use-region-p))
+                                                    (not (anju-org-element-empty-p)))
                                       :help "Convert headings to normal text, \
 or items or text to headings"])
 
         (easy-menu-add-item menu nil [org-toggle-item
                                       org-toggle-item
                                       :label "Change to Item"
+                                      :visible (and (not (use-region-p))
+                                                    (not (anju-org-element-empty-p)))
                                       :help "Convert headings or normal lines \
 to items, items to normal lines"])))
 
