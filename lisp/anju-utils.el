@@ -379,8 +379,7 @@ conform to extent <= (max/2) - 2"
      :help "Delete all whitespace following a specified column in each line"]))
 
 
-;; -------------------------------------------------------------------
-;; Delete Window Logic
+;;; Delete Window Logic
 
 (defun anju--scrub-frame-register-list ()
   "Scrub `anju--frame-register-alist'."

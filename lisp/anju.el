@@ -77,8 +77,7 @@
 (require 'anju-context-menu)
 
 
-;; -------------------------------------------------------------------
-;; Initialization Routines
+;;; Initialization Routines
 
 ;;;###autoload (autoload 'anju-init "anju" nil t)
 (defun anju-init ()
