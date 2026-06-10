@@ -244,6 +244,12 @@ Return t if populated, nil otherwise."
          (c-end (org-element-property :contents-end element)))
     (not (and c-beg c-end (> c-end c-beg)))))
 
+(defun anju-line-empty-p ()
+  "Predicate to test if line point is on is empty."
+  (let ((begin (line-beginning-position))
+        (end (line-end-position)))
+    (= end begin)))
+
 (easy-menu-define anju-org-table-region-menu nil
   "Key map for Org table region sub-menu."
   '("Org Table Region"
@@ -341,7 +347,6 @@ outline tree"])
                              :label "Promote Subtree ←"
                              :help "Promote heading subtree"]))
 
-
        ((and (org-at-item-p) (not (anju-rectangle-selected-p)))
 
         (if (org-at-item-checkbox-p)
@@ -349,7 +354,13 @@ outline tree"])
                                 [casual-org-checkbox-in-progress
                                  casual-org-checkbox-in-progress
                                  :label "In-Progress [-]"
-                                 :help "Change checkbox state to in-progress [-]"]))
+                                 :help "Change checkbox state to in-progress [-]"])
+          (easy-menu-add-item menu nil [org-toggle-item
+                                        org-toggle-item
+                                        :label "Change to Body"
+                                        :visible (not (or (use-region-p)
+                                                          (anju-line-empty-p)))
+                                        :help "Convert item to normal line"]))
 
         (easy-menu-add-item menu nil
                             [org-cycle-list-bullet
@@ -441,16 +452,16 @@ outline tree"])
         (easy-menu-add-item menu nil [org-toggle-heading
                                       org-toggle-heading
                                       :label "Change to Heading"
-                                      :visible (and (not (use-region-p))
-                                                    (not (anju-org-element-empty-p)))
+                                      :visible (not (or (use-region-p)
+                                                        (anju-line-empty-p)))
                                       :help "Convert headings to normal text, \
 or items or text to headings"])
 
         (easy-menu-add-item menu nil [org-toggle-item
                                       org-toggle-item
                                       :label "Change to Item"
-                                      :visible (and (not (use-region-p))
-                                                    (not (anju-org-element-empty-p)))
+                                      :visible (not (or (use-region-p)
+                                                        (anju-line-empty-p)))
                                       :help "Convert headings or normal lines \
 to items, items to normal lines"])))
 
