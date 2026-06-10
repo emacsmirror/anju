@@ -786,10 +786,16 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-mode
-   8
+   9
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Body"
+        #'org-toggle-item
+        "Convert item to normal line")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
