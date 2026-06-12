@@ -710,9 +710,10 @@ To learn more about rectangle commands@comma{} see @ref{Rectangles,info ``(emacs
 
 @image{images/anju-context-menu-vc,,,,png}
 
-If a context menu is raised on a buffer containing a modified version controlled file@comma{} then support for viewing the difference between the modifications with its previous commit is provided by the menu item “Ediff revision…”.
+If a context menu is raised on a buffer containing a modified version controlled file@comma{} then support for viewing the difference between the modifications with its previous commit is provided by the menu item “Ediff revision…”. The menu item “Git Grep…” (@code{vc-git-grep}) will constrain a @code{grep} search of only files that are checked-in the repository.
 
-If Magit 4.4+ is installed@comma{} then different Magit commands depending on context are displayed. If the context menu is raised in a file buffer@comma{} then the menu item ``Magit Dispatch…'' (@code{magit-file-dispatch}) is shown@comma{} otherwise ``Magit Status'' (@code{magit-status}).
+
+If Magit 4.4+ is installed@comma{} then different Magit commands depending on context are displayed. If the context menu is raised in a file buffer@comma{} then the menu item “Magit Dispatch…” (@code{magit-file-dispatch}) is shown@comma{} otherwise “Magit Status” (@code{magit-status}).
 
 @node Main Menu Features
 @section Main Menu Features

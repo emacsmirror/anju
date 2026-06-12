@@ -1444,7 +1444,7 @@ tests:
   (anju-test-context-menu-function
    #'anju-context-menu-vc
    "hi there"
-   3
+   4
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item (seq-elt items i) "--")
@@ -1458,7 +1458,13 @@ tests:
         (seq-elt items (cl-incf i))
         "Ediff revision…"
         #'casual-ediff-revision-from-menu
-        "Ediff this file with revision"))))
+        "Ediff this file with revision")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Git Grep…"
+        #'vc-git-grep
+        "Run git grep, searching for REGEXP in FILES in directory DIR"))))
 
   (kill-buffer))
 
@@ -1468,24 +1474,28 @@ tests:
   (anju-test-context-menu-function
    #'anju-context-menu-vc
    "hi there"
-   3
+   4
    (lambda (items)
-     (let* ((item0 (seq-elt items 0))
-            (item1 (seq-elt items 1))
-            (item2 (seq-elt items 2)))
-       (anju-test-menu-item item0 "--")
+     (let* ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
 
        (anju-test-menu-item
-        item1
+        (seq-elt items (cl-incf i))
         "Magit Status"
         #'magit-status
         "Show the status of the current Git repository in a buffer")
 
        (anju-test-menu-item
-        item2
+        (seq-elt items (cl-incf i))
         "Ediff revision…"
         #'casual-ediff-revision-from-menu
-        "Ediff this file with revision"))))
+        "Ediff this file with revision")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Git Grep…"
+        #'vc-git-grep
+        "Run git grep, searching for REGEXP in FILES in directory DIR"))))
 
   (kill-buffer))
 
