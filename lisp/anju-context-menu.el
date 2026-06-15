@@ -1034,7 +1034,13 @@ This function is intended to be hooked into `context-menu-functions'."
         :label "Ediff revision…"
         :visible (and (bound-and-true-p buffer-file-name)
                       (vc-registered (buffer-file-name)))
-        :help "Ediff this file with revision"])))
+        :help "Ediff this file with revision"])
+
+      (easy-menu-add-item
+       menu nil
+       [vc-git-grep vc-git-grep
+        :label "Git Grep…"
+        :help "Run git grep, searching for REGEXP in FILES in directory DIR"])))
   menu)
 
 
