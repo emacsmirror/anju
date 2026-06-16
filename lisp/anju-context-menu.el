@@ -27,6 +27,7 @@
 (require 'dired)
 (require 'org)
 (require 'org-table)
+(require 'org-agenda)
 (require 'ol)
 (require 'dictionary)
 (require 'elisp-mode)
@@ -42,6 +43,7 @@
 (require 'casual-ediff)
 (require 'casual-compile)
 (require 'casual-make)
+(require 'casual-agenda)
 
 
 ;;; Context Menu: Dired
@@ -472,6 +474,150 @@ to items, items to normal lines"])))
                              org-insert-link
                              :label "Link…"
                              :help "Insert a link.  At the prompt, enter the link"]))))
+  menu)
+
+
+;;; Context Menu: Org Agenda
+
+(defun anju-org-agenda-get-span ()
+  "Get current Org agenda span."
+  (let* ((args (get-text-property (min (1- (point-max)) (point)) 'org-last-args))
+         (curspan (nth 2 args)))
+      curspan))
+
+(easy-menu-define anju-org-agenda-view-menu nil
+  "Key map for Org agenda view sub-menu."
+  '("View"
+    :label (format "View (%s)" (capitalize (symbol-name
+                                            (anju-org-agenda-get-span))))
+    :visible (and (derived-mode-p 'org-agenda-mode) (casual-agenda-type-agendap))
+
+    ["← Earlier"
+     org-agenda-earlier
+     :help "Go backward in time by the current span in the agenda buffer"]
+
+    ["→ Later"
+     org-agenda-later
+     :help "Go forward in time by the current span in the agenda buffer"]
+
+    ["Day"
+     org-agenda-day-view
+     :style radio
+     :selected (eq (anju-org-agenda-get-span) 'day)
+     :help "Switch to daily view for agenda"]
+
+    ["Week"
+     org-agenda-week-view
+     :style radio
+     :selected (eq (anju-org-agenda-get-span) 'week)
+     :help "Switch to weekly view for agenda"]
+
+    ["Fortnight"
+     org-agenda-fortnight-view
+     :style radio
+     :selected (eq (anju-org-agenda-get-span) 'fortnight)
+     :help "Switch to fortnightly view for agenda"]
+
+    ["Month"
+     org-agenda-month-view
+     :style radio
+     :selected (eq (anju-org-agenda-get-span) 'month)
+     :help "Switch to monthly view for agenda"]
+
+    ["Year"
+     org-agenda-year-view
+     :style radio
+     :selected (eq (anju-org-agenda-get-span) 'year)
+     :help "Switch to yearly view for agenda"]))
+
+
+(defun anju-context-menu-org-agenda (menu click)
+  "Context menu hook function for Org agenda commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (and (derived-mode-p 'org-agenda-mode)
+             (not (anju-rectangle-selected-p)))
+    (mouse-set-point click)
+    (save-excursion
+      (when (casual-agenda-headlinep)
+        (easy-menu-add-item
+         menu nil
+         ["Clock in"
+          org-agenda-clock-in
+          :label (anju-middle-truncate
+                  (org-agenda-with-point-at-orig-entry nil
+                    (org-element-property :title (org-element-at-point)))
+                  "Clock In")
+          :visible (not (org-clocking-p))
+          :help "Clock in"])
+
+        (easy-menu-add-item
+         menu nil
+         ["Clock out"
+          org-agenda-clock-out
+          :label (if org-clock-current-task
+                     (anju-middle-truncate
+                      (substring-no-properties org-clock-current-task)
+                      "Clock Out")
+                   "Clock Out")
+          :visible (org-clocking-p)
+          :help "Clock out"])
+
+        (easy-menu-add-item
+         menu nil
+         ["TODO…"
+          org-agenda-todo
+          :label (format
+                  "TODO %s…"
+                  (anju-middle-truncate
+                  (org-agenda-with-point-at-orig-entry nil
+                    (org-element-property :title (org-element-at-point)))
+                  ""))
+          :help "Set Todo"])
+
+        (easy-menu-add-item menu nil ["Schedule…"
+                                      org-agenda-schedule
+                                      :help "Schedule headline"])
+
+        (easy-menu-add-item menu nil ["Deadline…"
+                                      org-agenda-deadline
+                                      :help "Deadline headline"])
+
+        (easy-menu-add-item menu nil ["↑ Priority"
+                                      org-agenda-priority-up
+                                      :help "Up priority"])
+
+        (easy-menu-add-item menu nil ["↓ Priority"
+                                      org-agenda-priority-down
+                                      :help "Down priority"])
+
+        (easy-menu-add-item menu nil ["Tags…"
+                                      org-agenda-set-tags
+                                      :help "Set Tags"])
+
+        (easy-menu-add-item menu nil ["Note…"
+                                      org-agenda-add-note
+                                      :help "Add note"]))
+
+      (easy-menu-add-item menu nil ["Now"
+                                    casual-agenda-goto-now
+                                    :help "Goto now"])
+
+      (easy-menu-add-item menu nil anju-org-agenda-view-menu)
+
+      (easy-menu-add-item menu nil ["Show log"
+                                    org-agenda-log-mode
+                                    :style toggle
+                                    :selected org-agenda-show-log
+                                    :help "Toggle log mode in an agenda buffer"])
+
+      (easy-menu-add-item menu nil ["Refresh"
+                                    org-agenda-redo-all
+                                    :help "Redo all"])))
   menu)
 
 
@@ -1648,6 +1794,7 @@ function into `context-menu-functions' over `add-hook'."
 (defvar anju-context-menu--inventory
   '(anju-context-menu-dired
     anju-context-menu-org-mode
+    anju-context-menu-org-agenda
     anju-context-menu-info-mode
     anju-context-menu-make-mode
     anju-context-menu-compile

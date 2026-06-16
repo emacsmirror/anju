@@ -94,6 +94,7 @@ Context Menu Features
 
 * Selected Text Commands::
 * Org Mode Context Menu::
+* Org Agenda Context Menu::
 * Dired Mode Context Menu::
 * Info Context Menu::
 * Emacs Lisp Context Menu::
@@ -361,6 +362,7 @@ Learn more about the different areas Anju enhances context menus in the links be
 @menu
 * Selected Text Commands::
 * Org Mode Context Menu::
+* Org Agenda Context Menu::
 * Dired Mode Context Menu::
 * Info Context Menu::
 * Emacs Lisp Context Menu::
@@ -567,6 +569,15 @@ If the clipboard (latest yank) is known by the user to be Markdown text@comma{} 
 If an image as been copied into the clipboard@comma{} this menu item will ``paste'' it via the @code{yank-media} command.
 @end table
 
+@node Org Agenda Context Menu
+@subsection Org Agenda Context Menu
+
+@cindex Org Agenda Context Menu
+
+@image{images/anju-context-menu-org-agenda,,,,png}
+
+Anju offers a context menu for Org Agenda (@ref{Agenda Views,,,org,}) providing commands that support updating a headline or changing the view of headlines (tasks) displayed.
+
 @node Dired Mode Context Menu
 @subsection Dired Mode Context Menu
 
@@ -711,7 +722,6 @@ To learn more about rectangle commands@comma{} see @ref{Rectangles,info ``(emacs
 @image{images/anju-context-menu-vc,,,,png}
 
 If a context menu is raised on a buffer containing a modified version controlled file@comma{} then support for viewing the difference between the modifications with its previous commit is provided by the menu item “Ediff revision…”. The menu item “Git Grep…” (@code{vc-git-grep}) will constrain a @code{grep} search of only files that are checked-in the repository.
-
 
 If Magit 4.4+ is installed@comma{} then different Magit commands depending on context are displayed. If the context menu is raised in a file buffer@comma{} then the menu item “Magit Dispatch…” (@code{magit-file-dispatch}) is shown@comma{} otherwise “Magit Status” (@code{magit-status}).
 
@@ -1366,37 +1376,51 @@ Learn more about the context menu functions provided by Anju in the section @ref
 @cindex Anju Context Menu Functions
 @vindex anju-context-menu-dired
 @vindex anju-context-menu-org-mode
+@vindex anju-context-menu-org-agenda
+@vindex anju-context-menu-info-mode
 @vindex anju-context-menu-make-mode
 @vindex anju-context-menu-compile
+@vindex anju-context-menu-elisp
+@vindex anju-context-menu-edebug-eval
 @vindex anju-context-menu-scratch
 @vindex anju-context-menu-buffers
 @vindex anju-context-menu-region
-@vindex anju-context-menu-region-extension
+@vindex anju-context-menu-dictionary
 @vindex anju-context-menu-narrow
 @vindex anju-context-menu-open-in
 @vindex anju-context-menu-vc
 @vindex anju-context-menu-markup
 @vindex anju-context-menu-wordcount
-@vindex anju-context-menu-window
-@vindex anju-context-menu-dictionary
-@vindex anju-context-menu-elisp
-@vindex anju-context-menu-edebug-eval
 @vindex anju-context-menu-rectangle
+@vindex anju-context-menu-window
+@vindex anju-context-menu-region-extension
 
 Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
 
 @table @asis
 @item @code{anju-context-menu-dired}
-Dired commands.
+Dired commands. See @ref{Dired Mode Context Menu, , Dired Mode Context Menu}.
 
 @item @code{anju-context-menu-org-mode} 
-Org mode commands.
+Org mode commands. See @ref{Org Mode Context Menu, , Org Mode Context Menu}.
+
+@item @code{anju-context-menu-org-agenda} 
+Org Agenda commands. See @ref{Org Agenda Context Menu, , Org Agenda Context Menu}.
+
+@item @code{anju-context-menu-info-mode} 
+Info mode commands. See @ref{Info Context Menu, , Info Context Menu}.
 
 @item @code{anju-context-menu-make-mode} 
-Makefile mode commands.
+Makefile mode commands. See @ref{Makefile Context Menu, , Makefile Context Menu}.
 
 @item @code{anju-context-menu-compile} 
-Compilation (or Grep) mode commands.
+Compilation (or Grep) mode commands. See @ref{Compilation/Grep Context Menu, , Compilation/Grep Context Menu}.
+
+@item @code{anju-context-menu-elisp}
+Emacs Lisp commands. See @ref{Emacs Lisp Context Menu, , Emacs Lisp Context Menu}.
+
+@item @code{anju-context-menu-edebug-eval}
+Edebug commands. See @ref{Edebug Mode Context Menu, , Edebug Mode Context Menu}.
 
 @item @code{anju-context-menu-scratch} 
 Open scratch buffer.
@@ -1421,7 +1445,7 @@ Open in Dired.
 
 @item @code{anju-context-menu-vc}
 Version control related commands.
-If Magit 4.4+ is installed@comma{} then calls to it are made from here.
+If Magit 4.4+ is installed@comma{} then calls to it are made from here. See @ref{Version-Controlled Source, , Version-Controlled Source}.
 
 @item @code{anju-context-menu-markup}
 Commands to show/hide text markup (e.g. Org@comma{} Markdown).
@@ -1429,17 +1453,11 @@ Commands to show/hide text markup (e.g. Org@comma{} Markdown).
 @item @code{anju-context-menu-wordcount}
 Word count command.
 
+@item @code{anju-context-menu-rectangle}
+Rectangle commands. See @ref{Rectangle Context Menu, , Rectangle Context Menu}.
+
 @item @code{anju-context-menu-window}
 Window management commands.
-
-@item @code{anju-context-menu-elisp}
-Emacs Lisp commands.
-
-@item @code{anju-context-menu-edebug-eval}
-Edebug commands.
-
-@item @code{anju-context-menu-rectangle}
-Rectangle commands.
 @end table
 
 @node Mode Line Buffer List Menu Customization
