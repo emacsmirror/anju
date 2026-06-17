@@ -5,7 +5,7 @@
 ;; Author: Charles Choi <charles.choi@yummymelon.com>
 ;; URL: https://github.com/kickingvegas/anju
 ;; Keywords: tools
-;; Version: 1.5.4-rc.1
+;; Version: 1.6.0
 ;; Package-Requires: ((emacs "29.1") (casual "2.14.0") (markdown-mode "2.7"))
 
 ;; This program is free software; you can redistribute it and/or modify
