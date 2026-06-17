@@ -6,7 +6,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.5.3
+#+MACRO: version 1.5.4-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -209,6 +209,9 @@ If a context menu is raised on selected text, the following menu items are displ
 
 
 *** Org Mode Context Menu
+:PROPERTIES:
+:CUSTOM_ID: org-mode-context-menu
+:END:
 #+CINDEX: Org Mode Context Menu
 
 Anju provides context-sensitive support for Org mode by providing commands relevant to the type of Org element the point is in. Org elements supported by Anju are:
@@ -320,7 +323,21 @@ Anju adds more “Paste” commands that will display given the right context.
 - Paste Media :: If an image as been copied into the clipboard, this menu item will "paste" it via the ~yank-media~ command.
 
 
+*** Org Agenda Context Menu
+:PROPERTIES:
+:CUSTOM_ID: org-agenda-context-menu
+:END:
+#+CINDEX: Org Agenda Context Menu
+
+[[file:images/anju-context-menu-org-agenda.png]]
+
+Anju offers a context menu for Org Agenda ([[info:org#Agenda Views]]) providing commands that support updating a headline or changing the view of headlines (tasks) displayed.
+
+
 *** Dired Mode Context Menu
+:PROPERTIES:
+:CUSTOM_ID: dired-mode-context-menu
+:END:
 #+CINDEX: Dired Mode Context Menu
 
 Anju enhances the context menu support for Dired mode. The screenshot below shows the context menu when the mouse point is over a file.
@@ -333,7 +350,11 @@ If the mouse point is over a directory, the option to insert a view (aka subdir)
 
 Note that the Dired context menu is intentionally restrained in its command offering in accord with Anju's [[#design-principles][Design Principles and Concerns]].
 
+
 *** Info Context Menu
+:PROPERTIES:
+:CUSTOM_ID: info-context-menu
+:END:
 #+CINDEX: Info Context Menu
 
 Anju enhances the context menu support for Info mode. Notable additions include copying the node name to the ~kill-ring~ and opening the node in a web browser.
@@ -342,6 +363,9 @@ Anju enhances the context menu support for Info mode. Notable additions include 
 
 
 *** Emacs Lisp Context Menu
+:PROPERTIES:
+:CUSTOM_ID: emacs-lisp-context-menu
+:END:
 #+CINDEX: Emacs Lisp Context Menu
 
 Anju enhances the context menu for Emacs Lisp (Elisp) development with support for Edebug and ERT.
@@ -407,7 +431,11 @@ The result is that a temporary buffer named ~*add-two*~ (the input name is used)
 
 The ~*add-two*~ buffer can be edited as needed and its contents placed into a desired Elisp file.
 
+
 *** Compilation/Grep Context Menu
+:PROPERTIES:
+:CUSTOM_ID: compilation-context-menu
+:END:
 #+CINDEX: Compilation/Grep Context Menu
 
 
@@ -421,6 +449,9 @@ If the buffer is the output of a Grep search, then its context menu is populated
 
 
 *** Makefile Context Menu
+:PROPERTIES:
+:CUSTOM_ID: makefile-context-menu
+:END:
 #+CINDEX: Makefile Context Menu
 
 [[file:images/anju-context-menu-makefile.png]]
@@ -428,7 +459,11 @@ If the buffer is the output of a Grep search, then its context menu is populated
 
 This context menu offers commands provided by Makefile mode.
 
+
 *** Rectangle Context Menu
+:PROPERTIES:
+:CUSTOM_ID: rectangle-context-menu
+:END:
 #+CINDEX: Rectangle Context Menu
 
 [[file:images/anju-context-menu-rectangle.png]]
@@ -439,14 +474,17 @@ To learn more about rectangle commands, see [[info:emacs#Rectangles][info "(emac
 
 
 *** Version-Controlled Source
+:PROPERTIES:
+:CUSTOM_ID: version-controlled-source
+:END:
 #+CINDEX: Version-Controlled Source
 #+CINDEX: Magit
 
 [[file:images/anju-context-menu-vc.png]]
 
-If a context menu is raised on a buffer containing a modified version controlled file, then support for viewing the difference between the modifications with its previous commit is provided by the menu item “Ediff revision…”.
+If a context menu is raised on a buffer containing a modified version controlled file, then support for viewing the difference between the modifications with its previous commit is provided by the menu item “Ediff revision…”. The menu item “Git Grep…” (~vc-git-grep~) will constrain a ~grep~ search of only files that are checked-in the repository.
 
-If Magit 4.4+ is installed, then different Magit commands depending on context are displayed. If the context menu is raised in a file buffer, then the menu item "Magit Dispatch…" (~magit-file-dispatch~) is shown, otherwise "Magit Status" (~magit-status~).
+If Magit 4.4+ is installed, then different Magit commands depending on context are displayed. If the context menu is raised in a file buffer, then the menu item “Magit Dispatch…” (~magit-file-dispatch~) is shown, otherwise “Magit Status” (~magit-status~).
 
 
 ** Main Menu Features
@@ -676,6 +714,11 @@ Keyboard macros offer workflow automation in Emacs in a "no-code" fashion.  Anju
 
 Note that both keystroke and mouse menu actions can be recorded by a keyboard macro.
 
+When recording a keyboard macro, the menu is modified to provide access to counter and query user (prompt) commands.
+
+[[file:images/anju-kmacro-menu-recording.png]]
+
+
 For more reading on keyboard macros, see [[info:emacs#Keyboard Macros]].
 
 ***  Help Menu Features
@@ -848,43 +891,68 @@ The context predicate can be embedded in the menu item definition itself. See mo
 
 It is up to the implementer to determine where to best define and apply the context predicate.
 
-#+TEXINFO: @subheading Customizing context-menu-functions
+*** Customizing context-menu-functions
+#+CINDEX: Customizing context-menu-functions
+#+VINDEX: context-menu-functions
+
+[[file:images/anju-context-menu-customize.png]]
 
 It is recommended to use the ~customize-variable~ command to configure ~context-menu-functions~ instead of using ~add-hook~ for the following reasons:
 
-1. A visual UI is provided showing what choices for built-in context menu functions are available.
-2. Users can insert their own custom function.
-3. Top-down ordering of functions will similarly determine the order of menu items in the context menu.
+- A visual UI is provided showing what choices for built-in context menu functions are available.
+   
+  - Anju modifies the choice selection to include Anju-defined context menu functions.
+     
+- Users can insert their own custom function.
+   
+- Top-down ordering of functions will similarly determine the order of menu items in the context menu.
+
+
+Learn more about the context menu functions provided by Anju in the section [[#anju-context-menu-functions][Anju Context Menu Functions]].
 
 *** Anju Context Menu Functions
+:PROPERTIES:
+:CUSTOM_ID: anju-context-menu-functions
+:END:
+#+CINDEX: Anju Context Menu Functions
 #+VINDEX: anju-context-menu-dired
 #+VINDEX: anju-context-menu-org-mode
+#+VINDEX: anju-context-menu-org-agenda
+#+VINDEX: anju-context-menu-info-mode
 #+VINDEX: anju-context-menu-make-mode
 #+VINDEX: anju-context-menu-compile
+#+VINDEX: anju-context-menu-elisp
+#+VINDEX: anju-context-menu-edebug-eval
 #+VINDEX: anju-context-menu-scratch
 #+VINDEX: anju-context-menu-buffers
 #+VINDEX: anju-context-menu-region
-#+VINDEX: anju-context-menu-region-extension
+#+VINDEX: anju-context-menu-dictionary
 #+VINDEX: anju-context-menu-narrow
 #+VINDEX: anju-context-menu-open-in
 #+VINDEX: anju-context-menu-vc
 #+VINDEX: anju-context-menu-markup
 #+VINDEX: anju-context-menu-wordcount
-#+VINDEX: anju-context-menu-window
-#+VINDEX: anju-context-menu-dictionary
-#+VINDEX: anju-context-menu-elisp
-#+VINDEX: anju-context-menu-edebug-eval
 #+VINDEX: anju-context-menu-rectangle
+#+VINDEX: anju-context-menu-window
+#+VINDEX: anju-context-menu-region-extension
 
 Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
 
-- ~anju-context-menu-dired~ :: Dired commands.
+- ~anju-context-menu-dired~ :: Dired commands. See [[#dired-mode-context-menu][Dired Mode Context Menu]].
 
-- ~anju-context-menu-org-mode~  :: Org mode commands.
+- ~anju-context-menu-org-mode~  :: Org mode commands. See [[#org-mode-context-menu][Org Mode Context Menu]].
 
-- ~anju-context-menu-make-mode~  :: Makefile mode commands.
+- ~anju-context-menu-org-agenda~  :: Org Agenda commands. See [[#org-agenda-context-menu][Org Agenda Context Menu]].
 
-- ~anju-context-menu-compile~  :: Compilation (or Grep) mode commands.
+- ~anju-context-menu-info-mode~  :: Info mode commands. See [[#info-context-menu][Info Context Menu]].
+
+- ~anju-context-menu-make-mode~  :: Makefile mode commands. See [[#makefile-context-menu][Makefile Context Menu]].
+
+- ~anju-context-menu-compile~  :: Compilation (or Grep) mode commands. See [[#compilation-context-menu][Compilation/Grep Context Menu]].
+
+- ~anju-context-menu-elisp~ :: Emacs Lisp commands. See [[#emacs-lisp-context-menu][Emacs Lisp Context Menu]].
+
+- ~anju-context-menu-edebug-eval~ :: Edebug commands. See [[#edebug-mode-context-menu][Edebug Mode Context Menu]].
 
 - ~anju-context-menu-scratch~  :: Open scratch buffer.
 
@@ -901,19 +969,15 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-open-in~ :: Open in Dired.
 
 - ~anju-context-menu-vc~ :: Version control related commands.
-  If Magit 4.4+ is installed, then calls to it are made from here.
+  If Magit 4.4+ is installed, then calls to it are made from here. See [[#version-controlled-source][Version-Controlled Source]].
 
 - ~anju-context-menu-markup~ :: Commands to show/hide text markup (e.g. Org, Markdown).
 
 - ~anju-context-menu-wordcount~ :: Word count command.
 
+- ~anju-context-menu-rectangle~ :: Rectangle commands. See [[#rectangle-context-menu][Rectangle Context Menu]].
+
 - ~anju-context-menu-window~ :: Window management commands.
-
-- ~anju-context-menu-elisp~ :: Emacs Lisp commands.
-
-- ~anju-context-menu-edebug-eval~ :: Edebug commands.
-
-- ~anju-context-menu-rectangle~ :: Rectangle commands.
 
 
 ** Mode Line Buffer List Menu Customization
