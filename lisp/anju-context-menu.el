@@ -1150,7 +1150,11 @@ This function is intended to be hooked into `context-menu-functions'."
 
 This function is intended to be hooked into `context-menu-functions'."
   (when (and (vc-responsible-backend default-directory t)
-             (not (derived-mode-p 'Info-mode))
+             (not (or (derived-mode-p 'Info-mode)
+                      (derived-mode-p 'help-mode)
+                      (derived-mode-p 'Man-mode)
+                      (derived-mode-p 'shortdoc-mode)
+                      (derived-mode-p 'eww-mode)))
              (not (use-region-p))
              (not (anju-at-org-table-p))
              (not (anju-rectangle-selected-p)))
