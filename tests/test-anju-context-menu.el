@@ -58,6 +58,7 @@
 (defvar anju-test-context-menu--inventory
   '(anju-context-menu-dired
     anju-context-menu-org-mode
+    anju-context-menu-org-agenda
     anju-context-menu-info-mode
     anju-context-menu-make-mode
     anju-context-menu-compile
@@ -104,8 +105,7 @@
           inventory)))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Region Extension
+;;; Context Menu: Region Extension
 
 (defun test--anju-context-menu-org-copy-as-menu (kmap)
   "Test KMAP for `anju-context-menu-org-copy-as-menu'."
@@ -200,8 +200,7 @@
                         "jane.org")))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Dired
+;;; Context Menu: Dired
 
 (ert-deftest test-anju-context-menu-dired ()
   "Test for `anju-context-menu-dired'."
@@ -326,8 +325,7 @@
   (kill-buffer))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Scratch Buffer
+;;; Context Menu: Scratch Buffer
 
 (ert-deftest test-anju-context-menu-scratch ()
   "Test for `anju-context-menu-scratch'."
@@ -348,8 +346,7 @@
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Dictionary
+;;; Context Menu: Dictionary
 
 (ert-deftest test-anju-context-menu-dictionary ()
   "Test for `anju-context-menu-dictionary'."
@@ -375,8 +372,7 @@
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Emacs Lisp Mode
+;;; Context Menu: Emacs Lisp Mode
 
 (defun test--anju-edebug-mode-menu (kmap)
   "Test for `anju-edebug-mode-menu'."
@@ -725,8 +721,7 @@
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Org Mode
+;;; Context Menu: Org Mode
 
 (ert-deftest test-anju-context-menu-org-mode-heading ()
   "Test for `anju-context-menu-org-mode' when point is in heading."
@@ -1047,8 +1042,170 @@
   (test--anju-org-table-region-menu anju-org-table-region-menu))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Buffer Navigation/Management
+;;; Context Menu: Org Agenda
+
+(defun test--anju-org-agenda-view-menu (kmap)
+  "Test for `anju-org-agenda-view-menu' with KMAP."
+  (anju-test-keymap
+   kmap
+   "View"
+   7
+   (lambda (items)
+     (let* ((i 0))
+       (anju-test-menu-item
+        (seq-elt items i)
+        "← Earlier"
+        #'org-agenda-earlier
+        "Go backward in time by the current span in the agenda buffer")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "→ Later"
+        #'org-agenda-later
+        "Go forward in time by the current span in the agenda buffer")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Day"
+        #'org-agenda-day-view
+        "Switch to daily view for agenda")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Week"
+        #'org-agenda-week-view
+        "Switch to weekly view for agenda")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Fortnight"
+        #'org-agenda-fortnight-view
+        "Switch to fortnightly view for agenda")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Month"
+        #'org-agenda-month-view
+        "Switch to monthly view for agenda")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Year"
+        #'org-agenda-year-view
+        "Switch to yearly view for agenda")))))
+
+(ert-deftest test-anju-org-agenda-view-menu ()
+  "Test for `anju-org-agenda-view-menu'."
+  (test--anju-org-agenda-view-menu anju-org-agenda-view-menu))
+
+(ert-deftest test-anju-context-menu-org-agenda ()
+  "Test for `anju-context-menu-org-agenda'."
+
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-org-agenda
+   13
+   (lambda (items)
+     (let* ((i 0))
+
+       (anju-test-menu-item
+        (seq-elt items i)
+        (lambda () (anju-middle-truncate
+                  (org-agenda-with-point-at-orig-entry nil
+                    (org-element-property :title (org-element-at-point)))
+                  "Clock In"))
+        #'org-agenda-clock-in
+        "Clock in")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (if org-clock-current-task
+                     (anju-middle-truncate
+                      (substring-no-properties org-clock-current-task)
+                      "Clock Out")
+                   "Clock Out"))
+        #'org-agenda-clock-out
+        "Clock out")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        (lambda () (format
+                  "TODO %s…"
+                  (anju-middle-truncate
+                  (org-agenda-with-point-at-orig-entry nil
+                    (org-element-property :title (org-element-at-point)))
+                  "")))
+        #'org-agenda-todo
+        "Set Todo")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Schedule…"
+        #'org-agenda-schedule
+        "Schedule headline")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Deadline…"
+        #'org-agenda-deadline
+        "Deadline headline")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "↑ Priority"
+        #'org-agenda-priority-up
+        "Up priority")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "↓ Priority"
+        #'org-agenda-priority-down
+        "Down priority")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Tags…"
+        #'org-agenda-set-tags
+        "Set Tags")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Note…"
+        #'org-agenda-add-note
+        "Add note")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Now"
+        #'casual-agenda-goto-now
+        "Goto now")
+
+       (let ((kmap (seq-elt (seq-elt items (cl-incf i)) 3)))
+         (test--anju-org-agenda-view-menu kmap))
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Show log"
+        #'org-agenda-log-mode
+        "Toggle log mode in an agenda buffer")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Refresh"
+        #'org-agenda-redo-all
+        "Redo all")))
+
+   (lambda (filename description)
+     (let* ((org-agenda-files (list filename)))
+       (insert "** TODO Dummy Task    :living:
+SCHEDULED: <2026-06-17 Wed 19:00>")
+       (save-buffer)
+       (org-agenda nil "n")
+       (org-agenda-next-item 1)))))
+
+
+
+;;; Context Menu: Buffer Navigation/Management
 
 
 (ert-deftest test-anju-context-menu-buffers ()
@@ -1085,8 +1242,7 @@
         "List all buffers")))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Makefile Mode
+;;; Context Menu: Makefile Mode
 
 (defun test--anju-makefile-modes-menu (kmap)
   "Test KMAP for `anju-makefile-modes-menu'."
@@ -1220,8 +1376,7 @@ tests:
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Narrow/Widen
+;;; Context Menu: Narrow/Widen
 
 (ert-deftest test-anju-context-menu-narrow-region ()
   "Test for `anju-context-menu-narrow' when editing a region."
@@ -1346,8 +1501,7 @@ tests:
      (org-narrow-to-subtree))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Open in…
+;;; Context Menu: Open in…
 
 (ert-deftest test-anju-context-menu-open-in ()
   "Test for `anju-context-menu-open-in'."
@@ -1367,9 +1521,7 @@ tests:
         "Open file in Dired")))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Info Mode
-
+;;; Context Menu: Info Mode
 
 (ert-deftest test-anju-context-menu-info-mode ()
   "Test for `anju-context-menu-info-mode'."
@@ -1434,8 +1586,7 @@ tests:
 
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: VC/Magit
+;;; Context Menu: VC/Magit
 
 (ert-deftest test-anju-context-menu-vc-file ()
   "Test for `anju-context-menu-vc'."
@@ -1500,8 +1651,7 @@ tests:
   (kill-buffer))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Region Operations
+;;; Context Menu: Region Operations
 
 (ert-deftest test-anju-context-menu-region ()
   "Test for `anju-context-menu-region'."
@@ -1555,8 +1705,7 @@ containing a match for selected word")
      (activate-mark))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Show Markup/Toggle Images
+;;; Context Menu: Show Markup/Toggle Images
 
 (ert-deftest test-anju-context-menu-markup ()
   "Test for `anju-context-menu-markup'."
@@ -1585,8 +1734,7 @@ temporarily visible (Visible mode)"
         )))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Compilation Mode
+;;; Context Menu: Compilation Mode
 
 (ert-deftest test-anju-context-menu-compile ()
   "Test for `anju-context-menu-compile'."
@@ -1623,8 +1771,7 @@ run ‘make’")
           "Kill the current compilation or grep process"))))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Word Count
+;;; Context Menu: Word Count
 
 (ert-deftest test-anju-context-menu-wordcount ()
   "Test for `anju-context-menu-wordcount'."
@@ -1644,8 +1791,7 @@ run ‘make’")
         "Count words")))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Window Management
+;;; Context Menu: Window Management
 
 (ert-deftest test-anju-context-menu-window ()
   "Test for `anju-context-menu-window'."
@@ -1719,8 +1865,7 @@ run ‘make’")
                                    "Swap window right")))))))))
 
 
-;; -------------------------------------------------------------------
-;; Context Menu: Rectangle Commands
+;;; Context Menu: Rectangle Commands
 
 (ert-deftest test-anju-context-menu-rectangle ()
   "Test for `anju-context-menu-rectangle'."
