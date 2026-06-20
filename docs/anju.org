@@ -601,6 +601,24 @@ Note that a menu command can be run again immediately after it has been issued u
 
 These modifications are optional. For more detail, see [[#edit-menu-customization][Edit Menu Customization]].
 
+
+*** Registers Menu Features
+#+CINDEX: Registers Menu Features
+
+[[file:images/anju-main-menu-registers.png]]
+
+
+Anju adds a *Registers* menu to the menu bar to work with Emacs registers ([[info:emacs#Registers]]). Registers offer run-time storage of Emacs state such as:
+
+- Text selection
+- Rectangle selection
+- Cursor position (point) 
+- Number (counter)
+- Window configuration
+- Keyboard macro
+
+This modification is optional. For more detail, see [[#registers-menu-customization][Registers Menu Customization]].
+
 *** Options Menu Features
 #+CINDEX: Options Menu Features
 
@@ -611,7 +629,7 @@ This modification is optional. For more detail, see [[#options-menu-customizatio
 ***  Bookmarks Menu Features
 #+CINDEX: Bookmarks Menu Features
 
-Anju adds a *Bookmarks* menu to the main menu to work with Emacs-specific bookmarks.
+Anju adds a *Bookmarks* menu to the menu bar to work with Emacs-specific bookmarks.
 
 [[file:images/anju-main-menu-bookmarks.png]]
 
@@ -1106,6 +1124,21 @@ Anju customizes the *Edit* menu using the hook function ~anju-main-menu--reconfi
 Add this hook function to ~anju-reconfigure-main-menu-hook~ to enable customization of the *Edit* menu.
 
 If ~customize-variable~ is used to configure ~anju-reconfigure-main-menu-hook~, then a checkbox interface to enable  ~anju-main-menu--reconfigure-edit~ is displayed.
+
+
+*** Registers Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: registers-menu-customization
+:END:
+#+CINDEX: Registers Menu Customization
+#+VINDEX: anju-main-menu--reconfigure-registers
+
+Anju customizes the *Registers* menu using the hook function ~anju-main-menu--reconfigure-registers~.
+
+To add the *Registers* menu to the menu bar, add the above hook function to ~anju-reconfigure-main-menu-hook~.
+
+If ~customize-variable~ is used to configure ~anju-reconfigure-main-menu-hook~, then a checkbox interface to enable  ~anju-main-menu--reconfigure-registers~ is displayed.
+
 
 *** Options Menu Customization
 :PROPERTIES:
