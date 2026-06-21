@@ -1104,7 +1104,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-agenda
-   13
+   14
    (lambda (items)
      (let* ((i 0))
 
@@ -1179,6 +1179,12 @@
         "Now"
         #'casual-agenda-goto-now
         "Goto now")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Goto date…"
+        #'org-agenda-goto-date
+        "Jump to DATE in the agenda buffer")
 
        (let ((kmap (seq-elt (seq-elt items (cl-incf i)) 3)))
          (test--anju-org-agenda-view-menu kmap))

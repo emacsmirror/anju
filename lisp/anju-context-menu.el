@@ -607,6 +607,10 @@ This function is intended to be hooked into `context-menu-functions'."
                                     casual-agenda-goto-now
                                     :help "Goto now"])
 
+      (easy-menu-add-item menu nil ["Goto date…"
+                                    org-agenda-goto-date
+                                    :help "Jump to DATE in the agenda buffer"])
+
       (easy-menu-add-item menu nil anju-org-agenda-view-menu)
 
       (easy-menu-add-item menu nil ["Show log"
