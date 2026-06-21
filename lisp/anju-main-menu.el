@@ -31,6 +31,7 @@
 (require 'org-agenda)
 (require 'whitespace)
 (require 'markdown-mode)
+(require 'register)
 (require 'anju-utils)
 (require 'anju-style-text)
 (require 'casual-bookmarks)
@@ -283,6 +284,54 @@ This function is intended to be used in
 
   (define-key global-map [menu-bar edit bookmark] nil t))
 
+
+;;; Reconfigure Registers Menu
+
+(easy-menu-define anju-registers-menu nil
+  "Keymap for Registers menu."
+  '("Registers"
+    ("Store"
+     ["Text Region…" copy-to-register
+      :enable (use-region-p)
+      :help "Copy region of text between START and END into REGISTER"]
+     ["Prepend to Register…" prepend-to-register
+      :enable (use-region-p)
+      :help "Prepend region of text between START and END to REGISTER"]
+     ["Append to Register…" append-to-register
+      :enable (use-region-p)
+      :help "Append region of text between START and END to REGISTER"]
+     "--"
+     ["Rectangle…" copy-rectangle-to-register
+      :enable (use-region-p)
+      :help "Copy rectangular region of text between START and END into REGISTER"]
+     "--"
+     ["Point…" point-to-register
+      :help "Store current location of point in REGISTER"]
+     "--"
+     ["Number…" number-to-register
+      :help "Store NUMBER (either at point or via prefix) in REGISTER"]
+     ["Increment Number…" increment-register
+      :help "Augment contents of REGISTER using PREFIX"]
+     "--"
+     ["Window Configuration…" window-configuration-to-register
+      :help "Store the window configuration of the selected frame in REGISTER"]
+     "--"
+     ["Keyboard Macro…" kmacro-to-register
+      :help "Store the last keyboard macro in register R"])
+
+    ["Insert…" insert-register
+     :help "Insert contents of REGISTER at point"]
+    ["Jump…" jump-to-register
+     :help "Go to location stored in REGISTER, or restore configuration stored there"]))
+
+(defun anju-main-menu--reconfigure-registers ()
+  "Hook function to add Registers menu to the main menu bar.
+
+This function is intended to be used in
+`anju-reconfigure-main-menu-hook'."
+  (easy-menu-add-item global-map '(menu-bar)
+                      anju-registers-menu
+                      'options))
 
 
 ;;; Help Menu Customization

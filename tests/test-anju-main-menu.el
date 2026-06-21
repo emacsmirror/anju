@@ -27,6 +27,129 @@
 (require 'anju-main-menu)
 (require 'anju-test-utils)
 
+
+
+;;; Registers Menu Tests
+
+(defun test--anju-registers-menu (kmap)
+  "Test for `anju-registers-menu' with KMAP."
+  (anju-test-keymap
+   kmap
+   "Registers"
+   3
+   (lambda (items)
+     (let ((i 0))
+       (let* ((item (seq-elt items i))
+              (kmap (seq-elt item 3)))
+         (anju-test-keymap
+          kmap
+          "Store"
+          14
+          (lambda (items)
+            (let ((i 0))
+              (anju-test-menu-item
+               (seq-elt items i)
+               "Text Region…"
+               #'copy-to-register
+               "Copy region of text between START and END into REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Prepend to Register…"
+               #'prepend-to-register
+               "Prepend region of text between START and END to REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Append to Register…"
+               #'append-to-register
+               "Append region of text between START and END to REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "--")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Rectangle…"
+               #'copy-rectangle-to-register
+               "Copy rectangular region of text between START and END into REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "--")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Point…"
+               #'point-to-register
+               "Store current location of point in REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "--")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Number…"
+               #'number-to-register
+               "Store NUMBER (either at point or via prefix) in REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Increment Number…"
+               #'increment-register
+               "Augment contents of REGISTER using PREFIX")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "--")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Window Configuration…"
+               #'window-configuration-to-register
+               "Store the window configuration of the selected frame in REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "--")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Keyboard Macro…"
+               #'kmacro-to-register
+               "Store the last keyboard macro in register R")))))
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Insert…"
+        #'insert-register
+        "Insert contents of REGISTER at point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Jump…"
+        #'jump-to-register
+        "Go to location stored in REGISTER, or restore configuration stored there")))))
+
+(ert-deftest test-anju-registers-menu ()
+  "Test for `anju-registers-menu'."
+  (test--anju-registers-menu anju-registers-menu))
+
+
+(ert-deftest test-anju-main-menu--reconfigure-registers ()
+  "Test for `anju-main-menu--reconfigure-registers'."
+
+  (anju-main-menu--reconfigure-registers)
+
+  (let ((registers-map (lookup-key global-map [menu-bar Registers])))
+    (test--anju-registers-menu registers-map)))
+
+
+
+;;; Window Swap Tests
+
 (defun test--anju-window-swap-menu (kmap)
   (anju-test-keymap
    kmap
@@ -67,7 +190,7 @@
     (should mfd)
     (should mfm)))
 
-;; -------------------------------------------------------------------
+;;; Options Menu Tests
 
 (ert-deftest test-anju-main-menu--reconfigure-options ()
   (anju-main-menu--reconfigure-options)
@@ -76,7 +199,8 @@
     (should (not cua-mode))))
 
 
-;; -------------------------------------------------------------------
+;;; Transpose Menu Tests
+
 
 (defun test--anju-transpose-menu (kmap)
   (anju-test-keymap
@@ -132,7 +256,7 @@ expressions (sexps)")))))
   (test--anju-transpose-menu anju-transpose-menu))
 
 
-;; -------------------------------------------------------------------
+;;; Move Text Menu Tests
 
 (defun test--anju-move-text-menu (kmap)
   (anju-test-keymap
@@ -182,7 +306,8 @@ one sexp")))))
 
 
 
-;; -------------------------------------------------------------------
+;;; Delete Space Menu Tests
+
 (defun test--anju-delete-space-menu (kmap)
   (anju-test-keymap
    kmap
@@ -257,7 +382,7 @@ leaving just one")
   (test--anju-move-text-menu anju-move-text-menu))
 
 
-;; -------------------------------------------------------------------
+;;; Edit Menu Tests
 
 (ert-deftest test-anju-main-menu--reconfigure-edit ()
   (anju-main-menu--reconfigure-edit)
@@ -397,6 +522,9 @@ leaving just one")
           "Send Bug Report…"
           #'report-emacs-bug
           "Send Emacs bug report"))))))
+
+
+;;; Text Mode Menu Tests
 
 (ert-deftest test-anju-main-menu--reconfigure-text-mode ()
   "Test for `anju-main-menu--reconfigure-text-mode'."
@@ -544,8 +672,7 @@ leaving just one")
           "Fill paragraphs within the region, allowing varying indentation within each"))))))
 
 
-;; -------------------------------------------------------------------
-;; Tools Menu Tests
+;;; Tools Menu Tests
 
 (defun test--anju-kmacro-menu (kmap)
   "Test KMAP for `anju-kmacro-menu'."

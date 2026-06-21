@@ -152,6 +152,7 @@ add their own filters to define the resulting buffer list returned by
 (defcustom anju-reconfigure-main-menu-hook
   '(anju-main-menu--reconfigure-file
     anju-main-menu--reconfigure-edit
+    anju-main-menu--reconfigure-registers
     anju-main-menu--reconfigure-options
     anju-main-menu--reconfigure-bookmarks
     anju-main-menu--reconfigure-text-mode
@@ -165,6 +166,7 @@ initialized with the following functions:
 
 - `anju-main-menu--reconfigure-file'
 - `anju-main-menu--reconfigure-edit'
+- `anju-main-menu--reconfigure-registers'
 - `anju-main-menu--reconfigure-options'
 - `anju-main-menu--reconfigure-bookmarks'
 - `anju-main-menu--reconfigure-text-mode'
@@ -174,6 +176,7 @@ initialized with the following functions:
   :type 'hook
   :options '(anju-main-menu--reconfigure-file
              anju-main-menu--reconfigure-edit
+             anju-main-menu--reconfigure-registers
              anju-main-menu--reconfigure-options
              anju-main-menu--reconfigure-bookmarks
              anju-main-menu--reconfigure-text-mode
