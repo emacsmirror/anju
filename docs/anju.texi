@@ -1130,7 +1130,6 @@ Provide general access to these commands
 
 Keyboard macros offer workflow automation in Emacs in a ``no-code'' fashion.  Anju showcases this capability by providing a menu of keyboard macro commands in the menu bar Tools menu.
 
-
 @image{images/anju-main-menu-tools-kmacro,,,,png}
 
 
@@ -1140,6 +1139,10 @@ When recording a keyboard macro@comma{} the menu is modified to provide access t
 
 @image{images/anju-kmacro-menu-recording,,,,png}
 
+
+If multiple keyboard macros are defined@comma{} they can be managed using the “List macros” (@code{kmacro-menu}) menu item. The window named ``✻Keyboard Macro List✻'' will be displayed.
+
+@image{images/anju-kmacro-menu,,,,png}
 
 For more reading on keyboard macros@comma{} see @ref{Keyboard Macros,,,emacs,}.
 

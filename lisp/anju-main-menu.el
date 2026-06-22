@@ -579,6 +579,12 @@ Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
      :enable (not defining-kbd-macro)
      :help "Insert in buffer the definition of kbd macro MACRONAME, as Lisp code"]
 
+    [kmacro-edit-lossage
+     kmacro-edit-lossage
+     :label "New macro from history…"
+     :enable (and (fboundp #'kmacro-edit-lossage) (not defining-kbd-macro))
+     :help "Edit most recent 300 keystrokes as a keyboard macro"]
+
     [kmacro-menu
      kmacro-menu
      :label "List macros"
