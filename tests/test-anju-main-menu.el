@@ -680,7 +680,7 @@ leaving just one")
   (anju-test-keymap
    kmap
    "Macro Recorder"
-   13
+   14
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -754,6 +754,12 @@ leaving just one")
         "Insert macro named…"
         #'insert-kbd-macro
         "Insert in buffer the definition of kbd macro MACRONAME, as Lisp code")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "New macro from history…"
+        #'kmacro-edit-lossage
+        "Edit most recent 300 keystrokes as a keyboard macro")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
