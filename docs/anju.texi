@@ -99,6 +99,7 @@ Context Menu Features
 * Info Context Menu::
 * Emacs Lisp Context Menu::
 * Compilation/Grep Context Menu::
+* Xref Context menu::
 * Makefile Context Menu::
 * Rectangle Context Menu::
 * Version-Controlled Source::
@@ -369,6 +370,7 @@ Learn more about the different areas Anju enhances context menus in the links be
 * Info Context Menu::
 * Emacs Lisp Context Menu::
 * Compilation/Grep Context Menu::
+* Xref Context menu::
 * Makefile Context Menu::
 * Rectangle Context Menu::
 * Version-Controlled Source::
@@ -693,6 +695,16 @@ The @code{*add-two*} buffer can be edited as needed and its contents placed into
 If the buffer is the output of a compilation@comma{} then its context menu is populated with commands to either recompile or invoke a new compile command.
 
 If the buffer is the output of a Grep search@comma{} then its context menu is populated with the command to refresh the search.
+
+@node Xref Context menu
+@subsection Xref Context menu
+
+@cindex Xref Context Menu
+
+
+@image{images/anju-context-menu-xref,,,,png}
+
+Commands such as @code{xref-find-references} or @code{xref-find-references-at-mouse} on a symbol will create a new buffer named @code{✻xref✻} listing locations where that symbol has been referenced. Anju provides a context menu for this  @code{✻xref✻}  buffer with commands described in @ref{Xref Commands,,,emacs,}.
 
 @node Makefile Context Menu
 @subsection Makefile Context Menu
@@ -1454,6 +1466,9 @@ Emacs Lisp commands. See @ref{Emacs Lisp Context Menu, , Emacs Lisp Context Menu
 
 @item @code{anju-context-menu-edebug-eval}
 Edebug commands. See @ref{Edebug Mode Context Menu, , Edebug Mode Context Menu}.
+
+@item @code{anju-context-menu-xref}
+Xref commands. See @ref{Xref Context menu, , Xref Context Menu}.
 
 @item @code{anju-context-menu-scratch} 
 Open scratch buffer.

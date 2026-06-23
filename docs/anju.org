@@ -447,6 +447,17 @@ If the buffer is the output of a compilation, then its context menu is populated
 If the buffer is the output of a Grep search, then its context menu is populated with the command to refresh the search.
 
 
+*** Xref Context menu
+:PROPERTIES:
+:CUSTOM_ID: xref-context-menu
+:END:
+#+CINDEX: Xref Context Menu
+
+
+[[file:images/anju-context-menu-xref.png]]
+
+Commands such as ~xref-find-references~ or ~xref-find-references-at-mouse~ on a symbol will create a new buffer named ~✻xref✻~ listing locations where that symbol has been referenced. Anju provides a context menu for this  ~✻xref✻~  buffer with commands described in [[info:emacs#Xref Commands]]. 
+
 
 *** Makefile Context Menu
 :PROPERTIES:
@@ -974,6 +985,8 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-elisp~ :: Emacs Lisp commands. See [[#emacs-lisp-context-menu][Emacs Lisp Context Menu]].
 
 - ~anju-context-menu-edebug-eval~ :: Edebug commands. See [[#edebug-mode-context-menu][Edebug Mode Context Menu]].
+
+- ~anju-context-menu-xref~ :: Xref commands. See [[#xref-context-menu][Xref Context Menu]].
 
 - ~anju-context-menu-scratch~  :: Open scratch buffer.
 
