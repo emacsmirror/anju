@@ -6,7 +6,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.6.0
+#+MACRO: version 1.6.1-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -447,6 +447,17 @@ If the buffer is the output of a compilation, then its context menu is populated
 If the buffer is the output of a Grep search, then its context menu is populated with the command to refresh the search.
 
 
+*** Xref Context menu
+:PROPERTIES:
+:CUSTOM_ID: xref-context-menu
+:END:
+#+CINDEX: Xref Context Menu
+
+
+[[file:images/anju-context-menu-xref.png]]
+
+Commands such as ~xref-find-references~ or ~xref-find-references-at-mouse~ on a symbol will create a new buffer named ~✻xref✻~ listing locations where that symbol has been referenced. Anju provides a context menu for this  ~✻xref✻~  buffer with commands described in [[info:emacs#Xref Commands]]. 
+
 
 *** Makefile Context Menu
 :PROPERTIES:
@@ -601,6 +612,24 @@ Note that a menu command can be run again immediately after it has been issued u
 
 These modifications are optional. For more detail, see [[#edit-menu-customization][Edit Menu Customization]].
 
+
+*** Registers Menu Features
+#+CINDEX: Registers Menu Features
+
+[[file:images/anju-main-menu-registers.png]]
+
+
+Anju adds a *Registers* menu to the menu bar to work with Emacs registers ([[info:emacs#Registers]]). Registers offer run-time storage of Emacs state such as:
+
+- Text selection
+- Rectangle selection
+- Cursor position (point) 
+- Number (counter)
+- Window configuration
+- Keyboard macro
+
+This modification is optional. For more detail, see [[#registers-menu-customization][Registers Menu Customization]].
+
 *** Options Menu Features
 #+CINDEX: Options Menu Features
 
@@ -611,7 +640,7 @@ This modification is optional. For more detail, see [[#options-menu-customizatio
 ***  Bookmarks Menu Features
 #+CINDEX: Bookmarks Menu Features
 
-Anju adds a *Bookmarks* menu to the main menu to work with Emacs-specific bookmarks.
+Anju adds a *Bookmarks* menu to the menu bar to work with Emacs-specific bookmarks.
 
 [[file:images/anju-main-menu-bookmarks.png]]
 
@@ -708,7 +737,6 @@ Anju makes the following modifications to the menu bar *Tools* menu:
 
 Keyboard macros offer workflow automation in Emacs in a "no-code" fashion.  Anju showcases this capability by providing a menu of keyboard macro commands in the menu bar Tools menu.
 
-
 [[file:images/anju-main-menu-tools-kmacro.png]]
 
 
@@ -718,6 +746,10 @@ When recording a keyboard macro, the menu is modified to provide access to count
 
 [[file:images/anju-kmacro-menu-recording.png]]
 
+
+If multiple keyboard macros are defined, they can be managed using the “List macros” (~kmacro-menu~) menu item. The window named "✻Keyboard Macro List✻" will be displayed.
+
+[[file:images/anju-kmacro-menu.png]]
 
 For more reading on keyboard macros, see [[info:emacs#Keyboard Macros]].
 
@@ -954,6 +986,8 @@ Anju provides the following context menu functions for convenience. They can be 
 
 - ~anju-context-menu-edebug-eval~ :: Edebug commands. See [[#edebug-mode-context-menu][Edebug Mode Context Menu]].
 
+- ~anju-context-menu-xref~ :: Xref commands. See [[#xref-context-menu][Xref Context Menu]].
+
 - ~anju-context-menu-scratch~  :: Open scratch buffer.
 
 - ~anju-context-menu-buffers~ :: Buffer navigation commands.
@@ -1106,6 +1140,21 @@ Anju customizes the *Edit* menu using the hook function ~anju-main-menu--reconfi
 Add this hook function to ~anju-reconfigure-main-menu-hook~ to enable customization of the *Edit* menu.
 
 If ~customize-variable~ is used to configure ~anju-reconfigure-main-menu-hook~, then a checkbox interface to enable  ~anju-main-menu--reconfigure-edit~ is displayed.
+
+
+*** Registers Menu Customization
+:PROPERTIES:
+:CUSTOM_ID: registers-menu-customization
+:END:
+#+CINDEX: Registers Menu Customization
+#+VINDEX: anju-main-menu--reconfigure-registers
+
+Anju customizes the *Registers* menu using the hook function ~anju-main-menu--reconfigure-registers~.
+
+To add the *Registers* menu to the menu bar, add the above hook function to ~anju-reconfigure-main-menu-hook~.
+
+If ~customize-variable~ is used to configure ~anju-reconfigure-main-menu-hook~, then a checkbox interface to enable  ~anju-main-menu--reconfigure-registers~ is displayed.
+
 
 *** Options Menu Customization
 :PROPERTIES:
