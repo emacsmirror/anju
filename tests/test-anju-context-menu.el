@@ -64,6 +64,7 @@
     anju-context-menu-compile
     anju-context-menu-elisp
     anju-context-menu-edebug-eval
+    anju-context-menu-xref
     anju-context-menu-scratch
     anju-context-menu-buffers
     anju-context-menu-region
@@ -1655,6 +1656,76 @@ tests:
         "Run git grep, searching for REGEXP in FILES in directory DIR"))))
 
   (kill-buffer))
+
+
+;;; Context Menu: Xref
+
+(ert-deftest test-anju-context-menu-xref ()
+  "Test for `anju-context-menu-xref'."
+  (let ((xref-prompt-for-identifier nil))
+    (find-function #'anju-menu-label)
+    (down-list)
+    (forward-sexp 2)
+    (backward-sexp)
+    (call-interactively #'xref-find-references)
+    (switch-to-buffer "*xref*")
+    (anju-test-context-menu-function
+     #'anju-context-menu-xref
+     "Dummy String"
+     9
+     (lambda (items)
+       (let ((i 0))
+         (anju-test-menu-item
+          (seq-elt items i)
+          "--")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Refresh"
+          #'revert-buffer
+          "Refresh context of the ‘*xref*’ buffer")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "↑ Line"
+          #'xref-prev-line
+          "Move to the previous xref and display its source in the appropriate window")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "↓ Line"
+          #'xref-next-line
+          "Move to the next xref and display its source in the appropriate window")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "↑ Group"
+          #'xref-prev-group
+          "Move to the first item of the previous xref group and display its source")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "↓ Group"
+          #'xref-next-group
+          "Move to the first item of the next xref group and display its source")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Replace xref…"
+          #'xref-query-replace-in-results
+          "Perform interactive replacement of FROM with TO in all displayed xrefs")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Quit to xref"
+          #'xref-quit-and-goto-xref
+          "Quit *xref* buffer, then jump to xref on current line")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Quit"
+          #'quit-window
+          "Quit *xref* buffer"))))))
 
 
 ;;; Context Menu: Region Operations

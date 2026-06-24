@@ -34,6 +34,7 @@
 (require 'hideshow)
 (require 'edebug)
 (require 'info)
+(require 'xref)
 (require 'make-mode)
 (require 'yank-media)
 (require 'anju-utils)
@@ -1119,6 +1120,80 @@ from current buffer"]))))
   menu)
 
 
+;;; Context Menu: Xref
+
+(defun anju-context-menu-xref (menu click)
+  "Context menu hook function for xref commands.
+
+- MENU: menu
+- CLICK: event
+
+This function is intended to be hooked into `context-menu-functions'."
+
+  (when (derived-mode-p 'xref--xref-buffer-mode)
+    (save-excursion
+      (mouse-set-point click)
+      (anju-context-menu-item-separator menu xref-separator)
+      (easy-menu-add-item
+       menu nil
+       [revert-buffer
+        revert-buffer
+        :label "Refresh"
+        :help "Refresh context of the ‘*xref*’ buffer"])
+
+      (easy-menu-add-item
+       menu nil
+       [xref-prev-line
+        xref-prev-line
+        :label "↑ Line"
+        :help "Move to the previous xref and display its source in the appropriate window"])
+
+      (easy-menu-add-item
+       menu nil
+       [xref-next-line
+        xref-next-line
+        :label "↓ Line"
+        :help "Move to the next xref and display its source in the appropriate window"])
+
+      (easy-menu-add-item
+       menu nil
+       [xref-prev-group
+        xref-prev-group
+        :label "↑ Group"
+        :help "Move to the first item of the previous xref group and display its source"])
+
+      (easy-menu-add-item
+       menu nil
+       [xref-next-group
+        xref-next-group
+        :label "↓ Group"
+        :help "Move to the first item of the next xref group and display its source"])
+
+      (easy-menu-add-item
+       menu nil
+       [xref-query-replace-in-results
+        xref-query-replace-in-results
+        :label "Replace xref…"
+        :help "Perform interactive replacement of FROM with TO in all displayed xrefs"])
+
+      (easy-menu-add-item
+       menu nil
+       [xref-quit-and-goto-xref
+        xref-quit-and-goto-xref
+        :label "Quit to xref"
+        :help "Quit *xref* buffer, then jump to xref on current line"])
+
+      (easy-menu-add-item
+       menu nil
+       [quit-window
+        quit-window
+        :label "Quit"
+        :help "Quit *xref* buffer"])))
+  menu)
+
+
+
+
 ;;; Context Menu: Open in…
 
 (defun anju-context-menu-open-in (menu click)
@@ -1808,6 +1883,7 @@ function into `context-menu-functions' over `add-hook'."
     anju-context-menu-compile
     anju-context-menu-elisp
     anju-context-menu-edebug-eval
+    anju-context-menu-xref
     anju-context-menu-scratch
     anju-context-menu-buffers
     anju-context-menu-region
