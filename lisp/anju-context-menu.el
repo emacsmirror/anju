@@ -51,20 +51,40 @@
 
 (defun anju-click-and-point-distant-p (click)
   "Predicate if CLICK event position is distant from the current point."
-  (let* ((current-line (line-number-at-pos (point)))
-         (menu-line (line-number-at-pos
-                      (posn-point (event-start click)))))
-    (message "current-line exp %s, %s" current-line menu-line)
-    (/= current-line menu-line)))
 
+  (if (display-graphic-p)
+      (let* ((current-position (window-absolute-pixel-position))
+             (click-position (anju-click-pixel-position click))
+             (dx (abs (- (car current-position) (car click-position))))
+             (dy (abs (- (cdr current-position) (cdr click-position)))))
+
+        ;; (message "current-line exp %s, %s, %d, %d" current-position click-position dx dy)
+        (or (> dx 18) (> dy 18)))
+
+    (let* ((current-line (line-number-at-pos (point)))
+           (menu-line (line-number-at-pos
+                       (posn-point (event-start click)))))
+      ;; (message "current-line exp %s, %s" current-line menu-line)
+      (/= current-line menu-line))))
+
+(defun anju-click-pixel-position (event)
+  "Compute absolute pixel position from EVENT."
+  (let* ((start-position (event-start event))
+         (window (posn-window start-position))
+         (rel-xy (posn-x-y start-position)) ; (X . Y) relative to the window
+         (win-edges (window-absolute-body-pixel-edges window)) ; (left top right bottom)
+
+         ;; Absolute X and Y
+         (abs-x (+ (car rel-xy) (nth 0 win-edges)))
+         (abs-y (+ (cdr rel-xy) (nth 1 win-edges))))
+    (cons abs-x abs-y)))
 
 (defun anju-adjust-point-for-click (click)
   "Adjust current point to position of CLICK if necessary."
-
-  ;; TODO: test on TTY
   (if (and (not (use-region-p))
            (anju-click-and-point-distant-p click))
-        (mouse-set-point click)))
+      (mouse-set-point click)))
+
 
 
 
@@ -297,6 +317,15 @@ Return t if populated, nil otherwise."
   (interactive)
   (org-table-recalculate 4))
 
+(defun anju-copy-raw-link ()
+  "Copy raw link from an Org hyperlink."
+  (interactive)
+  (let* ((element (org-element-context))
+         (link (org-element-property :raw-link element)))
+    (when link
+      (kill-new link)
+      (message "Copied '%s' to clipboard" link))))
+
 (defun anju-context-menu-org-mode (menu click)
   "Context menu hook function for Org mode commands.
 
@@ -493,13 +522,21 @@ or items or text to headings"])
                                     :help "Convert headings or normal lines \
 to items, items to normal lines"])))
 
-    (when (or (use-region-p)
-              (eq (org-element-type (org-element-context)) 'link))
-      (easy-menu-add-item menu nil
-                          [org-insert-link
-                           org-insert-link
-                           :label "Link…"
-                           :help "Insert a link.  At the prompt, enter the link"])))
+    (let ((is-link (eq (org-element-type (org-element-context)) 'link)))
+      (when (or (use-region-p)
+                is-link)
+        (easy-menu-add-item menu nil
+                            [org-insert-link
+                             org-insert-link
+                             :label "Link…"
+                             :help "Insert a link.  At the prompt, enter the link"]))
+
+      (when is-link
+            (easy-menu-add-item menu nil
+                                [anju-copy-raw-link
+                                 anju-copy-raw-link
+                                 :label "Copy Link Address…"
+                                 :help "Copy link address from an Org hyperlink"]))))
   menu)
 
 
