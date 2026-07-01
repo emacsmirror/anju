@@ -793,7 +793,7 @@
      (save-buffer))))
 
 
-(ert-deftest test-anju-context-menu-org-link ()
+(ert-deftest test-anju-context-menu-org-link-selected ()
   "Test for `anju-context-menu-org-mode' when point is on selected word."
   (anju-test-context-menu-function-with-filetype
    ".org"
@@ -826,6 +826,46 @@
      (push-mark (point-min) t t)
      (goto-char (point-max))
      (activate-mark))))
+
+
+(ert-deftest test-anju-context-menu-org-link-address ()
+  "Test for `anju-context-menu-org-mode' when point is on a link."
+  (anju-test-context-menu-function-with-filetype
+   ".org"
+   #'anju-context-menu-org-mode
+   5
+   (lambda (items)
+     (let ((i 0))
+       (anju-test-menu-item (seq-elt items i) "--")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Heading"
+        #'org-toggle-heading
+        "Convert headings to normal text, or items or text to headings")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Change to Item"
+        #'org-toggle-item
+        "Convert headings or normal lines to items, items to normal lines")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Link…"
+        #'org-insert-link
+        "Insert a link.  At the prompt, enter the link")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Copy Link Address…"
+        #'anju-copy-raw-link
+        "Copy link address from an Org hyperlink")))
+
+   (lambda (filename description)
+     (insert "[[http://yummymelon.com/devnull][Yummy Melon Blog]]\nImma going fishing.\n")
+     (save-buffer)
+     (goto-char (point-min)))))
 
 
 (ert-deftest test-anju-context-menu-org-mode-list-item ()
@@ -1105,7 +1145,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-agenda
-   14
+   15
    (lambda (items)
      (let* ((i 0))
 
@@ -1138,6 +1178,12 @@
                   "")))
         #'org-agenda-todo
         "Set Todo")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Date…"
+        #'org-agenda-date-prompt
+        "Change the date of this item.  Date is prompted for, with default today")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))

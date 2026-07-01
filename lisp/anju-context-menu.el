@@ -47,6 +47,47 @@
 (require 'casual-agenda)
 
 
+;;; Utilities
+
+(defun anju-click-and-point-distant-p (click)
+  "Predicate if CLICK event position is distant from the current point."
+
+  (if (display-graphic-p)
+      (let* ((current-position (window-absolute-pixel-position))
+             (click-position (anju-click-pixel-position click))
+             (dx (abs (- (car current-position) (car click-position))))
+             (dy (abs (- (cdr current-position) (cdr click-position)))))
+
+        ;; (message "current-line exp %s, %s, %d, %d" current-position click-position dx dy)
+        (or (> dx 18) (> dy 18)))
+
+    (let* ((current-line (line-number-at-pos (point)))
+           (menu-line (line-number-at-pos
+                       (posn-point (event-start click)))))
+      ;; (message "current-line exp %s, %s" current-line menu-line)
+      (/= current-line menu-line))))
+
+(defun anju-click-pixel-position (event)
+  "Compute absolute pixel position from EVENT."
+  (let* ((start-position (event-start event))
+         (window (posn-window start-position))
+         (rel-xy (posn-x-y start-position)) ; (X . Y) relative to the window
+         (win-edges (window-absolute-body-pixel-edges window)) ; (left top right bottom)
+
+         ;; Absolute X and Y
+         (abs-x (+ (car rel-xy) (nth 0 win-edges)))
+         (abs-y (+ (cdr rel-xy) (nth 1 win-edges))))
+    (cons abs-x abs-y)))
+
+(defun anju-adjust-point-for-click (click)
+  "Adjust current point to position of CLICK if necessary."
+  (if (and (not (use-region-p))
+           (anju-click-and-point-distant-p click))
+      (mouse-set-point click)))
+
+
+
+
 ;;; Context Menu: Dired
 
 (defun anju-dired-duplicate-file ()
@@ -68,160 +109,158 @@
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
 
-  (when (and (derived-mode-p 'dired-mode) (not (anju-rectangle-selected-p)))
+  (when (and (derived-mode-p 'dired-mode)
+             (not (anju-rectangle-selected-p)))
     (mouse-set-point click)
-    (save-excursion
-      (when (dired-file-name-at-point)
-        (easy-menu-add-item menu nil
-                            [dired-do-rename
-                             dired-do-rename
-                             :label "Rename to…"
-                             :help "Rename or move file"])
+    (when (dired-file-name-at-point)
+      (easy-menu-add-item menu nil
+                          [dired-do-rename
+                           dired-do-rename
+                           :label "Rename to…"
+                           :help "Rename or move file"])
 
-        (easy-menu-add-item menu nil
-                            [dired-do-copy
-                             dired-do-copy
-                             :label "Copy to…"
-                             :help "Copy file"])
+      (easy-menu-add-item menu nil
+                          [dired-do-copy
+                           dired-do-copy
+                           :label "Copy to…"
+                           :help "Copy file"])
 
-        (easy-menu-add-item menu nil
-                            [dired-do-relsymlink
-                             dired-do-relsymlink
-                             :label "Symlink…"
-                             :help "Make relative symlink"])
+      (easy-menu-add-item menu nil
+                          [dired-do-relsymlink
+                           dired-do-relsymlink
+                           :label "Symlink…"
+                           :help "Make relative symlink"])
 
-        (easy-menu-add-item menu nil
-                            [dired-copy-filename-as-kill
-                             dired-copy-filename-as-kill
-                             :label "Copy name"
-                             :help "Copy names of marked (or next ARG) files \
+      (easy-menu-add-item menu nil
+                          [dired-copy-filename-as-kill
+                           dired-copy-filename-as-kill
+                           :label "Copy name"
+                           :help "Copy names of marked (or next ARG) files \
 into the kill ring"])
 
-        (easy-menu-add-item menu nil
-                            [image-dired-dired-toggle-marked-thumbs
-                             image-dired-dired-toggle-marked-thumbs
-                             :label "Toggle Thumbnail"
-                             :visible (string-match-p (image-file-name-regexp)
-                                                      (dired-get-filename))
-                             :help "Toggle thumbnails in front of marked \
+      (easy-menu-add-item menu nil
+                          [image-dired-dired-toggle-marked-thumbs
+                           image-dired-dired-toggle-marked-thumbs
+                           :label "Toggle Thumbnail"
+                           :visible (string-match-p (image-file-name-regexp)
+                                                    (dired-get-filename))
+                           :help "Toggle thumbnails in front of marked \
 file names in the Dired buffer"])
 
-        (easy-menu-add-item
-         menu
-         nil
-         ["Duplicate"
-          anju-dired-duplicate-file
-          :label (format "Duplicate “%s”"
-                         (anju-filename-from-path (dired-get-filename)))
+      (easy-menu-add-item
+       menu
+       nil
+       ["Duplicate"
+        anju-dired-duplicate-file
+        :label (format "Duplicate “%s”"
+                       (anju-filename-from-path (dired-get-filename)))
 
-          :help "Duplicate selected item"])
+        :help "Duplicate selected item"])
 
-        ;; (easy-menu-add-item menu nil
-        ;;                     ["Change Mode…"
-        ;;                      dired-do-chmod
-        ;;                      :help "Change mode of file (chmod)"])
-
-        (easy-menu-add-item menu nil
-                            [dired-maybe-insert-subdir
-                             dired-maybe-insert-subdir
-                             :label "Insert Subdir"
-                             :label (format "Insert “%s” View"
-                                            (anju-filename-from-path (dired-get-filename)))
-                             :visible (file-directory-p
-                                       (dired-file-name-at-point))
-                             :help "Insert subdir (sub-directory)"])
-        (anju-context-menu-item-separator menu trash-separator)
-
-        (easy-menu-add-item menu nil
-                            [dired-do-delete
-                             dired-do-delete
-                             :label "Move to Trash…"
-                             :visible (file-writable-p
-                                       (dired-file-name-at-point))
-                             :help "Delete all marked files"])
-
-        (anju-context-menu-item-separator menu dired-separator))
-
-      ;; (mouse-set-point click)
-
-      (when (not (dired-file-name-at-point))
-        (easy-menu-add-item menu nil
-                            [dired-hide-subdir
-                             dired-hide-subdir
-                             :label (format
-                                     "%s “%s” View"
-                                     (if (dired-subdir-hidden-p
-                                          (dired-current-directory))
-                                         "Show" "Hide")
-                                     (anju-filename-from-path
-                                      (directory-file-name
-                                       (dired-current-directory))))
-                             :visible (and (dired-current-directory)
-                                           (> (line-number-at-pos) 1) ; hack!
-                                           (> (- (length dired-subdir-alist) 1) 0)
-                                           (not (dired-file-name-at-point)))
-                             :help "Toggle hide subdir (sub-directory)"])
-
-        (easy-menu-add-item menu nil
-                            [dired-kill-subdir
-                             dired-kill-subdir
-                             :label (format
-                                     "Remove “%s” View"
-                                     (anju-filename-from-path
-                                      (directory-file-name
-                                       (dired-current-directory))))
-                             :visible (and (dired-current-directory)
-                                           (> (line-number-at-pos) 1) ; hack!
-                                           (> (- (length dired-subdir-alist) 1) 0)
-                                           (not (dired-file-name-at-point)))
-                             :help "Kill subdir (sub-directory)"]))
-
-      (easy-menu-add-item menu nil casual-dired-sort-menu)
+      ;; (easy-menu-add-item menu nil
+      ;;                     ["Change Mode…"
+      ;;                      dired-do-chmod
+      ;;                      :help "Change mode of file (chmod)"])
 
       (easy-menu-add-item menu nil
-                          [dired-omit-mode
-                           dired-omit-mode
-                           :label "Omit Mode"
-                           :style toggle
-                           :selected dired-omit-mode
-                           :help "Omit mode"])
+                          [dired-maybe-insert-subdir
+                           dired-maybe-insert-subdir
+                           :label "Insert Subdir"
+                           :label (format "Insert “%s” View"
+                                          (anju-filename-from-path (dired-get-filename)))
+                           :visible (file-directory-p
+                                     (dired-file-name-at-point))
+                           :help "Insert subdir (sub-directory)"])
+      (anju-context-menu-item-separator menu trash-separator)
 
       (easy-menu-add-item menu nil
-                          [dired-hide-details-mode
-                           dired-hide-details-mode
-                           :label "Hide Details"
-                           :style toggle
-                           :selected dired-hide-details-mode
-                           :help "Hide directory details"])
+                          [dired-do-delete
+                           dired-do-delete
+                           :label "Move to Trash…"
+                           :visible (file-writable-p
+                                     (dired-file-name-at-point))
+                           :help "Delete all marked files"])
+
+      (anju-context-menu-item-separator menu dired-separator))
+
+    ;; (mouse-set-point click)
+
+    (when (not (dired-file-name-at-point))
+      (easy-menu-add-item menu nil
+                          [dired-hide-subdir
+                           dired-hide-subdir
+                           :label (format
+                                   "%s “%s” View"
+                                   (if (dired-subdir-hidden-p
+                                        (dired-current-directory))
+                                       "Show" "Hide")
+                                   (anju-filename-from-path
+                                    (directory-file-name
+                                     (dired-current-directory))))
+                           :visible (and (dired-current-directory)
+                                         (> (line-number-at-pos) 1) ; hack!
+                                         (> (- (length dired-subdir-alist) 1) 0)
+                                         (not (dired-file-name-at-point)))
+                           :help "Toggle hide subdir (sub-directory)"])
 
       (easy-menu-add-item menu nil
-                          [dired dired
-                           :label "📁 Dired…"
-                           :help "Open Dired"])))
+                          [dired-kill-subdir
+                           dired-kill-subdir
+                           :label (format
+                                   "Remove “%s” View"
+                                   (anju-filename-from-path
+                                    (directory-file-name
+                                     (dired-current-directory))))
+                           :visible (and (dired-current-directory)
+                                         (> (line-number-at-pos) 1) ; hack!
+                                         (> (- (length dired-subdir-alist) 1) 0)
+                                         (not (dired-file-name-at-point)))
+                           :help "Kill subdir (sub-directory)"]))
+
+    (easy-menu-add-item menu nil casual-dired-sort-menu)
+
+    (easy-menu-add-item menu nil
+                        [dired-omit-mode
+                         dired-omit-mode
+                         :label "Omit Mode"
+                         :style toggle
+                         :selected dired-omit-mode
+                         :help "Omit mode"])
+
+    (easy-menu-add-item menu nil
+                        [dired-hide-details-mode
+                         dired-hide-details-mode
+                         :label "Hide Details"
+                         :style toggle
+                         :selected dired-hide-details-mode
+                         :help "Hide directory details"])
+
+    (easy-menu-add-item menu nil
+                        [dired dired
+                         :label "📁 Dired…"
+                         :help "Open Dired"]))
   menu)
 
 
 ;;; Context Menu: Scratch Buffer
 
-(defun anju-context-menu-scratch (menu click)
+(defun anju-context-menu-scratch (menu _click)
   "Context menu hook function for journal commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
   (when (and (not (anju-at-org-table-p))
              (not (use-region-p))
              (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu journal-separator)
-      (easy-menu-add-item menu nil [scratch-buffer
-                                    scratch-buffer
-                                    :label "Scratch"
-                                    :help "Switch to the *scratch* buffer"])))
+    (anju-context-menu-item-separator menu journal-separator)
+    (easy-menu-add-item menu nil [scratch-buffer
+                                  scratch-buffer
+                                  :label "Scratch"
+                                  :help "Switch to the *scratch* buffer"]))
   menu)
 
 
@@ -278,203 +317,226 @@ Return t if populated, nil otherwise."
   (interactive)
   (org-table-recalculate 4))
 
+(defun anju-copy-raw-link ()
+  "Copy raw link from an Org hyperlink."
+  (interactive)
+  (let* ((element (org-element-context))
+         (link (org-element-property :raw-link element)))
+    (when link
+      (kill-new link)
+      (message "Copied '%s' to clipboard" link))))
+
 (defun anju-context-menu-org-mode (menu click)
   "Context menu hook function for Org mode commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'.
+
+NOTE: This hook shall change the current point via
+`anju-adjust-point-for-click', which can affect subsequent
+point-dependent hooks in `context-menu-functions'.
+
+This hook should be inserted in `context-menu-functions' before
+`context-menu-region'."
 
   (when (derived-mode-p 'org-mode)
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu org-separator)
+    (anju-adjust-point-for-click click)
+    (anju-context-menu-item-separator menu org-separator)
 
-      (cond
-       ((and (org-at-heading-p) (not (anju-rectangle-selected-p)))
-        (easy-menu-add-item menu nil
-                            [org-todo
-                             org-todo
-                             :label "TODO…"
-                             :help "Change the TODO state of an item"])
+    (cond
+     ((and (org-at-heading-p) (not (anju-rectangle-selected-p)))
+      (easy-menu-add-item menu nil
+                          [org-todo
+                           org-todo
+                           :label "TODO…"
+                           :help "Change the TODO state of an item"])
 
-        (easy-menu-add-item menu nil
-                            [org-toggle-heading
-                             org-toggle-heading
-                             :label "Change to Body"
-                             :help "Convert headings to normal text, or items or text to headings"])
+      (easy-menu-add-item menu nil
+                          [org-toggle-heading
+                           org-toggle-heading
+                           :label "Change to Body"
+                           :help "Convert headings to normal text, or items or text to headings"])
 
-        (easy-menu-add-item menu nil
-                            [org-clock-in
-                             org-clock-in
-                             :label "Clock In"
-                             :visible (not (org-clocking-p))
-                             :help "Clock in"])
+      (easy-menu-add-item menu nil
+                          [org-clock-in
+                           org-clock-in
+                           :label "Clock In"
+                           :visible (not (org-clocking-p))
+                           :help "Clock in"])
 
-        (easy-menu-add-item menu nil
-                            [org-clock-out
-                             org-clock-out
-                             :label "Clock Out"
-                             :visible (org-clocking-p)
-                             :help "Clock out"])
+      (easy-menu-add-item menu nil
+                          [org-clock-out
+                           org-clock-out
+                           :label "Clock Out"
+                           :visible (org-clocking-p)
+                           :help "Clock out"])
 
-        (easy-menu-add-item menu nil
-                            [org-sort-entries
-                             org-sort-entries
-                             :label "Sort…"
-                             :help "Sort entries on a certain level of an \
+      (easy-menu-add-item menu nil
+                          [org-sort-entries
+                           org-sort-entries
+                           :label "Sort…"
+                           :help "Sort entries on a certain level of an \
 outline tree"])
 
-        (easy-menu-add-item menu nil
-                            [org-do-demote
-                             org-do-demote
-                             :label "Demote →"
-                             :help "Demote"])
+      (easy-menu-add-item menu nil
+                          [org-do-demote
+                           org-do-demote
+                           :label "Demote →"
+                           :help "Demote"])
 
-        (easy-menu-add-item menu nil
-                            [org-do-promote
-                             org-do-promote
-                             :label "Promote ←"
-                             :help "Promote"])
+      (easy-menu-add-item menu nil
+                          [org-do-promote
+                           org-do-promote
+                           :label "Promote ←"
+                           :help "Promote"])
 
-        (easy-menu-add-item menu nil
-                            [org-demote-subtree
-                             org-demote-subtree
-                             :label "Demote Subtree →"
-                             :help "Demote heading subtree"])
+      (easy-menu-add-item menu nil
+                          [org-demote-subtree
+                           org-demote-subtree
+                           :label "Demote Subtree →"
+                           :help "Demote heading subtree"])
 
-        (easy-menu-add-item menu nil
-                            [org-promote-subtree
-                             org-promote-subtree
-                             :label "Promote Subtree ←"
-                             :help "Promote heading subtree"]))
+      (easy-menu-add-item menu nil
+                          [org-promote-subtree
+                           org-promote-subtree
+                           :label "Promote Subtree ←"
+                           :help "Promote heading subtree"]))
 
-       ((and (org-at-item-p) (not (anju-rectangle-selected-p)))
+     ((and (org-at-item-p) (not (anju-rectangle-selected-p)))
 
-        (if (org-at-item-checkbox-p)
-            (easy-menu-add-item menu nil
-                                [casual-org-checkbox-in-progress
-                                 casual-org-checkbox-in-progress
-                                 :label "In-Progress [-]"
-                                 :help "Change checkbox state to in-progress [-]"])
-          (easy-menu-add-item menu nil [org-toggle-item
-                                        org-toggle-item
-                                        :label "Change to Body"
-                                        :visible (not (or (use-region-p)
-                                                          (anju-line-empty-p)))
-                                        :help "Convert item to normal line"]))
-
-        (easy-menu-add-item menu nil
-                            [org-cycle-list-bullet
-                             org-cycle-list-bullet
-                             :label "Cycle Bullet"
-                             :help "Cycle through the different itemize/enumerate bullets"])
-
-        (easy-menu-add-item menu nil
-                            [org-sort-list
-                             org-sort-list
-                             :label "Sort…"
-                             :help "Sort list items"])
-
-        (easy-menu-add-item menu nil
-                            [casual-org-toggle-list-to-checkbox
-                             casual-org-toggle-list-to-checkbox
-                             :label (if (org-at-item-checkbox-p)
-                                        "Change to Item"
-                                      "Change to Checkbox")
-                             :help "Toggle Item/Checkbox"])
-
-        (easy-menu-add-item menu nil
-                            [org-indent-item
-                             org-indent-item
-                             :label "Demote →"
-                             :help "Demote"])
-
-        (easy-menu-add-item menu nil
-                            [org-outdent-item
-                             org-outdent-item
-                             :label "Promote ←"
-                             :help "Promote"])
-
-        (easy-menu-add-item menu nil
-                            [org-indent-item-tree
-                             org-indent-item-tree
-                             :label "Demote Subtree →"
-                             :help "Demote item subtree"])
-
-        (easy-menu-add-item menu nil
-                            [org-outdent-item-tree
-                             org-outdent-item-tree
-                             :label "Promote Subtree ←"
-                             :help "Promote item subtree"]))
-
-       ((anju-at-org-table-p)
-        (easy-menu-add-item menu nil
-                            [casual-org-table-copy-reference-dwim
-                             casual-org-table-copy-reference-dwim
-                             :label (casual-org-table--reference-dwim)
-                             :help "Copy Org table reference (field or range) into kill ring via mouse"])
-
-        (easy-menu-add-item menu nil anju-org-table-region-menu)
-
-        (easy-menu-add-item menu nil
-                            [org-table-sort-lines
-                             org-table-sort-lines
-                             :label "Sort…"
-                             :help "Sort table lines according to the column at point"])
-
-        (easy-menu-add-item menu nil
-                            [org-table-toggle-coordinate-overlays
-                             org-table-toggle-coordinate-overlays
-                             :label "Show Coordinates"
-                             :style toggle
-                             :selected org-table-coordinate-overlays
-                             :help "Toggle the display of row/column numbers in tables"])
-
-        (easy-menu-add-item menu nil
-                            [anju-org-table-recalculate
-                             anju-org-table-recalculate
-                             :label "Recalculate"
-                             :help "Recalculate table"])
-
-        (easy-menu-add-item menu nil
-                            [org-table-edit-formulas
-                             org-table-edit-formulas
-                             :label "Edit Table Formulas"
-                             :help "Edit the formulas of the current table in a separate buffer"])
-
-        ;; (easy-menu-add-item menu nil cc/insert-org-plot-menu)
-        (easy-menu-add-item menu nil [org-plot/gnuplot
-                                      org-plot/gnuplot
-                                      :label "Run gnuplot"
-                                      :help "Plot table using gnuplot"]))
-
-       ;; so far nothing global
-       (t
-        (easy-menu-add-item menu nil [org-toggle-heading
-                                      org-toggle-heading
-                                      :label "Change to Heading"
-                                      :visible (not (or (use-region-p)
-                                                        (anju-line-empty-p)))
-                                      :help "Convert headings to normal text, \
-or items or text to headings"])
-
+      (if (org-at-item-checkbox-p)
+          (easy-menu-add-item menu nil
+                              [casual-org-checkbox-in-progress
+                               casual-org-checkbox-in-progress
+                               :label "In-Progress [-]"
+                               :help "Change checkbox state to in-progress [-]"])
         (easy-menu-add-item menu nil [org-toggle-item
                                       org-toggle-item
-                                      :label "Change to Item"
+                                      :label "Change to Body"
                                       :visible (not (or (use-region-p)
                                                         (anju-line-empty-p)))
-                                      :help "Convert headings or normal lines \
+                                      :help "Convert item to normal line"]))
+
+      (easy-menu-add-item menu nil
+                          [org-cycle-list-bullet
+                           org-cycle-list-bullet
+                           :label "Cycle Bullet"
+                           :help "Cycle through the different itemize/enumerate bullets"])
+
+      (easy-menu-add-item menu nil
+                          [org-sort-list
+                           org-sort-list
+                           :label "Sort…"
+                           :help "Sort list items"])
+
+      (easy-menu-add-item menu nil
+                          [casual-org-toggle-list-to-checkbox
+                           casual-org-toggle-list-to-checkbox
+                           :label (if (org-at-item-checkbox-p)
+                                      "Change to Item"
+                                    "Change to Checkbox")
+                           :help "Toggle Item/Checkbox"])
+
+      (easy-menu-add-item menu nil
+                          [org-indent-item
+                           org-indent-item
+                           :label "Demote →"
+                           :help "Demote"])
+
+      (easy-menu-add-item menu nil
+                          [org-outdent-item
+                           org-outdent-item
+                           :label "Promote ←"
+                           :help "Promote"])
+
+      (easy-menu-add-item menu nil
+                          [org-indent-item-tree
+                           org-indent-item-tree
+                           :label "Demote Subtree →"
+                           :help "Demote item subtree"])
+
+      (easy-menu-add-item menu nil
+                          [org-outdent-item-tree
+                           org-outdent-item-tree
+                           :label "Promote Subtree ←"
+                           :help "Promote item subtree"]))
+
+     ((anju-at-org-table-p)
+      (easy-menu-add-item menu nil
+                          [casual-org-table-copy-reference-dwim
+                           casual-org-table-copy-reference-dwim
+                           :label (casual-org-table--reference-dwim)
+                           :help "Copy Org table reference (field or range) into kill ring via mouse"])
+
+      (easy-menu-add-item menu nil anju-org-table-region-menu)
+
+      (easy-menu-add-item menu nil
+                          [org-table-sort-lines
+                           org-table-sort-lines
+                           :label "Sort…"
+                           :help "Sort table lines according to the column at point"])
+
+      (easy-menu-add-item menu nil
+                          [org-table-toggle-coordinate-overlays
+                           org-table-toggle-coordinate-overlays
+                           :label "Show Coordinates"
+                           :style toggle
+                           :selected org-table-coordinate-overlays
+                           :help "Toggle the display of row/column numbers in tables"])
+
+      (easy-menu-add-item menu nil
+                          [anju-org-table-recalculate
+                           anju-org-table-recalculate
+                           :label "Recalculate"
+                           :help "Recalculate table"])
+
+      (easy-menu-add-item menu nil
+                          [org-table-edit-formulas
+                           org-table-edit-formulas
+                           :label "Edit Table Formulas"
+                           :help "Edit the formulas of the current table in a separate buffer"])
+
+      ;; (easy-menu-add-item menu nil cc/insert-org-plot-menu)
+      (easy-menu-add-item menu nil [org-plot/gnuplot
+                                    org-plot/gnuplot
+                                    :label "Run gnuplot"
+                                    :help "Plot table using gnuplot"]))
+
+     ;; so far nothing global
+     (t
+      (easy-menu-add-item menu nil [org-toggle-heading
+                                    org-toggle-heading
+                                    :label "Change to Heading"
+                                    :visible (not (or (use-region-p)
+                                                      (anju-line-empty-p)))
+                                    :help "Convert headings to normal text, \
+or items or text to headings"])
+
+      (easy-menu-add-item menu nil [org-toggle-item
+                                    org-toggle-item
+                                    :label "Change to Item"
+                                    :visible (not (or (use-region-p)
+                                                      (anju-line-empty-p)))
+                                    :help "Convert headings or normal lines \
 to items, items to normal lines"])))
 
+    (let ((is-link (eq (org-element-type (org-element-context)) 'link)))
       (when (or (use-region-p)
-                (eq (org-element-type (org-element-context)) 'link))
+                is-link)
         (easy-menu-add-item menu nil
                             [org-insert-link
                              org-insert-link
                              :label "Link…"
-                             :help "Insert a link.  At the prompt, enter the link"]))))
+                             :help "Insert a link.  At the prompt, enter the link"]))
+
+      (when is-link
+            (easy-menu-add-item menu nil
+                                [anju-copy-raw-link
+                                 anju-copy-raw-link
+                                 :label "Copy Link Address…"
+                                 :help "Copy link address from an Org hyperlink"]))))
   menu)
 
 
@@ -538,91 +600,103 @@ to items, items to normal lines"])))
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'.
+
+NOTE: This hook shall change the current point via
+`anju-adjust-point-for-click', which can affect subsequent
+point-dependent hooks in `context-menu-functions'.
+
+This hook should be inserted in `context-menu-functions' before
+`context-menu-region'."
 
   (when (and (derived-mode-p 'org-agenda-mode)
+             (not (use-region-p))
              (not (anju-rectangle-selected-p)))
-    (mouse-set-point click)
-    (save-excursion
-      (when (casual-agenda-headlinep)
-        (easy-menu-add-item
-         menu nil
-         ["Clock in"
-          org-agenda-clock-in
-          :label (anju-middle-truncate
-                  (org-agenda-with-point-at-orig-entry nil
-                    (org-element-property :title (org-element-at-point)))
-                  "Clock In")
-          :visible (not (org-clocking-p))
-          :help "Clock in"])
+    (anju-adjust-point-for-click click)
+    (when (casual-agenda-headlinep)
+      (easy-menu-add-item
+       menu nil
+       ["Clock in"
+        org-agenda-clock-in
+        :label (anju-middle-truncate
+                (org-agenda-with-point-at-orig-entry nil
+                  (org-element-property :title (org-element-at-point)))
+                "Clock In")
+        :visible (not (org-clocking-p))
+        :help "Clock in"])
 
-        (easy-menu-add-item
-         menu nil
-         ["Clock out"
-          org-agenda-clock-out
-          :label (if org-clock-current-task
-                     (anju-middle-truncate
-                      (substring-no-properties org-clock-current-task)
-                      "Clock Out")
-                   "Clock Out")
-          :visible (org-clocking-p)
-          :help "Clock out"])
+      (easy-menu-add-item
+       menu nil
+       ["Clock out"
+        org-agenda-clock-out
+        :label (if org-clock-current-task
+                   (anju-middle-truncate
+                    (substring-no-properties org-clock-current-task)
+                    "Clock Out")
+                 "Clock Out")
+        :visible (org-clocking-p)
+        :help "Clock out"])
 
-        (easy-menu-add-item
-         menu nil
-         ["TODO…"
-          org-agenda-todo
-          :label (format
-                  "TODO %s…"
-                  (anju-middle-truncate
-                  (org-agenda-with-point-at-orig-entry nil
-                    (org-element-property :title (org-element-at-point)))
-                  ""))
-          :help "Set Todo"])
+      (easy-menu-add-item
+       menu nil
+       ["TODO…"
+        org-agenda-todo
+        :label (format
+                "TODO %s…"
+                (anju-middle-truncate
+                 (org-agenda-with-point-at-orig-entry nil
+                   (org-element-property :title (org-element-at-point)))
+                 ""))
+        :help "Set Todo"])
 
-        (easy-menu-add-item menu nil ["Schedule…"
-                                      org-agenda-schedule
-                                      :help "Schedule headline"])
+      (easy-menu-add-item menu nil ["Date…"
+                                    org-agenda-date-prompt
+                                    :help "Change the date of this item.  \
+Date is prompted for, with default today"])
 
-        (easy-menu-add-item menu nil ["Deadline…"
-                                      org-agenda-deadline
-                                      :help "Deadline headline"])
+      (easy-menu-add-item menu nil ["Schedule…"
+                                    org-agenda-schedule
+                                    :help "Schedule headline"])
 
-        (easy-menu-add-item menu nil ["↑ Priority"
-                                      org-agenda-priority-up
-                                      :help "Up priority"])
+      (easy-menu-add-item menu nil ["Deadline…"
+                                    org-agenda-deadline
+                                    :help "Deadline headline"])
 
-        (easy-menu-add-item menu nil ["↓ Priority"
-                                      org-agenda-priority-down
-                                      :help "Down priority"])
+      (easy-menu-add-item menu nil ["↑ Priority"
+                                    org-agenda-priority-up
+                                    :help "Up priority"])
 
-        (easy-menu-add-item menu nil ["Tags…"
-                                      org-agenda-set-tags
-                                      :help "Set Tags"])
+      (easy-menu-add-item menu nil ["↓ Priority"
+                                    org-agenda-priority-down
+                                    :help "Down priority"])
 
-        (easy-menu-add-item menu nil ["Note…"
-                                      org-agenda-add-note
-                                      :help "Add note"]))
+      (easy-menu-add-item menu nil ["Tags…"
+                                    org-agenda-set-tags
+                                    :help "Set Tags"])
 
-      (easy-menu-add-item menu nil ["Now"
-                                    casual-agenda-goto-now
-                                    :help "Goto now"])
+      (easy-menu-add-item menu nil ["Note…"
+                                    org-agenda-add-note
+                                    :help "Add note"]))
 
-      (easy-menu-add-item menu nil ["Goto date…"
-                                    org-agenda-goto-date
-                                    :help "Jump to DATE in the agenda buffer"])
+    (easy-menu-add-item menu nil ["Now"
+                                  casual-agenda-goto-now
+                                  :help "Goto now"])
 
-      (easy-menu-add-item menu nil anju-org-agenda-view-menu)
+    (easy-menu-add-item menu nil ["Goto date…"
+                                  org-agenda-goto-date
+                                  :help "Jump to DATE in the agenda buffer"])
 
-      (easy-menu-add-item menu nil ["Show log"
-                                    org-agenda-log-mode
-                                    :style toggle
-                                    :selected org-agenda-show-log
-                                    :help "Toggle log mode in an agenda buffer"])
+    (easy-menu-add-item menu nil anju-org-agenda-view-menu)
 
-      (easy-menu-add-item menu nil ["Refresh"
-                                    org-agenda-redo-all
-                                    :help "Redo all"])))
+    (easy-menu-add-item menu nil ["Show log"
+                                  org-agenda-log-mode
+                                  :style toggle
+                                  :selected org-agenda-show-log
+                                  :help "Toggle log mode in an agenda buffer"])
+
+    (easy-menu-add-item menu nil ["Refresh"
+                                  org-agenda-redo-all
+                                  :help "Redo all"]))
   menu)
 
 
@@ -634,63 +708,61 @@ This function is intended to be hooked into `context-menu-functions'."
   (interactive)
   (Info-goto-node-web (Info-copy-current-node-name)))
 
-(defun anju-context-menu-info-mode (menu click)
+(defun anju-context-menu-info-mode (menu _click)
   "Context menu hook function for Info mode commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
   (when (derived-mode-p 'Info-mode)
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu info-mode-separator)
+    (anju-context-menu-item-separator menu info-mode-separator)
 
-      (easy-menu-add-item menu nil [Info-top-node
-                                    Info-top-node
-                                    :label "Top"
-                                    :help "Go to the Top node of this file"])
+    (easy-menu-add-item menu nil [Info-top-node
+                                  Info-top-node
+                                  :label "Top"
+                                  :help "Go to the Top node of this file"])
 
-      (easy-menu-add-item menu nil [Info-toc
-                                    Info-toc
-                                    :label "Table of Contents"
-                                    :help "Go to a node with table of contents \
+    (easy-menu-add-item menu nil [Info-toc
+                                  Info-toc
+                                  :label "Table of Contents"
+                                  :help "Go to a node with table of contents \
 of the current Info file"])
 
-      (easy-menu-add-item menu nil [Info-up
-                                    Info-up
-                                    :label "↑ Node"
-                                    :help "Go to the superior node of this \
+    (easy-menu-add-item menu nil [Info-up
+                                  Info-up
+                                  :label "↑ Node"
+                                  :help "Go to the superior node of this \
 node"])
 
-      (easy-menu-add-item menu nil [Info-backward-node
-                                    Info-backward-node
-                                    :label "← Node"
-                                    :help "Go backward one node, considering \
+    (easy-menu-add-item menu nil [Info-backward-node
+                                  Info-backward-node
+                                  :label "← Node"
+                                  :help "Go backward one node, considering \
 all nodes as forming one sequence"])
 
-      (easy-menu-add-item menu nil [Info-forward-node
-                                    Info-forward-node
-                                    :label "→ Node"
-                                    :help "Go forward one node, considering \
+    (easy-menu-add-item menu nil [Info-forward-node
+                                  Info-forward-node
+                                  :label "→ Node"
+                                  :help "Go forward one node, considering \
 all nodes as forming one sequence"])
 
-      (easy-menu-add-item menu nil [info-apropos
-                                    info-apropos
-                                    :label "Apropos…"
-                                    :help "Search indices of all known Info \
+    (easy-menu-add-item menu nil [info-apropos
+                                  info-apropos
+                                  :label "Apropos…"
+                                  :help "Search indices of all known Info \
 files on your system for STRING"])
 
-      (easy-menu-add-item menu nil [Info-copy-current-node-name
-                                    Info-copy-current-node-name
-                                    :label "Copy node name"
-                                    :help "Put the name of the current Info \
+    (easy-menu-add-item menu nil [Info-copy-current-node-name
+                                  Info-copy-current-node-name
+                                  :label "Copy node name"
+                                  :help "Put the name of the current Info \
 node into the kill ring"])
 
-      (easy-menu-add-item menu nil [anju-info-goto-node-web
-                                    anju-info-goto-node-web
-                                    :label "Open node in web"
-                                    :help "Open node in web browser"])))
+    (easy-menu-add-item menu nil [anju-info-goto-node-web
+                                  anju-info-goto-node-web
+                                  :label "Open node in web"
+                                  :help "Open node in web browser"]))
   menu)
 
 
@@ -814,127 +886,133 @@ node into the kill ring"])
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'.
+
+NOTE: This hook shall change the current point via
+`anju-adjust-point-for-click', which can affect subsequent
+point-dependent hooks in `context-menu-functions'.
+
+This hook should be inserted in `context-menu-functions' before
+`context-menu-region'."
 
   (when (and (derived-mode-p 'emacs-lisp-mode)
              (not (derived-mode-p 'edebug-eval-mode))
              (not (anju-rectangle-selected-p)))
 
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu emacs-lisp-separator)
+    (anju-adjust-point-for-click click)
+    (anju-context-menu-item-separator menu emacs-lisp-separator)
 
-      (if (anju-edebug-mode-p)
-          (progn
-            (easy-menu-add-item menu nil
-                                ["Step" edebug-step-mode
-                                 :help "Step"])
+    (if (anju-edebug-mode-p)
+        (progn
+          (easy-menu-add-item menu nil
+                              ["Step" edebug-step-mode
+                               :help "Step"])
 
-            (easy-menu-add-item menu nil
-                                ["Here" edebug-goto-here
-                                 :help "Here"])
+          (easy-menu-add-item menu nil
+                              ["Here" edebug-goto-here
+                               :help "Here"])
 
-            (easy-menu-add-item menu nil
-                                anju-edebug-mode-menu)
+          (easy-menu-add-item menu nil
+                              anju-edebug-mode-menu)
 
 
-            (easy-menu-add-item menu nil
-                                anju-edebug-sexp-menu)
+          (easy-menu-add-item menu nil
+                              anju-edebug-sexp-menu)
 
-            (easy-menu-add-item menu nil
-                                anju-edebug-breakpoint-menu)
+          (easy-menu-add-item menu nil
+                              anju-edebug-breakpoint-menu)
 
-            (easy-menu-add-item menu nil
-                                ["Eval…" edebug-eval-expression
-                                 :help "Eval expression"])
+          (easy-menu-add-item menu nil
+                              ["Eval…" edebug-eval-expression
+                               :help "Eval expression"])
 
-            (easy-menu-add-item menu nil
-                                ["Previous" edebug-previous-result
-                                 :help "Previous result"])
+          (easy-menu-add-item menu nil
+                              ["Previous" edebug-previous-result
+                               :help "Previous result"])
 
-            (easy-menu-add-item menu nil
-                                ["Suspend Edebug" edebug-view-outside
-                                 :help "Suspend Edebug, run edebug-where to resume"])
+          (easy-menu-add-item menu nil
+                              ["Suspend Edebug" edebug-view-outside
+                               :help "Suspend Edebug, run edebug-where to resume"])
 
-            (easy-menu-add-item menu nil
-                                ["Watchlist" edebug-visit-eval-list
-                                 :help "Open watchlist"])
+          (easy-menu-add-item menu nil
+                              ["Watchlist" edebug-visit-eval-list
+                               :help "Open watchlist"])
 
-            (easy-menu-add-item menu nil
-                                ["Stop execution" edebug-stop
-                                 :help "Stop Edebug execution, useful for exiting from trace or continue loop"])
+          (easy-menu-add-item menu nil
+                              ["Stop execution" edebug-stop
+                               :help "Stop Edebug execution, useful for exiting from trace or continue loop"])
 
-            (easy-menu-add-item menu nil
-                                ["Exit" edebug-top-level-nonstop
-                                 :help "Quit Edebug Nonstop"]))
+          (easy-menu-add-item menu nil
+                              ["Exit" edebug-top-level-nonstop
+                               :help "Quit Edebug Nonstop"]))
 
-        (easy-menu-add-item
-         menu nil
-         [eval-last-sexp
-          eval-last-sexp
-          :label "Eval Last Sexp"
-          :help "Evaluate sexp before point; print value in the echo area"])
+      (easy-menu-add-item
+       menu nil
+       [eval-last-sexp
+        eval-last-sexp
+        :label "Eval Last Sexp"
+        :help "Evaluate sexp before point; print value in the echo area"])
 
-        (easy-menu-add-item
-         menu nil
-         [eval-defun
-          eval-defun
-          :label (format "Eval “%s”" (anju-form-name-at-point))
-          :visible (anju-form-name-at-point)
-          :help "Evaluate the top level form point is in"])
+      (easy-menu-add-item
+       menu nil
+       [eval-defun
+        eval-defun
+        :label (format "Eval “%s”" (anju-form-name-at-point))
+        :visible (anju-form-name-at-point)
+        :help "Evaluate the top level form point is in"])
 
-        (easy-menu-add-item
-         menu nil
-         [anju-edebug-defun
-          anju-edebug-defun
-          :label (format "Edebug “%s”" (anju-form-name-at-point))
-          :visible (anju-form-name-at-point)
-          :help "Evaluate the top level form point is in, stepping through with Edebug"])
+      (easy-menu-add-item
+       menu nil
+       [anju-edebug-defun
+        anju-edebug-defun
+        :label (format "Edebug “%s”" (anju-form-name-at-point))
+        :visible (anju-form-name-at-point)
+        :help "Evaluate the top level form point is in, stepping through with Edebug"])
 
-        (easy-menu-add-item
-         menu nil
-         [elisp-eval-region-or-buffer
-          elisp-eval-region-or-buffer
-          :label (if (use-region-p) "Eval Region" "Eval Buffer")
-          :help "Evaluate region or buffer"])
+      (easy-menu-add-item
+       menu nil
+       [elisp-eval-region-or-buffer
+        elisp-eval-region-or-buffer
+        :label (if (use-region-p) "Eval Region" "Eval Buffer")
+        :help "Evaluate region or buffer"])
 
-        (easy-menu-add-item
-         menu nil
-         anju-hideshow-menu)
+      (easy-menu-add-item
+       menu nil
+       anju-hideshow-menu)
 
-        (easy-menu-add-item
-         menu nil
-         [xref-find-references-and-replace
-          xref-find-references-and-replace
-          :label (format "Rename “%s”" (thing-at-point 'symbol))
-          :visible (let ((thing (thing-at-point 'symbol)))
-                     (and thing
-                          (not (string-match-p "^[-+]?[[:digit:]]*\\.?[[:digit:]]+$" thing))
-                          (not (member (substring-no-properties thing) '("lambda" "nil")))))
-          :help "Rename xref symbol"])
+      (easy-menu-add-item
+       menu nil
+       [xref-find-references-and-replace
+        xref-find-references-and-replace
+        :label (format "Rename “%s”" (thing-at-point 'symbol))
+        :visible (let ((thing (thing-at-point 'symbol)))
+                   (and thing
+                        (not (string-match-p "^[-+]?[[:digit:]]*\\.?[[:digit:]]+$" thing))
+                        (not (member (substring-no-properties thing) '("lambda" "nil")))))
+        :help "Rename xref symbol"])
 
-        (easy-menu-add-item
-         menu nil
-         [anju-ert-run-test-at-point
-          anju-ert-run-test-at-point
-          :label (format "Test “%s”" (anju-form-name-at-point))
-          :visible (anju-point-in-ertdeftest-p)
-          :help "ERT"])
+      (easy-menu-add-item
+       menu nil
+       [anju-ert-run-test-at-point
+        anju-ert-run-test-at-point
+        :label (format "Test “%s”" (anju-form-name-at-point))
+        :visible (anju-point-in-ertdeftest-p)
+        :help "ERT"])
 
-        (easy-menu-add-item
-         menu nil
-         [anju-extract-lambda-to-defun
-          anju-extract-lambda-to-defun
-          :label "Extract 𝜆…"
-          :visible (anju-point-on-lambda-p)
-          :help "Convert lambda expression into a function"])
+      (easy-menu-add-item
+       menu nil
+       [anju-extract-lambda-to-defun
+        anju-extract-lambda-to-defun
+        :label "Extract 𝜆…"
+        :visible (anju-point-on-lambda-p)
+        :help "Convert lambda expression into a function"])
 
-        (easy-menu-add-item
-         menu nil
-         [eval-expression
-          eval-expression
-          :label "Eval Expression…"
-          :help "Evaluate expression and print result in mini-buffer"]))))
+      (easy-menu-add-item
+       menu nil
+       [eval-expression
+        eval-expression
+        :label "Eval Expression…"
+        :help "Evaluate expression and print result in mini-buffer"])))
   menu)
 
 
@@ -944,48 +1022,54 @@ This function is intended to be hooked into `context-menu-functions'."
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'.
+
+NOTE: This hook shall change the current point via
+`anju-adjust-point-for-click', which can affect subsequent
+point-dependent hooks in `context-menu-functions'.
+
+This hook should be inserted in `context-menu-functions' before
+`context-menu-region'."
 
   (when (and (derived-mode-p 'edebug-eval-mode)
              (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu edebug-eval-separator)
+    (anju-adjust-point-for-click click)
+    (anju-context-menu-item-separator menu edebug-eval-separator)
 
-      (easy-menu-add-item
-       menu nil
-       [edebug-update-eval-list
-        edebug-update-eval-list
-        :label "Add symbol"
-        :help "In the watchlist, type in symbol or sexp to add"])
+    (easy-menu-add-item
+     menu nil
+     [edebug-update-eval-list
+      edebug-update-eval-list
+      :label "Add symbol"
+      :help "In the watchlist, type in symbol or sexp to add"])
 
-      (easy-menu-add-item
-       menu nil
-       [edebug-delete-eval-item
-        edebug-delete-eval-item
-        :label "Delete symbol"
-        :help "Place point on symbol or sexp to delete"])
+    (easy-menu-add-item
+     menu nil
+     [edebug-delete-eval-item
+      edebug-delete-eval-item
+      :label "Delete symbol"
+      :help "Place point on symbol or sexp to delete"])
 
-      (easy-menu-add-item
-       menu nil
-       [edebug-eval-last-sexp
-        edebug-eval-last-sexp
-        :label "Eval last sexp"
-        :help "Eval last sexp"])
+    (easy-menu-add-item
+     menu nil
+     [edebug-eval-last-sexp
+      edebug-eval-last-sexp
+      :label "Eval last sexp"
+      :help "Eval last sexp"])
 
-      (easy-menu-add-item
-       menu nil
-       [edebug-eval-print-last-sexp
-        edebug-eval-print-last-sexp
-        :label "Insert last sexp"
-        :help "Insert (print) eval of last sexp into watchlist"])
+    (easy-menu-add-item
+     menu nil
+     [edebug-eval-print-last-sexp
+      edebug-eval-print-last-sexp
+      :label "Insert last sexp"
+      :help "Insert (print) eval of last sexp into watchlist"])
 
-      (easy-menu-add-item
-       menu nil
-       [edebug-where
-        edebug-where
-        :label "Resume"
-        :help "Resume code stepping"])))
+    (easy-menu-add-item
+     menu nil
+     [edebug-where
+      edebug-where
+      :label "Resume"
+      :help "Resume code stepping"]))
 menu)
 
 (defun anju-point-on-lambda-p ()
@@ -1036,87 +1120,83 @@ a reference to the new defun ARG."
 
 ;;; Context Menu: Buffer Navigation/Management
 
-(defun anju-context-menu-buffers (menu click)
+(defun anju-context-menu-buffers (menu _click)
   "Context menu hook function for buffers commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
   (when (and (not (use-region-p))
              (not (anju-at-org-table-p))
              (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu buffer-navigation-separator)
-      (easy-menu-add-item menu nil [previous-buffer
-                                    previous-buffer
-                                    :label "← Buffer"
-                                    :help "Go to previous buffer"])
+    (anju-context-menu-item-separator menu buffer-navigation-separator)
+    (easy-menu-add-item menu nil [previous-buffer
+                                  previous-buffer
+                                  :label "← Buffer"
+                                  :help "Go to previous buffer"])
 
-      (easy-menu-add-item menu nil [next-buffer
-                                    next-buffer
-                                    :label "→ Buffer"
-                                    :help "Go to next buffer"])
+    (easy-menu-add-item menu nil [next-buffer
+                                  next-buffer
+                                  :label "→ Buffer"
+                                  :help "Go to next buffer"])
 
-      (easy-menu-add-item menu nil [ibuffer
-                                    ibuffer
-                                    :label "≣ List All Buffers"
-                                    :help "List all buffers"])))
+    (easy-menu-add-item menu nil [ibuffer
+                                  ibuffer
+                                  :label "≣ List All Buffers"
+                                  :help "List all buffers"]))
   menu)
 
 
 ;;; Context Menu: Narrow/Widen
 
-(defun anju-context-menu-narrow (menu click)
+(defun anju-context-menu-narrow (menu _click)
   "Context menu hook function for narrow commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
 
   (when (and (not (anju-at-org-table-p))
              (not (derived-mode-p 'Info-mode))
              (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu narrow-separator)
-      (cond ((use-region-p)
-             (easy-menu-add-item menu nil
-                                 [narrow-to-region narrow-to-region
-                                  :label (anju-menu-label "Narrow Region")
-                                  :help "Restrict editing in this buffer \
+    (anju-context-menu-item-separator menu narrow-separator)
+    (cond ((use-region-p)
+           (easy-menu-add-item menu nil
+                               [narrow-to-region narrow-to-region
+                                :label (anju-menu-label "Narrow Region")
+                                :help "Restrict editing in this buffer \
 to the current region"]))
 
-            ((and (not (buffer-narrowed-p)) (derived-mode-p 'prog-mode))
-             (easy-menu-add-item menu nil
-                                 [narrow-to-defun narrow-to-defun
-                                  :label "Narrow to defun"
-                                  :help "Restrict editing in this buffer \
+          ((and (not (buffer-narrowed-p)) (derived-mode-p 'prog-mode))
+           (easy-menu-add-item menu nil
+                               [narrow-to-defun narrow-to-defun
+                                :label "Narrow to defun"
+                                :help "Restrict editing in this buffer \
 to the current defun"]))
 
-            ((and (not (buffer-narrowed-p)) (derived-mode-p 'org-mode))
-             (easy-menu-add-item menu nil
-                                 [org-narrow-to-subtree org-narrow-to-subtree
-                                  :label "Narrow to subtree"
-                                  :help "Restrict editing in this buffer \
+          ((and (not (buffer-narrowed-p)) (derived-mode-p 'org-mode))
+           (easy-menu-add-item menu nil
+                               [org-narrow-to-subtree org-narrow-to-subtree
+                                :label "Narrow to subtree"
+                                :help "Restrict editing in this buffer \
 to the current subtree"]))
 
-            ((and (not (buffer-narrowed-p)) (derived-mode-p 'markdown-mode))
-             (easy-menu-add-item menu nil
-                                 [markdown-narrow-to-subtree
-                                  markdown-narrow-to-subtree
-                                  :label "Narrow to subtree"
-                                  :help "Restrict editing in this buffer \
+          ((and (not (buffer-narrowed-p)) (derived-mode-p 'markdown-mode))
+           (easy-menu-add-item menu nil
+                               [markdown-narrow-to-subtree
+                                markdown-narrow-to-subtree
+                                :label "Narrow to subtree"
+                                :help "Restrict editing in this buffer \
 to the current subtree"])))
 
-      (when (and (buffer-narrowed-p) (not (derived-mode-p 'Info-mode)))
-        (easy-menu-add-item menu nil
-                            [widen widen
-                             :label "Widen buffer"
-                             :help "Remove narrowing restrictions \
-from current buffer"]))))
+    (when (and (buffer-narrowed-p) (not (derived-mode-p 'Info-mode)))
+      (easy-menu-add-item menu nil
+                          [widen widen
+                           :label "Widen buffer"
+                           :help "Remove narrowing restrictions \
+from current buffer"])))
   menu)
 
 
@@ -1128,67 +1208,73 @@ from current buffer"]))))
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'.
+
+NOTE: This hook shall change the current point via
+`anju-adjust-point-for-click', which can affect subsequent
+point-dependent hooks in `context-menu-functions'.
+
+This hook should be inserted in `context-menu-functions' before
+`context-menu-region'."
 
   (when (derived-mode-p 'xref--xref-buffer-mode)
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu xref-separator)
-      (easy-menu-add-item
-       menu nil
-       [revert-buffer
-        revert-buffer
-        :label "Refresh"
-        :help "Refresh context of the ‘*xref*’ buffer"])
+    (anju-adjust-point-for-click click)
+    (anju-context-menu-item-separator menu xref-separator)
+    (easy-menu-add-item
+     menu nil
+     [revert-buffer
+      revert-buffer
+      :label "Refresh"
+      :help "Refresh context of the ‘*xref*’ buffer"])
 
-      (easy-menu-add-item
-       menu nil
-       [xref-prev-line
-        xref-prev-line
-        :label "↑ Line"
-        :help "Move to the previous xref and display its source in the appropriate window"])
+    (easy-menu-add-item
+     menu nil
+     [xref-prev-line
+      xref-prev-line
+      :label "↑ Line"
+      :help "Move to the previous xref and display its source in the appropriate window"])
 
-      (easy-menu-add-item
-       menu nil
-       [xref-next-line
-        xref-next-line
-        :label "↓ Line"
-        :help "Move to the next xref and display its source in the appropriate window"])
+    (easy-menu-add-item
+     menu nil
+     [xref-next-line
+      xref-next-line
+      :label "↓ Line"
+      :help "Move to the next xref and display its source in the appropriate window"])
 
-      (easy-menu-add-item
-       menu nil
-       [xref-prev-group
-        xref-prev-group
-        :label "↑ Group"
-        :help "Move to the first item of the previous xref group and display its source"])
+    (easy-menu-add-item
+     menu nil
+     [xref-prev-group
+      xref-prev-group
+      :label "↑ Group"
+      :help "Move to the first item of the previous xref group and display its source"])
 
-      (easy-menu-add-item
-       menu nil
-       [xref-next-group
-        xref-next-group
-        :label "↓ Group"
-        :help "Move to the first item of the next xref group and display its source"])
+    (easy-menu-add-item
+     menu nil
+     [xref-next-group
+      xref-next-group
+      :label "↓ Group"
+      :help "Move to the first item of the next xref group and display its source"])
 
-      (easy-menu-add-item
-       menu nil
-       [xref-query-replace-in-results
-        xref-query-replace-in-results
-        :label "Replace xref…"
-        :help "Perform interactive replacement of FROM with TO in all displayed xrefs"])
+    (easy-menu-add-item
+     menu nil
+     [xref-query-replace-in-results
+      xref-query-replace-in-results
+      :label "Replace xref…"
+      :help "Perform interactive replacement of FROM with TO in all displayed xrefs"])
 
-      (easy-menu-add-item
-       menu nil
-       [xref-quit-and-goto-xref
-        xref-quit-and-goto-xref
-        :label "Quit to xref"
-        :help "Quit *xref* buffer, then jump to xref on current line"])
+    (easy-menu-add-item
+     menu nil
+     [xref-quit-and-goto-xref
+      xref-quit-and-goto-xref
+      :label "Quit to xref"
+      :help "Quit *xref* buffer, then jump to xref on current line"])
 
-      (easy-menu-add-item
-       menu nil
-       [quit-window
-        quit-window
-        :label "Quit"
-        :help "Quit *xref* buffer"])))
+    (easy-menu-add-item
+     menu nil
+     [quit-window
+      quit-window
+      :label "Quit"
+      :help "Quit *xref* buffer"]))
   menu)
 
 
@@ -1196,26 +1282,24 @@ This function is intended to be hooked into `context-menu-functions'."
 
 ;;; Context Menu: Open in…
 
-(defun anju-context-menu-open-in (menu click)
+(defun anju-context-menu-open-in (menu _click)
   "Context menu hook function for open-in commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
 
   (when (and (not (use-region-p))
              (not (anju-at-org-table-p))
              (buffer-file-name)
              (not (derived-mode-p 'dired-mode))
              (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu open-in-separator)
-      (easy-menu-add-item menu nil
-                          [dired-jump-other-window dired-jump-other-window
-                           :label "📁 Open in Dired"
-                           :help "Open file in Dired"])))
+    (anju-context-menu-item-separator menu open-in-separator)
+    (easy-menu-add-item menu nil
+                        [dired-jump-other-window dired-jump-other-window
+                         :label "📁 Open in Dired"
+                         :help "Open file in Dired"]))
   menu)
 
 
@@ -1227,7 +1311,14 @@ This function is intended to be hooked into `context-menu-functions'."
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'.
+
+NOTE: This hook shall change the current point via
+`anju-adjust-point-for-click', which can affect subsequent
+point-dependent hooks in `context-menu-functions'.
+
+This hook should be inserted in `context-menu-functions' before
+`context-menu-region'."
   (when (and (vc-responsible-backend default-directory t)
              (not (or (derived-mode-p 'Info-mode)
                       (derived-mode-p 'help-mode)
@@ -1238,39 +1329,39 @@ This function is intended to be hooked into `context-menu-functions'."
              (not (anju-at-org-table-p))
              (not (anju-rectangle-selected-p)))
 
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu vc-separator)
+    (anju-adjust-point-for-click click)
+    (anju-context-menu-item-separator menu vc-separator)
 
-      (when (and (package-installed-p 'magit)
-                 (not (derived-mode-p 'magit-status-mode)))
-        (require 'magit)
-        (if (buffer-file-name)
-            (easy-menu-add-item
-             menu nil
-             [magit-file-dispatch magit-file-dispatch
-              :label "Magit Dispatch…"
-              :help "Show the status of the current Git repository in a buffer"])
+    (when (and (package-installed-p 'magit)
+               (not (derived-mode-p 'magit-status-mode)))
+      (require 'magit)
+      (if (buffer-file-name)
           (easy-menu-add-item
            menu nil
-           [magit-status magit-status
-            :label "Magit Status"
-            :help "Show the status of the current Git repository in a buffer"])))
+           [magit-file-dispatch magit-file-dispatch
+            :label "Magit Dispatch…"
+            :help "Show the status of the current Git repository in a buffer"])
+        (easy-menu-add-item
+         menu nil
+         [magit-status magit-status
+          :label "Magit Status"
+          :help "Show the status of the current Git repository in a buffer"])))
 
-      (easy-menu-add-item
-       menu nil
-       [casual-ediff-revision-from-menu casual-ediff-revision-from-menu
-        :label "Ediff revision…"
-        :visible (and (bound-and-true-p buffer-file-name)
-                      (vc-registered (buffer-file-name)))
-        :help "Ediff this file with revision"])
+    (easy-menu-add-item
+     menu nil
+     [casual-ediff-revision-from-menu casual-ediff-revision-from-menu
+      :label "Ediff revision…"
+      :visible (and (bound-and-true-p buffer-file-name)
+                    (vc-registered (buffer-file-name)))
+      :help "Ediff this file with revision"])
 
-      (easy-menu-add-item
-       menu nil
-       [vc-git-grep vc-git-grep
-        :label "Git Grep…"
-        :help "Run git grep, searching for REGEXP in FILES in directory DIR"])))
+    (easy-menu-add-item
+     menu nil
+     [vc-git-grep vc-git-grep
+      :label "Git Grep…"
+      :help "Run git grep, searching for REGEXP in FILES in directory DIR"]))
   menu)
+
 
 
 
@@ -1284,54 +1375,52 @@ This function is intended to be hooked into `context-menu-functions'."
          (regex (buffer-substring-no-properties start end)))
     (occur regex)))
 
-(defun anju-context-menu-region (menu click)
+(defun anju-context-menu-region (menu _click)
   "Context menu hook function for region commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
   (when (and (use-region-p) (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu transform-text-separator)
-      (easy-menu-add-item menu nil
-                          [anju-occur-selected-region anju-occur-selected-region
-                           :label (anju-menu-label "Occur")
-                           :visible (eq (count-lines (region-beginning) (region-end)) 1)
-                           :help "Show all lines in the current buffer \
+    (anju-context-menu-item-separator menu transform-text-separator)
+    (easy-menu-add-item menu nil
+                        [anju-occur-selected-region anju-occur-selected-region
+                         :label (anju-menu-label "Occur")
+                         :visible (eq (count-lines (region-beginning) (region-end)) 1)
+                         :help "Show all lines in the current buffer \
 containing a match for selected word"])
 
-      (if (or (and (derived-mode-p 'org-mode) (not (anju-at-org-table-p)))
-              (derived-mode-p 'markdown-mode))
-          (easy-menu-add-item menu nil anju-style-menu))
+    (if (or (and (derived-mode-p 'org-mode) (not (anju-at-org-table-p)))
+            (derived-mode-p 'markdown-mode))
+        (easy-menu-add-item menu nil anju-style-menu))
 
-      (if (not buffer-read-only)
-          (easy-menu-add-item menu nil anju-transform-text-menu))
+    (if (not buffer-read-only)
+        (easy-menu-add-item menu nil anju-transform-text-menu))
 
-      (easy-menu-add-item menu nil
-                          [query-replace query-replace
-                           :label "Query Replace…"
-                           :visible (not buffer-read-only)
-                           :help "Replace some occurrences of FROM-STRING with TO-STRING"])
+    (easy-menu-add-item menu nil
+                        [query-replace query-replace
+                         :label "Query Replace…"
+                         :visible (not buffer-read-only)
+                         :help "Replace some occurrences of FROM-STRING with TO-STRING"])
 
-      (easy-menu-add-item menu nil
-                          [query-replace-regexp query-replace-regexp
-                           :label "Query Replace Regexp…"
-                           :visible (not buffer-read-only)
-                           :help "Replace some things after point matching REGEXP with TO-STRING"])
+    (easy-menu-add-item menu nil
+                        [query-replace-regexp query-replace-regexp
+                         :label "Query Replace Regexp…"
+                         :visible (not buffer-read-only)
+                         :help "Replace some things after point matching REGEXP with TO-STRING"])
 
-      (if (or (derived-mode-p 'prog-mode) (derived-mode-p 'org-mode))
-          (easy-menu-add-item menu nil
-                              [comment-dwim comment-dwim
-                               :label "Toggle Comment"
-                               :visible (not buffer-read-only)
-                               :help "Toggle comment on selected region"]))
+    (if (or (derived-mode-p 'prog-mode) (derived-mode-p 'org-mode))
+        (easy-menu-add-item menu nil
+                            [comment-dwim comment-dwim
+                             :label "Toggle Comment"
+                             :visible (not buffer-read-only)
+                             :help "Toggle comment on selected region"]))
 
-      (easy-menu-add-item menu nil
-                          [write-region write-region
-                           :label "Write Region…"
-                           :help "Write current region into specified file"])))
+    (easy-menu-add-item menu nil
+                        [write-region write-region
+                         :label "Write Region…"
+                         :help "Write current region into specified file"]))
   menu)
 
 
@@ -1466,85 +1555,84 @@ URL `https://gist.github.com/danielmartin/3c5d3a3a8cd24a3556379c5251651748'."
      :visible (eq system-type 'darwin)
      :help "Copy as RTF to clipboard"]))
 
-(defun anju-context-menu-region-extension (menu click)
-  "Region menu using MENU and CLICK."
+(defun anju-context-menu-region-extension (menu _click)
+  "Region menu using MENU and CLICK.
+
+This hook function should follow after `context-menu-region' when added
+to `context-menu-functions'."
 
   (when (and (derived-mode-p 'org-mode) (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (easy-menu-add-item menu nil
-                          [org-insert-last-stored-link
-                           org-insert-last-stored-link
-                           :label "Paste Last Org Link"
-                           :visible (and (not buffer-read-only) (anju-org-stored-links-p))
-                           :help "Insert the last link stored in org-stored-links"]
-                          "Clear")
+    (easy-menu-add-item menu nil
+                        [org-insert-last-stored-link
+                         org-insert-last-stored-link
+                         :label "Paste Last Org Link"
+                         :visible (and (not buffer-read-only) (anju-org-stored-links-p))
+                         :help "Insert the last link stored in org-stored-links"]
+                        "Clear")
 
-      (easy-menu-add-item menu nil
-                          [anju-yank-markdown-as-org
-                           anju-yank-markdown-as-org
-                           :label "Paste Markdown as Org"
-                           :visible (not buffer-read-only)
-                           :help "Convert clipboard (latest yank) of Markdown text to Org, then paste"]
-                          "Clear")
+    (easy-menu-add-item menu nil
+                        [anju-yank-markdown-as-org
+                         anju-yank-markdown-as-org
+                         :label "Paste Markdown as Org"
+                         :visible (not buffer-read-only)
+                         :help "Convert clipboard (latest yank) of Markdown text to Org, then paste"]
+                        "Clear")
 
-      (easy-menu-add-item menu nil
-                          [yank-media
-                           yank-media
-                           :label "Paste Media"
-                           :visible (and (not buffer-read-only)
-                                         (display-graphic-p)
-                                         (anju-yank-media-p))
-                           :help "Paste (yank) media"]
-                          "Clear")
+    (easy-menu-add-item menu nil
+                        [yank-media
+                         yank-media
+                         :label "Paste Media"
+                         :visible (and (not buffer-read-only)
+                                       (display-graphic-p)
+                                       (anju-yank-media-p))
+                         :help "Paste (yank) media"]
+                        "Clear")
 
-      (easy-menu-add-item menu nil
-                          anju-context-menu-org-copy-as-menu
-                          "Paste")))
+    (easy-menu-add-item menu nil
+                        anju-context-menu-org-copy-as-menu
+                        "Paste"))
   menu)
 
 
 
 ;;; Context Menu: Compilation Mode
 
-(defun anju-context-menu-compile (menu click)
+(defun anju-context-menu-compile (menu _click)
   "Context menu hook function for compile commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
 
   (when (derived-mode-p 'compilation-mode)
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu compile-separator)
+    (anju-context-menu-item-separator menu compile-separator)
 
-      (easy-menu-add-item menu nil
-                          [recompile
-                           recompile
-                           :label (casual-compile--select-mode-label
-                                   "Recompile"
-                                   "Refresh")
-                           :enable (not (casual-compile--compilation-running-p))
-                           :help "Re-compile the program including the \
+    (easy-menu-add-item menu nil
+                        [recompile
+                         recompile
+                         :label (casual-compile--select-mode-label
+                                 "Recompile"
+                                 "Refresh")
+                         :enable (not (casual-compile--compilation-running-p))
+                         :help "Re-compile the program including the \
 current buffer"])
 
-      (easy-menu-add-item menu nil
-                          [compile
-                           compile
-                           :label "Compile…"
-                           :visible (not (derived-mode-p 'grep-mode))
-                           :enable (not (casual-compile--compilation-running-p))
-                           :help "Compile the program including the current \
+    (easy-menu-add-item menu nil
+                        [compile
+                         compile
+                         :label "Compile…"
+                         :visible (not (derived-mode-p 'grep-mode))
+                         :enable (not (casual-compile--compilation-running-p))
+                         :help "Compile the program including the current \
 buffer.  Default: run ‘make’"])
 
-      (easy-menu-add-item menu nil
-                          [kill-compilation
-                           kill-compilation
-                           :label (casual-compile-unicode-get :kill)
-                           :visible (casual-compile--compilation-running-p)
-                           :help "Kill the current compilation or grep process"])))
+    (easy-menu-add-item menu nil
+                        [kill-compilation
+                         kill-compilation
+                         :label (casual-compile-unicode-get :kill)
+                         :visible (casual-compile--compilation-running-p)
+                         :help "Kill the current compilation or grep process"]))
   menu)
 
 
@@ -1552,18 +1640,16 @@ buffer.  Default: run ‘make’"])
 
 ;;; Context Menu: Show Markup/Toggle Images
 
-(defun anju-context-menu-markup (menu click)
+(defun anju-context-menu-markup (menu _click)
   "Context menu hook function for markup commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
   (when (and (not (use-region-p))
              (member (derived-mode-p major-mode) '(org-mode markdown-mode))
              (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
       (pcase (derived-mode-p major-mode)
         ('org-mode
          (anju-context-menu-item-separator menu org-mode-operations-separator)
@@ -1591,50 +1677,46 @@ temporarily visible (Visible mode)"]))
                               :style toggle
                               :selected markdown-hide-markup
                               :help "Toggle the display or hiding of markup"]))
-        (m nil))))
+        (m nil)))
   menu)
 
 
 ;;; Context Menu: Word Count
 
-(defun anju-context-menu-wordcount (menu click)
-  "Context menu hook function for wordcount commands.
+(defun anju-context-menu-wordcount (menu _click)
+  "Context menu hook function for word-count commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
   (when (and (derived-mode-p 'text-mode)
              (not (anju-at-org-table-p))
              (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu count-words-separator)
-      (easy-menu-add-item menu nil [count-words count-words
-                                    :label "Count Words"
-                                    :help "Count words"])))
+    (anju-context-menu-item-separator menu count-words-separator)
+    (easy-menu-add-item menu nil [count-words count-words
+                                  :label "Count Words"
+                                  :help "Count words"]))
   menu)
 
 
 ;;; Context Menu: Dictionary
 
-(defun anju-context-menu-dictionary (menu click)
+(defun anju-context-menu-dictionary (menu _click)
   "Context menu hook function for the dictionary command.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
 
   (when (and (use-region-p) (not (anju-rectangle-selected-p)))
-    (save-excursion
-      (mouse-set-point click)
-      (easy-menu-add-item
-       menu nil
-       ["Look Up"
-        dictionary-search-word-at-mouse
-        :label (format "Look Up “%s”" (substring-no-properties (thing-at-point 'word)))
-        :help "Look up selected region in dictionary"])))
+    (easy-menu-add-item
+     menu nil
+     ["Look Up"
+      dictionary-search-word-at-mouse
+      :label (format "Look Up “%s”" (substring-no-properties (thing-at-point 'word)))
+      :help "Look up selected region in dictionary"]))
   menu)
 
 
@@ -1672,16 +1754,13 @@ This function is intended to be hooked into `context-menu-functions'."
       :visible (window-in-direction 'right)
       :help "Swap window right"])))
 
-(defun anju-context-menu-window (menu click)
-  "Context menu hook function for wordcount commands.
+(defun anju-context-menu-window (menu _click)
+  "Context menu hook function for window commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
-
-  (ignore click)
-
+This hook is intended for `context-menu-functions'."
   (save-excursion
     (anju-context-menu-item-separator menu context-window--separator)
     (easy-menu-add-item menu nil anju-context-window-management-menu))
@@ -1690,23 +1769,21 @@ This function is intended to be hooked into `context-menu-functions'."
 
 ;;; Context Menu: Rectangle Commands
 
-(defun anju-context-menu-rectangle (menu click)
-  "Context menu hook function for wordcount commands.
+(defun anju-context-menu-rectangle (menu _click)
+  "Context menu hook function for rectangle commands.
 
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'."
 
   (when (or (and (anju-rectangle-selected-p)
                  (not (anju-at-org-table-p)))
             (and (not buffer-read-only)
                  (boundp 'killed-rectangle)
                  killed-rectangle))
-    (save-excursion
-      (mouse-set-point click)
       (anju-context-menu-item-separator menu context-rectangle--separator)
-      (easy-menu-add-item menu nil anju-rectangle-menu)))
+      (easy-menu-add-item menu nil anju-rectangle-menu))
   menu)
 
 
@@ -1772,85 +1849,91 @@ This function is intended to be hooked into `context-menu-functions'."
 - MENU: menu
 - CLICK: event
 
-This function is intended to be hooked into `context-menu-functions'."
+This hook is intended for `context-menu-functions'.
+
+NOTE: This hook shall change the current point via
+`anju-adjust-point-for-click', which can affect subsequent
+point-dependent hooks in `context-menu-functions'.
+
+This hook should be inserted in `context-menu-functions' before
+hooks provided by the built-in `mouse.el'."
 
   (when (derived-mode-p 'makefile-mode)
-    (save-excursion
-      (mouse-set-point click)
-      (anju-context-menu-item-separator menu context-makefile--separator1)
+    (anju-adjust-point-for-click click)
+    (anju-context-menu-item-separator menu context-makefile--separator1)
 
-      (easy-menu-add-item menu nil
-                          [compile
-                           compile
-                           :label "Compile…"
-                           :help "Compile the program including the \
+    (easy-menu-add-item menu nil
+                        [compile
+                         compile
+                         :label "Compile…"
+                         :help "Compile the program including the \
 current buffer.  Default: run ‘make’"])
 
-      (easy-menu-add-item menu nil
-                          [makefile-insert-target-ref
-                           makefile-insert-target-ref
-                           :label "Insert target…"
-                           :enable (not buffer-read-only)
-                           :help "Complete on a list of known targets, \
+    (easy-menu-add-item menu nil
+                        [makefile-insert-target-ref
+                         makefile-insert-target-ref
+                         :label "Insert target…"
+                         :enable (not buffer-read-only)
+                         :help "Complete on a list of known targets, \
 then insert TARGET-NAME at point"])
 
-      (easy-menu-add-item menu nil
-                          [makefile-insert-macro-ref
-                           makefile-insert-macro-ref
-                           :label "Insert macro…"
-                           :enable (not buffer-read-only)
-                           :help "Complete on a list of known macros, \
+    (easy-menu-add-item menu nil
+                        [makefile-insert-macro-ref
+                         makefile-insert-macro-ref
+                         :label "Insert macro…"
+                         :enable (not buffer-read-only)
+                         :help "Complete on a list of known macros, \
 then insert complete ref at point"])
 
-      (easy-menu-add-item menu nil
-                          [makefile-backslash-region
-                           makefile-backslash-region
-                           :label "\\ Region"
-                           :visible (use-region-p)
-                           :enable (not buffer-read-only)
-                           :help "Insert, align, or delete end-of-line \
+    (easy-menu-add-item menu nil
+                        [makefile-backslash-region
+                         makefile-backslash-region
+                         :label "\\ Region"
+                         :visible (use-region-p)
+                         :enable (not buffer-read-only)
+                         :help "Insert, align, or delete end-of-line \
 backslashes on the lines in the region"])
 
-      (easy-menu-add-item menu nil
-                          [makefile-insert-gmake-function
-                           makefile-insert-gmake-function
-                           :label "Insert GNU make function…"
-                           :visible (derived-mode-p 'makefile-gmake-mode)
-                           :enable (not buffer-read-only)
-                           :help "Insert a GNU make function call"])
+    (easy-menu-add-item menu nil
+                        [makefile-insert-gmake-function
+                         makefile-insert-gmake-function
+                         :label "Insert GNU make function…"
+                         :visible (derived-mode-p 'makefile-gmake-mode)
+                         :enable (not buffer-read-only)
+                         :help "Insert a GNU make function call"])
 
-      (easy-menu-add-item menu nil
-                          [casual-make-identify-autovar-region
-                           casual-make-identify-autovar-region
-                           :label "Identify Auto Var"
-                           :visible (use-region-p)
-                           :help "Identify GNU Make automatic variable in \
+    (easy-menu-add-item menu nil
+                        [casual-make-identify-autovar-region
+                         casual-make-identify-autovar-region
+                         :label "Identify Auto Var"
+                         :visible (use-region-p)
+                         :help "Identify GNU Make automatic variable in \
 region from START to END"])
 
-      (anju-context-menu-item-separator menu context-makefile--separator2)
+    (anju-context-menu-item-separator menu context-makefile--separator2)
 
-      (easy-menu-add-item menu nil
-                          [makefile-pickup-everything
-                           makefile-pickup-everything
-                           :label "Refresh targets and macros"
-                           :help "Notice names of all macros and \
+    (easy-menu-add-item menu nil
+                        [makefile-pickup-everything
+                         makefile-pickup-everything
+                         :label "Refresh targets and macros"
+                         :help "Notice names of all macros and \
 targets in Makefile"])
 
-      (easy-menu-add-item menu nil
-                          [makefile-pickup-filenames-as-targets
-                           makefile-pickup-filenames-as-targets
-                           :label "Include file names as targets"
-                           :help "Scan the current directory for \
+    (easy-menu-add-item menu nil
+                        [makefile-pickup-filenames-as-targets
+                         makefile-pickup-filenames-as-targets
+                         :label "Include file names as targets"
+                         :help "Scan the current directory for \
 filenames to use as targets"])
 
-      (easy-menu-add-item menu nil
-                          [makefile-create-up-to-date-overview
-                           makefile-create-up-to-date-overview
-                           :label "Overview"
-                           :help "Create a buffer containing an overview of \
+    (easy-menu-add-item menu nil
+                        [makefile-create-up-to-date-overview
+                         makefile-create-up-to-date-overview
+                         :label "Overview"
+                         :help "Create a buffer containing an overview of \
 the state of all known targets"])
 
-      (easy-menu-add-item menu nil anju-makefile-modes-menu)))
+    (easy-menu-add-item menu nil anju-makefile-modes-menu))
   menu)
 
 

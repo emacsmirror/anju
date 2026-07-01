@@ -6,7 +6,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.7.0
+#+MACRO: version 1.7.1-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -269,6 +269,11 @@ The “Org Table Region” sub-menu provides commands to cut, copy, and paste re
 
 If the point is on selected text or an existing Org link, the context menu will have the menu item “Link…” to run the command ~org-insert-link~. From there you can add or edit a link.
 
+On an existing Org link, use the menu item “Copy Link Address…” to copy the raw link address into the clipboard (~kill-ring~).
+
+[[file:images/anju-context-menu-org-link-copy-address.png]]
+
+
 If an Org link has already been stored, then the menu item “Paste Last Org Link” will be displayed. See more at [[#org-paste-context-menu][Org Paste Context Menu]].
 
 
@@ -456,7 +461,7 @@ If the buffer is the output of a Grep search, then its context menu is populated
 
 [[file:images/anju-context-menu-xref.png]]
 
-Commands such as ~xref-find-references~ or ~xref-find-references-at-mouse~ on a symbol will create a new buffer named ~✻xref✻~ listing locations where that symbol has been referenced. Anju provides a context menu for this  ~✻xref✻~  buffer with commands described in [[info:emacs#Xref Commands]]. 
+Commands such as ~xref-find-references~ or ~xref-find-references-at-mouse~ on a symbol will create a new buffer named ~✻xref✻~ listing locations where that symbol has been referenced. Anju provides a context menu for this  ~✻xref✻~  buffer with commands described in [[info:emacs#Xref Commands]].
 
 
 *** Makefile Context Menu
@@ -623,7 +628,7 @@ Anju adds a *Registers* menu to the menu bar to work with Emacs registers ([[inf
 
 - Text selection
 - Rectangle selection
-- Cursor position (point) 
+- Cursor position (point)
 - Number (counter)
 - Window configuration
 - Keyboard macro
@@ -874,54 +879,84 @@ By default, all the above ~*-enable~ variables are set to ~t~.  Users preferring
 #+VINDEX: context-menu-mode
 #+VINDEX: context-menu-functions
 
+In Emacs, the implementation of a context menu is a list of functions placed in the customizable hook variable ~context-menu-functions~. When the context menu is raised, typically via right-click (~mouse-3~), each function in ~context-menu-functions~ is run /in order/ from first to last to populate the menu. Within each function is predicate logic to test if the /context/ for adding a menu item is appropriate.
 
-Anju uses ~context-menu-mode~ (introduced in Emacs 28) to define its context menu behavior. This is accomplished through the customizable hook variable ~context-menu-functions~.
+A context menu function has two arguments:
 
-~context-menu-functions~ is a list of functions where each function has two arguments:
+  - ~menu~ : reference to the context menu.
+  - ~click~ : a mouse event which holds the position of the raised context menu.
 
-  - ~menu~ : reference to the context menu
-  - ~click~ : a mouse event
+The ~click~ event can be translated to a cursor position (point).
 
-When the context menu is raised, typically via right-click (~mouse-3~), each function in ~context-menu-functions~ is run, populating the context menu.
+The predicate logic implementation can take place at different levels:
 
-The following example Elisp illustrates an implementation of a context menu function.
+  1. At the time of menu item instantiation.
 
-  #+BEGIN_SRC elisp :lexical no
-    (defun anju-context-menu-wordcount (menu click)
-      "Context menu hook function for wordcount commands.
+     If the menu item is instantiated using the macro ~easy-menu-define~, then the ~:visible~ and ~:active~ keywords can control how the menu item is displayed ([[info:elisp#Easy Menu]]).
 
-    - MENU: menu
-    - CLICK: event
-
-    This function is intended to be hooked into `context-menu-functions'."
-      (when (and (derived-mode-p 'text-mode) (not (anju-at-org-table-p)))
-        (save-excursion
-          (mouse-set-point click)
-          (anju-context-menu-item-separator menu count-words-separator)
-          (easy-menu-add-item menu nil [count-words count-words
-                                        :label "Count Words"
-                                        :help "Count words"])))
-      menu)
-  #+END_SRC
+  2. At a level above menu item instantiation.
 
 
-Defining how a menu item is context-sensitive can be determined in multiple places:
-
-  1. At the time of menu item definition
-  2. At a higher level.
-
-The /context/ is determined by a predicate which can take into account different things, among them:
+The /context/ is determined by a predicate which can take into account different conditions, among them:
 
   - Selected Text (~use-region-p~)
   - Major mode
-  - Cursor (Point) position
+  - Current cursor (point) position
   - Mouse position
 
-In the example above, the context predicate tests if the major mode is derived from ~text-mode~ /and/ if point is not inside an Org table (~anju-at-org-table-p~).  Note that it is defined at a higher level to avoid instantiating menu items if the context does not apply.
+Separation of concerns between context menu functions are handled by /convention/. It is the responsibility of the implementer to manage any side-effect dependencies between different context menu functions, if any.
 
-The context predicate can be embedded in the menu item definition itself. See more about this with the ~:visible~ and ~:active~ keywords for the macro ~easy-menu-define~ ([[info:elisp#Easy Menu]]).
+Shown below is a context menu function that demonstrates an example implementation of (2) above. Here it tests for major mode (~text-mode~) and to not apply when the current point is in an Org table nor a rectangle selection. Note that ~_click~ is ignored using the underscore notation, so the position of the context menu is unused.
 
-It is up to the implementer to determine where to best define and apply the context predicate.
+#+BEGIN_SRC elisp :lexical no
+  (defun anju-context-menu-wordcount (menu _click)
+    "Context menu hook function for word-count commands.
+
+  - MENU: menu
+  - CLICK: event
+
+  This hook is intended for `context-menu-functions'."
+    (when (and (derived-mode-p 'text-mode)
+               (not (anju-at-org-table-p))
+               (not (anju-rectangle-selected-p)))
+      (anju-context-menu-item-separator menu count-words-separator)
+      (easy-menu-add-item menu nil [count-words count-words
+                                    :label "Count Words"
+                                    :help "Count words"]))
+    menu)
+#+END_SRC
+
+
+It is up to the implementer to determine where to best define and apply predicates for a context.
+
+
+#+TEXINFO: @subheading Context Menu Current Point Handling
+#+CINDEX: Context Menu Current Point Handling
+
+A design consideration for a context menu function with commands that act on a point is, /which point/: the current point or the point at which the context menu is raised?
+
+A context menu function that does not change the point can unpleasantly surprise the user. For example, in an Org file window, while the current point is in body text, a user could raise the context menu over a heading. Should the context menu be populated with commands for body text or for a heading?
+
+To clarify what the answer to that question could (or should) be, we will enumerate the following implementations of a menu item (command) that acts on a point:
+
+1. Use the current point /p/, ignoring the computed point /p'/ of the context menu position.
+2. Use the computed point /p'/, leaving the current point /p/ unchanged.
+3. Move the current point to /p'/, displacing /p/.
+
+Option (1) allows for ~context-menu-functions~ to be arbitrarily ordered at the cost of surprising the user when /p/ and /p'/ are far from each other. The user must always adjust the current point to get the desired context menu.
+
+Option (2) also allows for ~context-menu-functions~ to be arbitrarily ordered, however it adds implementation complexity as the context menu function and the commands within it must checkpoint and restore the current point /p/ via ~save-excursion~ and ~mouse-set-point~. The current point is unchanged, however more subtle behavior is introduced as menu items work on text where the context menu is raised, /not/ where the current point is. This path could also result in a context menu with some menu items working on /p'/ and other menu items working on /p/, which might also lead to surprise.
+
+Option (3) offers the least user surprise as it will move the current point to the position where the context menu is raised. This is a common approach taken by many other GUI applications. Option (3) makes the ordering of ~context-menu-functions~ significant, opening the possibility for unforeseen side-effects. One would be changing the insertion point for the context menu for paste operations.
+
+Anju aspires to provide the least surprise to the user. As such all context menus which hold a command that depends on the current point will move it to where the context menu is raised. Anju makes the opinionated decision to take option (3).
+
+The design guidelines taken by Anju for moving the current point will require the following conditions to be met:
+
+- The context menu contains commands that only apply to a major mode. This permits implicit mutual exclusion between major modes.
+- The context menu contains a command which depends on the current point.
+- The current point is moved only if /p/ and /p'/ are distant.
+- No region is selected.
 
 *** Customizing context-menu-functions
 #+CINDEX: Customizing context-menu-functions
@@ -929,18 +964,20 @@ It is up to the implementer to determine where to best define and apply the cont
 
 [[file:images/anju-context-menu-customize.png]]
 
-It is recommended to use the ~customize-variable~ command to configure ~context-menu-functions~ instead of using ~add-hook~ for the following reasons:
+It is strongly recommended to use the ~customize-variable~ command to configure ~context-menu-functions~ for the following reasons:
 
 - A visual UI is provided showing what choices for built-in context menu functions are available.
-   
-  - Anju modifies the choice selection to include Anju-defined context menu functions.
-     
-- Users can insert their own custom function.
-   
-- Top-down ordering of functions will similarly determine the order of menu items in the context menu.
 
+  - Anju modifies the choice selection to include Anju-defined context menu functions.
+
+- Users can insert their own custom context menu function.
+
+- Top-down ordering of functions will determine the order of menu items in the context menu.
+
+Users who insist on using ~add-hook~ to modify ~context-menu-functions~ should be mindful of its function ordering.
 
 Learn more about the context menu functions provided by Anju in the section [[#anju-context-menu-functions][Anju Context Menu Functions]].
+
 
 *** Anju Context Menu Functions
 :PROPERTIES:
@@ -968,25 +1005,42 @@ Learn more about the context menu functions provided by Anju in the section [[#a
 #+VINDEX: anju-context-menu-window
 #+VINDEX: anju-context-menu-region-extension
 
-Anju provides the following context menu functions for convenience. They can be used as-is or serve as a base for user-customized behavior.
+Anju provides the following context menu functions for convenience. They can be used as-is or serve as a basis for building a bespoke custom context menu function.
+
+Note that if a function changes the current point to where a context menu is raised, it should be inserted before  ~context-menu-region~ provided by ~mouse.el~.
+
 
 - ~anju-context-menu-dired~ :: Dired commands. See [[#dired-mode-context-menu][Dired Mode Context Menu]].
 
+  This function changes the current point to where the context menu is raised.
+
 - ~anju-context-menu-org-mode~  :: Org mode commands. See [[#org-mode-context-menu][Org Mode Context Menu]].
 
+  This function changes the current point to where the context menu is raised.
+
 - ~anju-context-menu-org-agenda~  :: Org Agenda commands. See [[#org-agenda-context-menu][Org Agenda Context Menu]].
+
+  This function changes the current point to where the context menu is raised.
 
 - ~anju-context-menu-info-mode~  :: Info mode commands. See [[#info-context-menu][Info Context Menu]].
 
 - ~anju-context-menu-make-mode~  :: Makefile mode commands. See [[#makefile-context-menu][Makefile Context Menu]].
 
+  This function changes the current point to where the context menu is raised.
+
 - ~anju-context-menu-compile~  :: Compilation (or Grep) mode commands. See [[#compilation-context-menu][Compilation/Grep Context Menu]].
 
 - ~anju-context-menu-elisp~ :: Emacs Lisp commands. See [[#emacs-lisp-context-menu][Emacs Lisp Context Menu]].
 
+  This function changes the current point to where the context menu is raised.
+
 - ~anju-context-menu-edebug-eval~ :: Edebug commands. See [[#edebug-mode-context-menu][Edebug Mode Context Menu]].
 
+  This function changes the current point to where the context menu is raised.
+
 - ~anju-context-menu-xref~ :: Xref commands. See [[#xref-context-menu][Xref Context Menu]].
+
+  This function changes the current point to where the context menu is raised.
 
 - ~anju-context-menu-scratch~  :: Open scratch buffer.
 
@@ -994,7 +1048,9 @@ Anju provides the following context menu functions for convenience. They can be 
 
 - ~anju-context-menu-region~ :: Commands for selected text.
 
-- ~anju-context-menu-region-extension~ :: Commands for extending the menu items provided by the built-in ~context-menu-region~ hook. Anju puts the Org-dependent “Paste” commands here.
+- ~anju-context-menu-region-extension~ :: Commands for extending the menu items provided by the built-in ~context-menu-region~ hook.
+
+  Anju puts the Org-dependent “Paste” commands here. This function should always follow ~context-menu-region~ in ~context-menu-functions~.
 
 - ~anju-context-menu-dictionary~ :: Look up definition of selected word with ~dictionary~.
 
@@ -1003,7 +1059,8 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-open-in~ :: Open in Dired.
 
 - ~anju-context-menu-vc~ :: Version control related commands.
-  If Magit 4.4+ is installed, then calls to it are made from here. See [[#version-controlled-source][Version-Controlled Source]].
+
+  This function changes the current point to where the context menu is raised. If Magit 4.4+ is installed, then calls to it are made from here. See [[#version-controlled-source][Version-Controlled Source]].
 
 - ~anju-context-menu-markup~ :: Commands to show/hide text markup (e.g. Org, Markdown).
 
@@ -1012,7 +1069,6 @@ Anju provides the following context menu functions for convenience. They can be 
 - ~anju-context-menu-rectangle~ :: Rectangle commands. See [[#rectangle-context-menu][Rectangle Context Menu]].
 
 - ~anju-context-menu-window~ :: Window management commands.
-
 
 ** Mode Line Buffer List Menu Customization
 :PROPERTIES:
