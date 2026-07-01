@@ -1145,7 +1145,7 @@
   (anju-test-context-menu-function-with-filetype
    ".org"
    #'anju-context-menu-org-agenda
-   14
+   15
    (lambda (items)
      (let* ((i 0))
 
@@ -1178,6 +1178,12 @@
                   "")))
         #'org-agenda-todo
         "Set Todo")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Date…"
+        #'org-agenda-date-prompt
+        "Change the date of this item.  Date is prompted for, with default today")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))

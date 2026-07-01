@@ -649,6 +649,11 @@ This hook should be inserted in `context-menu-functions' before
                  ""))
         :help "Set Todo"])
 
+      (easy-menu-add-item menu nil ["Date…"
+                                    org-agenda-date-prompt
+                                    :help "Change the date of this item.  \
+Date is prompted for, with default today"])
+
       (easy-menu-add-item menu nil ["Schedule…"
                                     org-agenda-schedule
                                     :help "Schedule headline"])
