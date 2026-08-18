@@ -1761,7 +1761,7 @@ This hook is intended for `context-menu-functions'."
 - CLICK: event
 
 This hook is intended for `context-menu-functions'."
-  (save-excursion
+  (when (not (use-region-p))
     (anju-context-menu-item-separator menu context-window--separator)
     (easy-menu-add-item menu nil anju-context-window-management-menu))
   menu)
