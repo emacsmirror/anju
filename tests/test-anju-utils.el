@@ -158,7 +158,7 @@
   (anju-test-keymap
    kmap
    "Fill"
-   5
+   8
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -166,6 +166,18 @@
         "Paragraph"
         #'fill-paragraph
         "Fill paragraph at or after point")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Paragraph ⤶"
+        #'fill-paragraph-semlf
+        "Fill paragraph at or after point using semantic linefeeds")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Unfill Paragraph"
+        #'unfill-paragraph
+        "Join lines of this paragraph and fix up whitespace at joins")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
@@ -178,6 +190,12 @@
         "Region as paragraph"
         #'fill-region-as-paragraph
         "Fill the region as if it were a single paragraph")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Region as paragraph ⤶"
+        #'fill-region-as-paragraph-semlf
+        "Fill the region using semantic linefeeds as if it were a single paragraph")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
