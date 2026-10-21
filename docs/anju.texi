@@ -1070,9 +1070,15 @@ Fill (@code{anju-fill-text-menu})
 @item
 Paragraph (@code{fill-paragraph})
 @item
+Paragraph ⤶ (@code{fill-paragraph-semlf}) (Only Emacs 31.1+)
+@item
+Unfill Paragraph (@code{unfill-paragraph})
+@item
 Region (@code{fill-region})
 @item
 Region as paragraph (@code{fill-region-as-paragraph})
+@item
+Region as paragraph ⤶ (@code{fill-region-as-paragraph-semlf}) (Only Emacs 31.1+)
 @item
 Individual paragraphs (@code{fill-individual-paragraphs})
 @item

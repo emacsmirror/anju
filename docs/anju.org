@@ -689,8 +689,11 @@ The menu hierarchy of the *Text* menu is described below with the actual command
 
 - Fill (~anju-fill-text-menu~)
   - Paragraph (~fill-paragraph~)
+  - Paragraph ⤶ (~fill-paragraph-semlf~) (Only Emacs 31.1+)
+  - Unfill Paragraph (~unfill-paragraph~)
   - Region (~fill-region~)
   - Region as paragraph (~fill-region-as-paragraph~)
+  - Region as paragraph ⤶ (~fill-region-as-paragraph-semlf~) (Only Emacs 31.1+)
   - Individual paragraphs (~fill-individual-paragraphs~)
   - Non-uniform paragraphs (~fill-nonuniform-paragraphs~)
 
