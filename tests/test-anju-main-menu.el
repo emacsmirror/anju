@@ -686,7 +686,7 @@ leaving just one")
   (anju-test-keymap
    kmap
    "Macro Recorder"
-   14
+   15
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -742,6 +742,12 @@ leaving just one")
         "Edit last"
         #'kmacro-edit-macro
         "As edit last keyboard macro, but without kmacro-repeat property")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Set counter…"
+        #'kmacro-set-counter
+        "Prompt for value of `kmacro-counter'")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))
