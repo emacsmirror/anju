@@ -973,6 +973,8 @@ Number (counter)
 @item
 Window configuration
 @item
+Frameset
+@item
 Keyboard macro
 @end itemize
 
