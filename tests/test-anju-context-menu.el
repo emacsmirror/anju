@@ -296,11 +296,17 @@
   (anju-test-context-menu-function
    #'anju-context-menu-dired
    "hi there"
-   6
+   7
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
         (seq-elt items i)
+        "Create Directory…"
+        #'dired-create-directory
+        "Create a directory called DIRECTORY")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
         (lambda () (format
                "%s “%s” View"
                (if (dired-subdir-hidden-p
