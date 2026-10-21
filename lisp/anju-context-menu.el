@@ -189,6 +189,12 @@ file names in the Dired buffer"])
 
     (when (not (dired-file-name-at-point))
       (easy-menu-add-item menu nil
+                          [dired-create-directory
+                           dired-create-directory
+                           :label "Create Directory…"
+                           :help "Create a directory called DIRECTORY"])
+
+      (easy-menu-add-item menu nil
                           [dired-hide-subdir
                            dired-hide-subdir
                            :label (format
