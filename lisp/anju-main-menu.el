@@ -563,6 +563,12 @@ Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
      :enable (and (not defining-kbd-macro) last-kbd-macro)
      :help "As edit last keyboard macro, but without kmacro-repeat property"]
 
+    [kmacro-set-counter
+     kmacro-set-counter
+     :label "Set counter…"
+     :enable (not defining-kbd-macro)
+     :help "Prompt for value of `kmacro-counter'"]
+
     [kmacro-step-edit-macro
      kmacro-step-edit-macro
      :label "Step edit macro…"
