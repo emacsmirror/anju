@@ -44,7 +44,7 @@
          (anju-test-keymap
           kmap
           "Store"
-          14
+          15
           (lambda (items)
             (let ((i 0))
               (anju-test-menu-item
@@ -110,6 +110,12 @@
                "Window Configuration…"
                #'window-configuration-to-register
                "Store the window configuration of the selected frame in REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Frameset…"
+               #'frameset-to-register
+               "Store the current frameset in register REGISTER.")
 
               (anju-test-menu-item
                (seq-elt items (cl-incf i))

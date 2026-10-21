@@ -315,6 +315,8 @@ This function is intended to be used in
      "--"
      ["Window Configuration…" window-configuration-to-register
       :help "Store the window configuration of the selected frame in REGISTER"]
+     ["Frameset…" frameset-to-register
+      :help "Store the current frameset in register REGISTER."]
      "--"
      ["Keyboard Macro…" kmacro-to-register
       :help "Store the last keyboard macro in register R"])

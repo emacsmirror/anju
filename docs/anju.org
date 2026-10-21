@@ -631,6 +631,7 @@ Anju adds a *Registers* menu to the menu bar to work with Emacs registers ([[inf
 - Cursor position (point)
 - Number (counter)
 - Window configuration
+- Frameset
 - Keyboard macro
 
 This modification is optional. For more detail, see [[#registers-menu-customization][Registers Menu Customization]].
