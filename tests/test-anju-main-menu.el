@@ -44,7 +44,7 @@
          (anju-test-keymap
           kmap
           "Store"
-          14
+          15
           (lambda (items)
             (let ((i 0))
               (anju-test-menu-item
@@ -110,6 +110,12 @@
                "Window Configuration…"
                #'window-configuration-to-register
                "Store the window configuration of the selected frame in REGISTER")
+
+              (anju-test-menu-item
+               (seq-elt items (cl-incf i))
+               "Frameset…"
+               #'frameset-to-register
+               "Store the current frameset in register REGISTER.")
 
               (anju-test-menu-item
                (seq-elt items (cl-incf i))
@@ -638,7 +644,7 @@ leaving just one")
     (anju-test-keymap
      fill-map
      "Fill"
-     5
+     8
      (lambda (items)
        (let ((i 0))
          (anju-test-menu-item
@@ -646,6 +652,18 @@ leaving just one")
           "Paragraph"
           #'fill-paragraph
           "Fill paragraph at or after point")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Paragraph ⤶"
+          #'fill-paragraph-semlf
+          "Fill paragraph at or after point using semantic linefeeds")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Unfill Paragraph"
+          #'unfill-paragraph
+          "Join lines of this paragraph and fix up whitespace at joins")
 
          (anju-test-menu-item
           (seq-elt items (cl-incf i))
@@ -658,6 +676,12 @@ leaving just one")
           "Region as paragraph"
           #'fill-region-as-paragraph
           "Fill the region as if it were a single paragraph")
+
+         (anju-test-menu-item
+          (seq-elt items (cl-incf i))
+          "Region as paragraph ⤶"
+          #'fill-region-as-paragraph-semlf
+          "Fill the region using semantic linefeeds as if it were a single paragraph")
 
          (anju-test-menu-item
           (seq-elt items (cl-incf i))
@@ -680,7 +704,7 @@ leaving just one")
   (anju-test-keymap
    kmap
    "Macro Recorder"
-   14
+   15
    (lambda (items)
      (let ((i 0))
        (anju-test-menu-item
@@ -736,6 +760,12 @@ leaving just one")
         "Edit last"
         #'kmacro-edit-macro
         "As edit last keyboard macro, but without kmacro-repeat property")
+
+       (anju-test-menu-item
+        (seq-elt items (cl-incf i))
+        "Set counter…"
+        #'kmacro-set-counter
+        "Prompt for value of `kmacro-counter'")
 
        (anju-test-menu-item
         (seq-elt items (cl-incf i))

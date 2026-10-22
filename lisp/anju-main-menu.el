@@ -315,6 +315,8 @@ This function is intended to be used in
      "--"
      ["Window Configuration…" window-configuration-to-register
       :help "Store the window configuration of the selected frame in REGISTER"]
+     ["Frameset…" frameset-to-register
+      :help "Store the current frameset in register REGISTER."]
      "--"
      ["Keyboard Macro…" kmacro-to-register
       :help "Store the last keyboard macro in register R"])
@@ -560,6 +562,12 @@ Auto rescan `imenu-auto-rescan' is enabled for all affected modes."
      :label "Edit last"
      :enable (and (not defining-kbd-macro) last-kbd-macro)
      :help "As edit last keyboard macro, but without kmacro-repeat property"]
+
+    [kmacro-set-counter
+     kmacro-set-counter
+     :label "Set counter…"
+     :enable (not defining-kbd-macro)
+     :help "Prompt for value of `kmacro-counter'"]
 
     [kmacro-step-edit-macro
      kmacro-step-edit-macro

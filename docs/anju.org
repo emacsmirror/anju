@@ -6,7 +6,7 @@
 #+EMAIL: kickingvegas@gmail.com
 #+OPTIONS: ':t toc:t author:t email:t H:4 f:t
 #+LANGUAGE: en
-#+MACRO: version 1.8.1
+#+MACRO: version 1.8.2-rc.1
 #+MACRO: kbd (eval (org-texinfo-kbd-macro $1))
 #+TEXINFO_FILENAME: anju.info
 #+TEXINFO_CLASS: casual
@@ -631,6 +631,7 @@ Anju adds a *Registers* menu to the menu bar to work with Emacs registers ([[inf
 - Cursor position (point)
 - Number (counter)
 - Window configuration
+- Frameset
 - Keyboard macro
 
 This modification is optional. For more detail, see [[#registers-menu-customization][Registers Menu Customization]].
@@ -688,8 +689,11 @@ The menu hierarchy of the *Text* menu is described below with the actual command
 
 - Fill (~anju-fill-text-menu~)
   - Paragraph (~fill-paragraph~)
+  - Paragraph ⤶ (~fill-paragraph-semlf~) (Only Emacs 31.1+)
+  - Unfill Paragraph (~unfill-paragraph~)
   - Region (~fill-region~)
   - Region as paragraph (~fill-region-as-paragraph~)
+  - Region as paragraph ⤶ (~fill-region-as-paragraph-semlf~) (Only Emacs 31.1+)
   - Individual paragraphs (~fill-individual-paragraphs~)
   - Non-uniform paragraphs (~fill-nonuniform-paragraphs~)
 
@@ -1365,3 +1369,7 @@ Index for this user guide.
 :END:
 
 Variables, functions, commands, and menus referenced by this user guide.
+
+# Local Variables:
+# burnish-backend: kvtexinfo
+# End:

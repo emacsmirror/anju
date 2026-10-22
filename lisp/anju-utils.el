@@ -311,6 +311,14 @@ conform to extent <= (max/2) - 2"
     ["Paragraph" fill-paragraph
      :help "Fill paragraph at or after point"]
 
+    ["Paragraph ⤶" fill-paragraph-semlf
+     :visible (fboundp #'fill-paragraph-semlf)
+     :help "Fill paragraph at or after point using semantic linefeeds"]
+
+    ["Unfill Paragraph" unfill-paragraph
+     :visible (fboundp #'unfill-paragraph)
+     :help "Join lines of this paragraph and fix up whitespace at joins"]
+
     ["Region" fill-region
      :enable (use-region-p)
      :help "Fill each of the paragraphs in the region"]
@@ -318,6 +326,10 @@ conform to extent <= (max/2) - 2"
     ["Region as paragraph" fill-region-as-paragraph
      :enable (use-region-p)
      :help "Fill the region as if it were a single paragraph"]
+
+    ["Region as paragraph ⤶" fill-region-as-paragraph-semlf
+     :enable (and (fboundp #'fill-paragraph-semlf) (use-region-p))
+     :help "Fill the region using semantic linefeeds as if it were a single paragraph"]
 
     ["Individual paragraphs" fill-individual-paragraphs
      :enable (use-region-p)
